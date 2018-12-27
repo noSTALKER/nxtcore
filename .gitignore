@@ -1,5 +1,4 @@
 build/
-SenseGUI.pro
 .vscode/
-SenseGUI.pro.user
-build_local.sh
+.vs/
+
