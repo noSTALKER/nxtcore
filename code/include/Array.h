@@ -1,6 +1,7 @@
 #pragma once
 
 #include <iterator>
+#include <memory>
 
 namespace nxt {
 namespace core {
@@ -84,7 +85,7 @@ public:
     T data_[N];
 };
 
-template<class T, std::size_t Size>
+template<class T>
 class ConstArrayIterator {
 public:
     using difference_type = std::ptrdiff_t;
