@@ -28,7 +28,5 @@ private:
     Node* root_node_;
 };
 
-std::allocator_traits<std::allocator>::c
-
 }
 }
