@@ -1,9 +1,22 @@
-#include "../include/TypeTraits.h"
-#include "../include/Array.h"
-#include <vector>
+#include <type_traits>
+#include <string>
+
+class A {
+public:
+    A() = default;
+    int a;
+};
+
+class B : public A {
+public:
+    constexpr B() : A() {}
+};
 
 void
 main() {
-    std::vector<int, std::allocator<int>> array;
-    constexpr auto value = nxt::core::IsTemplateInstanceOf<std::vector, decltype(array)>::value;
+    constexpr auto is_nothrow_a = std::is_default_constructible_v<A>;
+    constexpr auto is_nothrow_b = std::is_default_constructible_v<B>;
+    constexpr B b;
+    constexpr auto a = b.a;
+    
 }
