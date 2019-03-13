@@ -14,21 +14,41 @@ Equals(const T& comp) {
     return [comp](const T& value) { return comp = value; };
 }
 
-template<typename F1, typename F2>
-constexpr auto
-Compose(F1 f1, F2 f2) {
-    return [f1, f2](const auto& value) { return f1(f2(value)); };
-}
-
 template<typename... Predicates>
 constexpr auto
 WhenAll(Predicates... ps) {
     return [=](const auto& value) { return (ps(value) && ...); };
 }
 
-constexpr int
-increment(int x) {
-    return x + 1;
+template<typename... Predicates>
+constexpr auto
+WhenAny(Predicates... ps) {
+    return [=](const auto& value) { return (ps(value) || ...); };
+}
+
+
+template<typename... Predicates>
+constexpr auto
+WhenNone(Predicates... ps) {
+    return [=](const auto& value) { return !(ps(value) && ...); };
+}
+
+template<typename F, typename ... Funcs>
+constexpr auto
+Compose(F f, Funcs ...funcs) {
+    return [ = ](const auto& value) {
+        return f(Compose(funcs...)(value));
+        
+    };
+}
+
+template<typename F>
+constexpr auto
+Compose(F f) {
+    return [ = ](const auto& value) {
+        return f(value);
+        
+    };
 }
 
 }  // namespace core
