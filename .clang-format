@@ -13,7 +13,7 @@ BinPackParameters : false
 BreakBeforeTernaryOperators : true
 BreakConstructorInitializers : BeforeComma
 
-#BreakInheritanceList : BeforeComma
+BreakInheritanceList : BeforeComma
 
 CompactNamespaces : false
 ConstructorInitializerAllOnOneLineOrOnePerLine : false
@@ -34,13 +34,12 @@ SpaceAfterCStyleCast : false
 SpaceAfterTemplateKeyword : false
 SpaceBeforeAssignmentOperators : true
 
-#SpaceBeforeCpp11BracedList : false
-#SpaceBeforeCtorInitializerColon : true
-#SpaceBeforeInheritanceColon : true
+SpaceBeforeCpp11BracedList : false
+SpaceBeforeCtorInitializerColon : true
+SpaceBeforeInheritanceColon : true
 
 SpaceBeforeParens : ControlStatements
-
-#SpaceBeforeRangeBasedForLoopColon : false
+SpaceBeforeRangeBasedForLoopColon : false
 
 SpaceInEmptyParentheses : false
 SpacesInAngles : false
