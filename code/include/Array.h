@@ -6,14 +6,10 @@
 namespace nxt {
 namespace core {
 
-/**
-
-*/
-template<typename T, std::size_t Size>
+template<class T, std::size_t Size>
 class Array {
 public:
-    static_assert(Size > 0, "Can't create a array with size 0, it leads to undefined behaviour");
-
+    using difference_type = std::ptrdiff_t;
     using value_type = T;
     using size_type = std::size_t;
     using reference = value_type&;
@@ -108,7 +104,7 @@ public:
         return (data_ + Size);
     }
 
-    T data_[N];
+    T data_[Size];
 };
 
 }  // namespace core
