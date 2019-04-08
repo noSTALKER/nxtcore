@@ -26,30 +26,27 @@ WhenAny(Predicates... ps) {
     return [=](const auto& value) { return (ps(value) || ...); };
 }
 
-
 template<typename... Predicates>
 constexpr auto
 WhenNone(Predicates... ps) {
     return [=](const auto& value) { return !(ps(value) && ...); };
 }
 
-template<typename F, typename ... Funcs>
+template<typename F, typename... Funcs>
 constexpr auto
-Compose(F f, Funcs ...funcs) {
-    return [ = ](const auto& value) {
+Compose(F f, Funcs... funcs) {
+    return [=](const auto& value) {
         return f(Compose(funcs...)(value));
-        
     };
 }
 
 template<typename F>
 constexpr auto
 Compose(F f) {
-    return [ = ](const auto& value) {
+    return [=](const auto& value) {
         return f(value);
-        
     };
 }
 
 }  // namespace core
-}  // namespace ess
+}  // namespace nxt

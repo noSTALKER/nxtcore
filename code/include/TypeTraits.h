@@ -1,8 +1,6 @@
 #pragma once
 
 #include <type_traits>
-#include <vector>
-#include <atomic>
 
 namespace nxt {
 namespace core {
@@ -76,6 +74,9 @@ struct ReplaceFirstTemplateParameter<U<First, Args...>, Replace> {
 
 template<typename U, typename Replace>
 using ReplaceFirstTemplateParameterT = typename ReplaceFirstTemplateParameter<U, Replace>::type;
+
+template<typename T>
+using IsIteratorV = typename IsIterator<T>::value;
 
 }  // namespace core
 }  // namespace nxt
