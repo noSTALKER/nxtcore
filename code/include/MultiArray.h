@@ -2,12 +2,12 @@
 #include <iostream>
 
 template <typename T, size_t... Ns>
-class multi_array;
+class MultiArray;
 
 template <typename T, size_t N0, size_t... Ns>
-class multi_array<T, N0, Ns...> {
+class MultiArray<T, N0, Ns...> {
 public:
-    using internal_type = typename std::array<multi_array<T, Ns...>, N0>;
+    using internal_type = typename std::array<MultiArray<T, Ns...>, N0>;
     using reference = typename internal_type::reference;
     using const_reference = typename internal_type::const_reference;
 
@@ -36,7 +36,7 @@ private:
 };
 
 template <typename T, size_t N0>
-class multi_array<T, N0> {
+class MultiArray<T, N0> {
 public:
     using internal_type = typename std::array<T, N0>;
     using reference = typename internal_type::reference;
