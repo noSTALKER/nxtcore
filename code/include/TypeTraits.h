@@ -9,8 +9,8 @@ namespace core {
 template<template<typename...> typename U, typename T>
 struct IsTemplateInstanceOf : std::false_type {};
 
-template<template<typename...> typename U, typename... args>
-struct IsTemplateInstanceOf<U, U<args...>> : std::true_type {};
+template<template<typename...> typename U, typename... Args>
+struct IsTemplateInstanceOf<U, U<Args...>> : std::true_type {};
 
 template<typename T, typename = void>
 struct IsIterator : std::false_type {};
