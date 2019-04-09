@@ -1,26 +1,140 @@
 #pragma once
-#include <list>
+#include <type_traits>
+#include <iterator>
 
 namespace nxt {
 namespace core {
 
+template<typename List>
+class ConstListIterator {
+public:
+    using node_type = typename List::node_type;
+    using value_type = typename List::value_type;
+    using difference_type = typename List::difference_type;
+    using pointer = typename List::const_pointer;
+    using reference = typename List::const_reference;
+    using const_reference = typename List::const_reference;
+    using iterator_category = std::bidirectional_iterator_tag;
+
+    ConstListIterator(List* list, node_type* node)
+        : list_(list)
+        , node_(node) {}
+
+    ConstListIterator& operator++() noexcept {
+        node_ = node_->next;
+        return *this;
+    }
+
+    ConstListIterator operator++(int) noexcept {
+        ConstListIterator temp = ConstListIterator(list_, node_);
+        node_ = node_->next;
+        return temp;
+    }
+
+    ConstListIterator& operator--() noexcept {
+        node_ = node_->previous;
+        return *this;
+    }
+
+    ConstListIterator operator--(int) noexcept {
+        ConstListIterator temp = ConstListIterator(list_, node_);
+        node_ = node_->previous;
+        return temp;
+    }
+
+    [[nodiscard]] reference operator*() const noexcept {
+        return node_->value;
+    }
+
+    [[nodiscard]] pointer operator->() const noexcept {
+        return pointer_traits<pointer>::pointer_to(node->value);
+    }
+
+    [[nodiscard]] bool operator==(const ConstListIterator& rhs) const noexcept {
+        return node_ == rhs->node_;
+    }
+
+    [[nodiscard]] bool operator!=(const ConstListIterator& rhs) const noexcept {
+        return node_ != rhs->node_;
+    }
+
+protected:
+    List* list_;
+    node_type* node_;
+
+    friend class List;
+};
+
+template<typename List>
+class ListIterator : public ConstListIterator<List> {
+public:
+    using node_type = typename List::node_type;
+    using value_type = typename List::value_type;
+    using difference_type = typename List::difference_type;
+    using pointer = typename List::pointer;
+    using reference = typename List::reference;
+    using iterator_category = std::bidirectional_iterator_tag;
+
+    ListIterator(List* list, node_type* node)
+        : ConstListIterator<List>(list, node) {}
+
+    ListIterator& operator++() noexcept {
+        node_ = node_->next;
+        return *this;
+    }
+
+    ListIterator operator++(int) noexcept {
+        ListIterator temp = ListIterator(list_, node_);
+        node_ = node_->next;
+        return temp;
+    }
+
+    ListIterator& operator--() noexcept {
+        node_ = node_->previous;
+        return *this;
+    }
+
+    ListIterator operator--(int) noexcept {
+        ListIterator temp = ListIterator(list_, node_);
+        node_ = node_->previous;
+        return temp;
+    }
+
+    [[nodiscard]] reference operator*() const noexcept {
+        return node_->value;
+    }
+
+    [[nodiscard]] pointer operator->() const noexcept {
+        return pointer_traits<pointer>::pointer_to(node_->value);
+    }
+};
+
 template<typename T, typename Allocator = std::allocator<T>>
 class List {
 public:
-    class ListIterator;
-    class ConstListIterator;
+    struct Node;
+
+    using node_type = Node;
+    using node_allocator_type = typename std::allocator_traits<allocator_type>::template rebind<Node>;
+    using node_allocator_traits = std::allocator_traits<node_allocator_type>;
 
     using value_type = T;
-    using allocator_type = Allocator;
+    using allocator_type = std::allocator_traits<Allocator>::template rebind<value_type>;
     using allocator_traits = std::allocator_traits<allocator_type>;
     using size_type = std::allocator_traits<allocator_type>::size_type;
     using reference = T&;
     using const_reference = const T&;
-    using node_allocator_type = typename std::allocator_traits<allocator_type>::template rebind<Node>;
-    using node_allocator_traits = std::allocator_traits<node_allocator_type>;
+    using pointer = typename std::allocator_traits<allocator_type>::pointer;
+    using const_pointer = typename std::allocator_traits<allocator_type>::const_pointer;
 
-    using iterator = ListIterator;
-    using const_iterator = ConstListIterator;
+    using iterator = ListIterator<List>;
+    using const_iterator = ConstListIterator<List>;
+
+    struct Node {
+        Node* next;
+        Node* previous;
+        value_type value;
+    };
 
     List()
         : alloc_()
@@ -80,12 +194,6 @@ public:
     }
 
 private:
-    struct Node {
-        Node* next;
-        Node* previous;
-        value_type value;
-    };
-
     constructHeadNode() {
         head_ = node_allocator_traits::allocate(alloc_, 1);
         head_->next = head_;
@@ -97,7 +205,7 @@ private:
         auto previous_node = node;
         auto next_node = previous_node->next;
 
-        auto new_node = node_allocator::allocate(alloc_, 1);
+        auto new_node = node_allocator_traits::allocate(alloc_, 1);
         allocator_traits::construct(alloc_, std::addressof(new_node->value), std::forward<Args>(args)...);
 
         new_node->next = next_node;
@@ -105,6 +213,7 @@ private:
 
         next_node->previous = new_node;
         previous_node->next = new_node;
+        ++size_;
 
         return new_node;
     }
@@ -112,6 +221,9 @@ private:
     Node* head_;
     size_type size_;
     node_allocator_type alloc_;
+
+    friend class iterator;
+    friend class const_iterator;
 };
 }  // namespace core
 }  // namespace nxt

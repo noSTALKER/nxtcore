@@ -1,23 +1,23 @@
 #pragma once
+#include <iterator>
 #include <type_traits>
 
 namespace nxt {
 namespace core {
 template<typename T, typename Allocator = std::allocator<T>>
 class Vector {
-    using alloc_traits = typename std::allocator_traits<Allocator>;
-
 public:
     using value_type = T;
-    using size_type = typename alloc_traits::size_type;
-    using difference_type = typename alloc_traits::difference_type;
+    using allocator_type = std::allocator_traits<Allocator>::template rebind<value_type>;
+    using allocator_traits = typename std::allocator_traits<Allocator>;
+    using size_type = typename allocator_traits::size_type;
+    using difference_type = typename allocator_traits::difference_type;
     using reference = T&;
     using const_reference = const T&;
-    using pointer = typename alloc_traits::pointer;
-    using const_pointer = typename alloc_traits::const_pointer;
+    using pointer = typename allocator_traits::pointer;
+    using const_pointer = typename allocator_traits::const_pointer;
     using iterator = pointer;
     using const_iterator = const_pointer;
-    using allocator_type = Allocator;
 
     Vector() noexcept(std::is_noexcept_default_constructible_v<Allocator>)
         : size_(0)
@@ -33,7 +33,7 @@ public:
         return data_;
     }
 
-	[[nodiscard]] const_iterator cbegin() const noexcept {
+    [[nodiscard]] const_iterator cbegin() const noexcept {
         return data_;
     }
 
@@ -45,7 +45,7 @@ public:
         return data_ + size_;
     }
 
-	[[nodiscard]] const_iterator cend() const noexcept {
+    [[nodiscard]] const_iterator cend() const noexcept {
         return data_ + size_;
     }
 
@@ -65,7 +65,7 @@ public:
         return data_[position];
     }
 
-    [[nodiscard]] const_reference operator[](size_type position) {
+    [[nodiscard]] const_reference operator[](size_type position) const {
         return data_[position];
     }
 
@@ -77,4 +77,3 @@ private:
 };
 }  // namespace core
 }  // namespace nxt
-
