@@ -2,8 +2,13 @@
 
 #include "Key.h"
 
+#include <type_traits>
+#include <iterator>
+
 namespace nxt {
 namespace core {
+
+
 template<class T, class KeyType = Key, class Allocator = std::allocator<T>>
 class SlotMap {
 public:
@@ -20,7 +25,7 @@ public:
     using const_pointer = typename std::allocator_traits<Allocator>::const_pointer;
     using difference_type = typename std::allocator_traits<Allocator>::difference_type;
     using iterator = typename SlotMap<T, KeyType, Allocator>::SlotMapIterator;
-    using const_iterator typename SlotMap<T, KeyType, Allocator>::ConstSlotMapIterator;
+    using const_iterator = typename SlotMap<T, KeyType, Allocator>::ConstSlotMapIterator;
     using key_allocator = typename std::allocator_traits<Allocator>::template rebind_alloc<key_type>;
 
     SlotMap(size_type capacity = 1024)

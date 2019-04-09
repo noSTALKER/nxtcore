@@ -2,6 +2,8 @@
 #include <iterator>
 #include <type_traits>
 
+#include <vector>
+
 namespace nxt {
 namespace core {
 template<typename T, typename Allocator = std::allocator<T>>
