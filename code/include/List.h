@@ -1,6 +1,6 @@
 #pragma once
-#include <type_traits>
 #include <iterator>
+#include <type_traits>
 
 namespace nxt {
 namespace core {
@@ -193,6 +193,12 @@ public:
         return iterator(this, new_node);
     }
 
+    iterator erase(const_iterator position) {
+        auto node = position.ptr_;
+        auto next_node = eraseNode(node);
+        return iterator(this, next_node);
+	}
+
 private:
     constructHeadNode() {
         head_ = node_allocator_traits::allocate(alloc_, 1);
@@ -216,6 +222,24 @@ private:
         ++size_;
 
         return new_node;
+    }
+
+    Node* eraseNode(Node* node) {
+        if (node != head_) {
+            auto previous_node = node->previous;
+            auto next_node = node->next;
+
+            allocator_traits::destroy(alloc_, std::addressof(next_node->value));
+            node_allocator_traits::deallocate(alloc_, node, 1);
+
+			previous_node->next = next_node;
+            next_node->previous = previous_node;
+
+			return next_node;
+        }
+
+		return node;
+
     }
 
     Node* head_;
