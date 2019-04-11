@@ -1,5 +1,6 @@
 #pragma once
 #include <iterator>
+#include <list>
 #include <type_traits>
 
 namespace nxt {
@@ -134,12 +135,35 @@ public:
         Node* next;
         Node* previous;
         value_type value;
+
+        Node(const Node*) = delete;
+        Node& operator=(const Node*) = delete;
     };
 
     List()
         : alloc_()
         , size_type_(0) {
         constructHeadNode();
+    }
+
+    explicit List(const Allocator& alloc)
+        : alloc_(alloc)
+        , size_type_(0) {
+        constructHeadNode();
+    }
+
+    explicit List(size_type count, const Allocator& alloc = Allocator())
+        : alloc_(alloc)
+        , size_type_(0) {
+        constructHeadNode();
+        insertNode(head_, count);
+    }
+
+    List(size_type count, const value_type& value, const Allocator& alloc = Allocator())
+        : alloc_(alloc)
+        , size_type_(0) {
+        constructHeadNode();
+        insertNode(head_, count, value);
     }
 
     [[nodiscard]] bool empty() const noexcept {
@@ -197,7 +221,7 @@ public:
         auto node = position.ptr_;
         auto next_node = eraseNode(node);
         return iterator(this, next_node);
-	}
+    }
 
 private:
     constructHeadNode() {
@@ -212,7 +236,7 @@ private:
         auto next_node = previous_node->next;
 
         auto new_node = node_allocator_traits::allocate(alloc_, 1);
-        allocator_traits::construct(alloc_, std::addressof(new_node->value), std::forward<Args>(args)...);
+        node_allocator_traits::construct(alloc_, std::addressof(new_node->value), std::forward<Args>(args)...);
 
         new_node->next = next_node;
         new_node->previous = previous_node;
@@ -224,23 +248,57 @@ private:
         return new_node;
     }
 
-    Node* eraseNode(Node* node) {
+    template<typename... Args>
+    Node* insertNode(Node* node, size_type count, Args&&... args) {
+        auto previous_node = node;
+        auto next_node = previous_node->next;
+        bool added = false;
+
+        size_type i = count;
+        while (i) {
+            auto new_node = node_allocator_traits::allocate(alloc_, 1);
+            node_allocator_traits::construct(alloc_, std::addressof(new_node->value), std::forward<Args>(args)...);
+
+            new_node->previous_node = previous_node;
+            previous_node->next = new_node;
+
+            previous_node = new_node;
+            added = true;
+
+			++size_;
+
+            --i;
+        }
+
+        if (added) {
+            previous_node->next = next_node;
+            next_node->previous = previous_node;
+            return node->next;
+        } else {
+            return node;
+        }
+    }
+
+    Node* eraseNode(Node* node) noexcept {
         if (node != head_) {
             auto previous_node = node->previous;
             auto next_node = node->next;
 
-            allocator_traits::destroy(alloc_, std::addressof(next_node->value));
+            node_allocator_traits::destroy(alloc_, std::addressof(next_node->value));
             node_allocator_traits::deallocate(alloc_, node, 1);
 
-			previous_node->next = next_node;
+            previous_node->next = next_node;
             next_node->previous = previous_node;
 
-			return next_node;
+			--size_;
+
+            return next_node;
         }
 
-		return node;
-
+        return node;
     }
+
+	void clearList()
 
     Node* head_;
     size_type size_;
