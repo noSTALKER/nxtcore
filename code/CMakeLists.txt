@@ -11,4 +11,4 @@ file(GLOB NXTCORE_SOURCE_FILES ${NXTCORE_SOURCE_DIRECTORY}/src/*.cpp)
 source_group("Header Files"   FILES ${ESSCORE_HEADER_FILES})
 source_group("Source Files"   FILES ${ESSCORE_SOURCE_FILES})
 
-add_library(nxtcore SHARED ${NXTCORE_SOURCE_FILES} ${NXTCORE_HEADER_FILES})
+add_executable(nxtcore ${NXTCORE_SOURCE_FILES} ${NXTCORE_HEADER_FILES})

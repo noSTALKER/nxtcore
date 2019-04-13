@@ -15,7 +15,10 @@ template<typename T, typename = void>
 struct IsIterator : std::false_type {};
 
 template<typename T>
-struct IsIterator<T, std::void_t<std::iterator_traits<T>::iterator_category>> : std::true_type {};
+struct IsIterator<T, std::void_t<typename std::iterator_traits<T>::iterator_category>> : std::true_type {};
+
+template<typename T>
+constexpr auto IsIteratorV = typename IsIterator<T>::value;
 
 struct NoSuchClass {
     NoSuchClass() = delete;
@@ -46,13 +49,7 @@ template<typename Default, template<typename...> typename Op, typename... Args>
 using DetectedOr = Detection<Default, void, Op, Args...>;
 
 template<template <typename...> typename Op, typename... Args>
-using IsDetectedV = IsDetected<Op, Args...>::value;
-
-template<typename Default, template <typename...> typename Op, typename... Args>
-using IsDetectedT = DetectedOr<Default, Op, Args...>::type;
-
-template<typename Default>
-using IsDetectedSame = DetectedOr<Default, std::is_same_t, Default>;
+constexpr auto IsDetectedV = IsDetected<Op, Args...>::value;
 
 template<typename U> struct FirstTemplateParameter;
 
@@ -74,9 +71,6 @@ struct ReplaceFirstTemplateParameter<U<First, Args...>, Replace> {
 
 template<typename U, typename Replace>
 using ReplaceFirstTemplateParameterT = typename ReplaceFirstTemplateParameter<U, Replace>::type;
-
-template<typename T>
-using IsIteratorV = typename IsIterator<T>::value;
 
 }  // namespace core
 }  // namespace nxt
