@@ -51,6 +51,15 @@ using DetectedOr = Detection<Default, void, Op, Args...>;
 template<template <typename...> typename Op, typename... Args>
 constexpr auto IsDetectedV = IsDetected<Op, Args...>::value;
 
+template<typename Default, template<typename...> typename Op, typename... Args>
+using DetectedOrT = DetectedOr<Default, Op, Args...>::type;
+
+template<typename Expected, template<typename...> typename Op, typename... Args>
+using IsDetectedExact = std::is_same<Expected, DetectedT<Op, Args...>>;
+
+template<typename Expected, template<typename...> typename Op, typename... Args>
+constexpr auto IsDetectedExactV = IsDetectedExact<Expected, Op, Args...>::value;
+
 template<typename U> struct FirstTemplateParameter;
 
 template<template<typename...> typename U, typename First, typename... Args>
