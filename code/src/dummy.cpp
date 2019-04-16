@@ -1,8 +1,9 @@
 #include <array>
 #include <iostream>
-#include "../include/List.h"
-#include "../include/Vector.h"
 #include "../include/CompressedPair.h"
+#include "../include/List.h"
+#include "../include/Sort.h"
+#include "../include/Vector.h"
 
 int
 main() {
@@ -32,15 +33,17 @@ main() {
         std::cout << value << '\n';
     }
 
-    nxt::core::Vector<int> vector;
-    vector.pushBack(0);
+    nxt::core::List<int> vector;
+    vector.pushBack(3);
     vector.pushBack(1);
     vector.pushBack(2);
-    vector.pushBack(3);
+    vector.pushBack(4);
+    vector.pushBack(0);
 
+    nxt::core::insertionSort(vector.begin(), vector.end());
 
-	std::cout << "vector :\n"; 
-	for (auto value : vector) {
+    std::cout << "vector :\n";
+    for (auto value : vector) {
         std::cout << value << '\n';
     }
 
