@@ -40,7 +40,16 @@ main() {
     vector.pushBack(4);
     vector.pushBack(0);
 
-    nxt::core::insertionSort(vector.begin(), vector.end());
+    int test_again[] = {-1, 2, 52, 13, 0, -10, 6};
+
+    nxt::core::insertionSort(std::begin(test_again), std::end(test_again));
+
+    std::cout << "vector :\n";
+    for (auto value : test_again) {
+        std::cout << value << '\n';
+    }
+
+    nxt::core::insertionSort(vector.begin(), vector.end(), std::greater<>());
 
     std::cout << "vector :\n";
     for (auto value : vector) {
