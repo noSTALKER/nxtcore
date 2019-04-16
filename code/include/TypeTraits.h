@@ -18,7 +18,65 @@ template<typename T>
 struct IsIterator<T, std::void_t<typename std::iterator_traits<T>::iterator_category>> : std::true_type {};
 
 template<typename T>
-constexpr auto IsIteratorV = typename IsIterator<T>::value;
+constexpr auto IsIteratorV = IsIterator<T>::value;
+
+template<typename T, typename = void>
+struct IsOutputIterator : std::false_type {};
+
+template<typename T>
+struct IsOutputIterator<
+    T,
+    std::enable_if_t<std::is_base_of_v<std::output_iterator_tag, typename std::iterator_traits<T>::iterator_category>>>
+    : std::true_type {};
+
+template<typename T>
+constexpr auto IsOutputIteratorV = IsOutputIterator<T>::value;
+
+template<typename T, typename = void>
+struct IsInputIterator : std::false_type {};
+
+template<typename T>
+struct IsInputIterator<
+    T,
+    std::enable_if_t<std::is_base_of_v<std::input_iterator_tag, typename std::iterator_traits<T>::iterator_category>>>
+    : std::true_type {};
+
+template<typename T>
+constexpr auto IsInputIteratorV = IsInputIterator<T>::value;
+
+template<typename T,
+         typename = void>
+struct IsForwardIterator : std::false_type {};
+
+template<typename T>
+struct IsForwardIterator<T, std::enable_if_t<std::is_base_of_v<std::forward_iterator_tag, typename std::iterator_traits<T>::iterator_category>>> : std::true_type {};
+
+template<typename T>
+constexpr auto IsForwardIteratorV = IsForwardIterator<T>::value;
+
+template<typename T, typename = void>
+struct IsBidirectionalIterator : std::false_type {};
+
+template<typename T>
+struct IsBidirectionalIterator<
+    T,
+    std::enable_if_t<std::is_base_of_v<std::bidirectional_iterator_tag, typename std::iterator_traits<T>::iterator_category>>>
+    : std::true_type {};
+
+template<typename T>
+constexpr auto IsBidirectionalIteratorV = IsBidirectionalIterator<T>::value;
+
+template<typename T, typename = void>
+struct IsRandomAccessIterator : std::false_type {};
+
+template<typename T>
+struct IsRandomAccessIterator<T,
+                               std::enable_if_t<std::is_base_of_v<std::random_access_iterator_tag,
+                                                                  typename std::iterator_traits<T>::iterator_category>>>
+    : std::true_type {};
+
+template<typename T>
+constexpr auto IsRandomAccessIteratorV = IsRandomAccessIterator<T>::value;
 
 struct NoSuchClass {
     NoSuchClass() = delete;
@@ -48,7 +106,7 @@ using IsDetected = typename Detection<NoSuchClass, void, Op, Args...>::value_t;
 template<typename Default, template<typename...> typename Op, typename... Args>
 using DetectedOr = Detection<Default, void, Op, Args...>;
 
-template<template <typename...> typename Op, typename... Args>
+template<template<typename...> typename Op, typename... Args>
 constexpr auto IsDetectedV = IsDetected<Op, Args...>::value;
 
 template<typename Default, template<typename...> typename Op, typename... Args>
@@ -60,7 +118,8 @@ using IsDetectedExact = std::is_same<Expected, DetectedT<Op, Args...>>;
 template<typename Expected, template<typename...> typename Op, typename... Args>
 constexpr auto IsDetectedExactV = IsDetectedExact<Expected, Op, Args...>::value;
 
-template<typename U> struct FirstTemplateParameter;
+template<typename U>
+struct FirstTemplateParameter;
 
 template<template<typename...> typename U, typename First, typename... Args>
 struct FirstTemplateParameter<U<First, Args...>> {

@@ -23,6 +23,9 @@ main() {
     std::array test = {20, 20, 20};
 
     constexpr auto value = nxt::core::IsIteratorV<decltype(test.begin())>;
+    constexpr auto test2 = nxt::core::IsForwardIteratorV<int*>;
+    constexpr auto test3 = nxt::core::IsForwardIteratorV<int>;
+    constexpr auto test4 = nxt::core::IsForwardIteratorV<decltype(list.begin())>;
     list.insert(list.end(), {20, 30, 40});
 
     for (auto value : list) {

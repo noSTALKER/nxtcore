@@ -9,15 +9,15 @@ namespace nxt {
 namespace core {
 
 
-template<class T, class KeyType = Key, class Allocator = std::allocator<T>>
+template<class T, class KeyType = Key, std::size_t BlockSize = 1024, Allocator = std::allocator<T>>
 class SlotMap {
 public:
     class SlotMapIterator;
     class ConstSlotMapIterator;
 
-    using allocator = Allocator;
+	using value_type = T;
+    using allocator_type = typename std::allocator_traits<Allocator>::template rebind_alloc<value_type>;
     using size_type = typename KeyType::index_type;
-    using value_type = T;
     using key_type = KeyType;
     using reference = T&;
     using const_reference = const T&;
@@ -27,8 +27,10 @@ public:
     using iterator = typename SlotMap<T, KeyType, Allocator>::SlotMapIterator;
     using const_iterator = typename SlotMap<T, KeyType, Allocator>::ConstSlotMapIterator;
     using key_allocator = typename std::allocator_traits<Allocator>::template rebind_alloc<key_type>;
+	
+	static constexpr auto block_size = BlockSize;
 
-    SlotMap(size_type capacity = 1024)
+    SlotMap(size_type capacity = block_size)
         : size_(0)
         , free_index_(0)
         , capacity_(capacity) {
@@ -255,11 +257,9 @@ private:
         return static_cast<SizeType>(data_.Size());
     }
 
-	Vector<Key, KeyAllocator> next_;
-    T* data_;
+    Vector<Block, BlockAllocator> blocks_;
     size_type size_;
     size_type free_index_;
-    size_type capacity_;
 
     friend class SlotMapIterator;
     friend class ConstSlotMapIterator;

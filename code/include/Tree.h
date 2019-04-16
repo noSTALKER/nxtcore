@@ -30,17 +30,25 @@ public:
     bool insert(const T& value);
     bool insert(T&& value);
 
-    template<Args args...>
-    bool emplace(Args&&... args)
+    template<typename Args...>
+	bool emplace(Args&& ... args) {
+
+	}
 
 private:
     struct Node {
         T value;
+        Node* parent;
         Node* left_child;
         Node* right_child;
+
     };
 
     Node* root_node_;
+    Node* leftmost_node_;
+    Node* rightmost_node_;
+    size_type size_;
+    node_allocator_type alloc_;
 };
 
 }
