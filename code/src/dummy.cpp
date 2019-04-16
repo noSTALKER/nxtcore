@@ -2,6 +2,7 @@
 #include <iostream>
 #include "../include/List.h"
 #include "../include/Vector.h"
+#include "../include/CompressedPair.h"
 
 int
 main() {
