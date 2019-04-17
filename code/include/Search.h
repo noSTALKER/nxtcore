@@ -38,6 +38,35 @@ template<typename ForwardIter,
          typename T,
          typename Compare,
          typename = std::enable_if_t<IsForwardIteratorV<ForwardIter>>>
+constexpr ForwardIter
+upperBound(ForwardIter first, ForwardIter last, const T& value, Compare comp) {
+    auto distance = std::distance(first, last);
+
+    while (distance > 0) {
+        auto step = distance / 2;
+        auto mid = std::next(first, step);
+        if (comp(value, *mid)) {
+            distance = step;
+        } else {
+            ++mid;
+            first = mid;
+            distance -= step + 1;
+        }
+    }
+
+    return first;
+}
+
+template<typename ForwardIter, typename T, typename = std::enable_if_t<IsForwardIteratorV<ForwardIter>>>
+constexpr ForwardIter
+upperBound(ForwardIter first, ForwardIter last, const T& value) {
+    return upperBound(first, last, value, std::less<>());
+}
+
+template<typename ForwardIter,
+         typename T,
+         typename Compare,
+         typename = std::enable_if_t<IsForwardIteratorV<ForwardIter>>>
 constexpr bool
 binarySearch(ForwardIter first, ForwardIter last, const T& value, Compare comp) {
 	// get the lower bound which is the first element not less than value

@@ -1,10 +1,11 @@
 #include <array>
 #include <iostream>
+#include <algorithm>
 #include "../include/CompressedPair.h"
 #include "../include/List.h"
+#include "../include/Search.h"
 #include "../include/Sort.h"
 #include "../include/Vector.h"
-#include "../include/Search.h"
 
 int
 main() {
@@ -28,6 +29,8 @@ main() {
     constexpr auto test2 = nxt::core::IsForwardIteratorV<int*>;
     constexpr auto test3 = nxt::core::IsForwardIteratorV<int>;
     constexpr auto test4 = nxt::core::IsForwardIteratorV<decltype(list.begin())>;
+
+	//std::upper_bound
     list.insert(list.end(), {20, 30, 40});
 
     for (auto value : list) {
@@ -50,8 +53,9 @@ main() {
         std::cout << value << '\n';
     }
 
-	std::cout << "search :\n";
-	std::cout << *nxt::core::lowerBound(std::begin(test_again), std::end(test_again), 12) << std::endl;
+    std::cout << "search :\n";
+    std::cout << *nxt::core::lowerBound(std::begin(test_again), std::end(test_again), 12) << std::endl;
+    std::cout << *nxt::core::upperBound(std::begin(test_again), std::end(test_again), 12) << std::endl;
     std::cout << nxt::core::binarySearch(std::begin(test_again), std::end(test_again), 13) << std::endl;
     std::cout << nxt::core::binarySearch(std::begin(test_again), std::end(test_again), 12) << std::endl;
 
