@@ -4,6 +4,7 @@
 #include "../include/List.h"
 #include "../include/Sort.h"
 #include "../include/Vector.h"
+#include "../include/Search.h"
 
 int
 main() {
@@ -48,6 +49,11 @@ main() {
     for (auto value : test_again) {
         std::cout << value << '\n';
     }
+
+	std::cout << "search :\n";
+	std::cout << *nxt::core::lowerBound(std::begin(test_again), std::end(test_again), 12) << std::endl;
+    std::cout << nxt::core::binarySearch(std::begin(test_again), std::end(test_again), 13) << std::endl;
+    std::cout << nxt::core::binarySearch(std::begin(test_again), std::end(test_again), 12) << std::endl;
 
     nxt::core::insertionSort(vector.begin(), vector.end(), std::greater<>());
 
