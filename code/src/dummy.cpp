@@ -67,5 +67,16 @@ main() {
         std::cout << value << '\n';
     }
 
+	std::array merge1 = {1, 3, 5, 7};
+    std::array merge2 = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+    std::array<int, 15> result = {};
+
+	nxt::core::merge(merge1.begin(), merge1.end(), merge2.begin(), merge2.end(), result.begin(), std::less<>());
+
+	std::cout << "Merge Result :\n";
+        for (auto value : result) {
+            std::cout << value << '\n';
+        }
+
     return 0;
 }

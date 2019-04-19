@@ -80,14 +80,14 @@ partition(BiDirectionalIter first, BiDirectionalIter last, Compare comp) {
                 return lower;
             }
 
-			if (comp(*lower))
+            if (comp(*lower)) {
                 break;
+            }
 
             ++lower;
-            
         }
 
-		//do always decreases higher so it avoids dereferencing last and does decrement after a swap
+        // do always decreases higher so it avoids dereferencing last and does decrement after a swap
         do {
             --higher;
             if (lower == higher) {
@@ -97,14 +97,43 @@ partition(BiDirectionalIter first, BiDirectionalIter last, Compare comp) {
 
         using std::swap;
 
-		//swap the element that are out of order
+        // swap the element that are out of order
         swap(*lower, *higher);
 
-		//increment lower to next element. note higher is decreased in start of do-while loop
+        // increment lower to next element. note higher is decreased in start of do-while loop
         ++lower;
     }
 
     return lower;
 }
 
+template<typename InputIter1, typename InputIter2, typename OutputIter, typename Compare>
+constexpr OutputIter
+merge(InputIter1 first1, InputIter1 last1, InputIter2 first2, InputIter2 last2, OutputIter outputIter, Compare comp) {
+    while (first1 != last1 && first2 != last2) {
+        // order of comparision is important for stable merge
+        if (comp(*first2, *first1)) {
+            *outputIter = *first2;
+            ++first2;
+        } else {
+            *outputIter = *first1;
+            ++first1;
+        }
+        ++outputIter;
+    }
+
+    while (first1 != last1) {
+        *outputIter = *first1;
+        ++first1;
+        ++outputIter;
+    }
+
+    while (first2 != last2) {
+        *outputIter = *first2;
+        ++first2;
+        ++outputIter;
+    }
+
+    return outputIter;
+}
 }  // namespace nxt::core
