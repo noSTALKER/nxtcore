@@ -70,19 +70,21 @@ template<typename BiDirectionalIter,
          typename = std::enable_if_t<IsBidirectionalIteratorV<BiDirectionalIter>>>
 BiDirectionalIter
 partition(BiDirectionalIter first, BiDirectionalIter last, Compare comp) {
-    if (first == last)
-        return first;
-
     auto lower = first;
     auto higher = last;
 
     while (true) {
         // skip elements which return false for predicate
-        while (!comp(*lower)) {
-            ++lower;
+        while (true) {
             if (lower == higher) {
                 return lower;
             }
+
+			if (comp(*lower))
+                break;
+
+            ++lower;
+            
         }
 
 		//do always decreases higher so it avoids dereferencing last and does decrement after a swap

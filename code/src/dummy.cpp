@@ -44,9 +44,9 @@ main() {
     vector.pushBack(4);
     vector.pushBack(0);
 
-    int test_again[] = {-1, 2, 52, 13, 0, -10, 6};
+    int test_again[] = {-1, 2, 0, 52, 13, 0, -10, 6};
 
-    nxt::core::partition(std::begin(test_again), std::end(test_again), [](int i) { return i > 0; });
+    nxt::core::partition(std::begin(test_again), std::end(test_again), [](int i) { return i == 0; });
 
     std::cout << "vector :\n";
     for (auto value : test_again) {
