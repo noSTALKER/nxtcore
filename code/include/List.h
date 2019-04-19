@@ -4,8 +4,7 @@
 #include <type_traits>
 #include "TypeTraits.h"
 
-namespace nxt {
-namespace core {
+namespace nxt::core {
 
 template<typename List>
 class ConstListIterator {
@@ -176,39 +175,39 @@ public:
         insertFromIterator(head_->next, first, last);
     }
 
-    List(const List& list) 
-		: alloc_(node_allocator_traits::select_on_container_copy_construction(list.alloc_))
-		, size_(0) {
+    List(const List& list)
+        : alloc_(node_allocator_traits::select_on_container_copy_construction(list.alloc_))
+        , size_(0) {
         constructHeadNode();
         insertFromIterator(head_->next, list.begin(), list.end());
-	}
+    }
 
-	List(const List& list, const Allocator& alloc)
-			: alloc_(alloc)
-			, size_(0) {
+    List(const List& list, const Allocator& alloc)
+        : alloc_(alloc)
+        , size_(0) {
         constructHeadNode();
         insertFromIterator(head_->next, list.begin(), list.end());
-	}
+    }
 
-	List(std::initializer_list<T> values, const Allocator& alloc = Allocator()) 
-		: alloc_(alloc)
-		, size_(0) {
+    List(std::initializer_list<T> values, const Allocator& alloc = Allocator())
+        : alloc_(alloc)
+        , size_(0) {
         constructHeadNode();
         insertFromIterator(head->next, values.begin(), values.end());
-	}
+    }
 
-	List(List&& list) 
-		: alloc_(std::move(list.alloc_))
-		, size_(0) {
+    List(List&& list)
+        : alloc_(std::move(list.alloc_))
+        , size_(0) {
         constructHeadNode();
         std::swap(head_, list.head_);
-	}
+    }
 
-	List(List&& list, const Allocator& alloc) 
-		: alloc_(alloc)
-		, size_(0) {
+    List(List&& list, const Allocator& alloc)
+        : alloc_(alloc)
+        , size_(0) {
         constructHeadNode();
-	}
+    }
 
     [[nodiscard]] bool empty() const noexcept {
         return size_ == 0;
@@ -435,9 +434,7 @@ private:
         return node;
     }
 
-    void clearList() noexcept {
-        
-    }
+    void clearList() noexcept {}
 
     void destroyHeadNode() noexcept {
         node_allocator_traits::deallocate(alloc_, head_, 1);
@@ -450,5 +447,4 @@ private:
     friend class iterator;
     friend class const_iterator;
 };
-}  // namespace core
-}  // namespace nxt
+}  // namespace nxt::core

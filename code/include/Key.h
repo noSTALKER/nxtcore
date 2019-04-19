@@ -4,8 +4,7 @@
 #include <cstdint>
 #include "Export.h"
 
-namespace ess {
-namespace data {
+namespace nxt::core {
 /**
  * @brief Key structure to be used in SlotMap
  *
@@ -13,7 +12,7 @@ namespace data {
 struct Key {
     static constexpr Key kInvalidKey;
 
-	using index_type = uint32_t;
+    using index_type = uint32_t;
     using generation_type = uint32_t;
 
     Key() = default;
@@ -40,5 +39,4 @@ struct Key {
     index_type index;
     generation_type generation;
 };
-}  // namespace data
-}  // namespace ess
+}  // namespace nxt::core

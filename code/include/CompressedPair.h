@@ -2,8 +2,7 @@
 
 #include <type_traits>
 
-namespace nxt {
-namespace core {
+namespace nxt::core {
 
 struct ValueInitThenVariadicArgsT {};
 struct FirstArgThenVariadicArgsT {};
@@ -17,10 +16,9 @@ public:
         , second_(std::forward<Args>(args)...) {}
 
     template<typename FirstArg, typename... Args>
-	CompressedPair(FirstArgThenVariadicArgsT, First&& firstArg, Args&& ... args) 
-		: First(std::forward<FirstArg>(firstArg))
-		, second_(std::forward<Args>(args)...){
-	}
+    CompressedPair(FirstArgThenVariadicArgsT, First&& firstArg, Args&&... args)
+        : First(std::forward<FirstArg>(firstArg))
+        , second_(std::forward<Args>(args)...) {}
 
     const First& getFirst() const noexcept {
         return *this;
@@ -51,10 +49,9 @@ public:
         , second_(std::forward<Args>(args)...) {}
 
     template<typename FirstArg, typename... Args>
-	CompressedPair(FirstArgThenVariadicArgsT, First&& firstArg, Args&& ... args) 
-		: first_(std::forward<FirstArg>(firstArg))
-		, second_(std::forward<Args>(args)...){
-	}
+    CompressedPair(FirstArgThenVariadicArgsT, First&& firstArg, Args&&... args)
+        : first_(std::forward<FirstArg>(firstArg))
+        , second_(std::forward<Args>(args)...) {}
 
     const First& getFirst() const noexcept {
         return first_;
@@ -77,5 +74,4 @@ private:
     Second second_;
 };
 
-}  // namespace core
-}  // namespace nxt
+}  // namespace nxt::core

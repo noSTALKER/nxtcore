@@ -4,8 +4,8 @@
 
 #include <vector>
 
-namespace nxt {
-namespace core {
+namespace nxt::core {
+
 template<typename T, typename Allocator = std::allocator<T>>
 class Vector {
 public:
@@ -59,9 +59,9 @@ public:
         return *_data;
     }
 
-	[[nodiscard]] reference back() noexcept {
+    [[nodiscard]] reference back() noexcept {
         return *(_data_ + size_ - 1);
-	}
+    }
 
     [[nodiscard]] size_type size() const noexcept {
         return size_;
@@ -157,5 +157,4 @@ private:
     size_type capacity_;
     allocator_type alloc_;
 };
-}  // namespace core
-}  // namespace nxt
+}  // namespace nxt::core

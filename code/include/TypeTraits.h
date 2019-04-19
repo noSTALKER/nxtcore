@@ -2,8 +2,7 @@
 
 #include <type_traits>
 
-namespace nxt {
-namespace core {
+namespace nxt::core {
 
 template<template<typename...> typename U, typename T>
 struct IsTemplateInstanceOf : std::false_type {};
@@ -44,12 +43,14 @@ struct IsInputIterator<
 template<typename T>
 constexpr auto IsInputIteratorV = IsInputIterator<T>::value;
 
-template<typename T,
-         typename = void>
+template<typename T, typename = void>
 struct IsForwardIterator : std::false_type {};
 
 template<typename T>
-struct IsForwardIterator<T, std::enable_if_t<std::is_base_of_v<std::forward_iterator_tag, typename std::iterator_traits<T>::iterator_category>>> : std::true_type {};
+struct IsForwardIterator<
+    T,
+    std::enable_if_t<std::is_base_of_v<std::forward_iterator_tag, typename std::iterator_traits<T>::iterator_category>>>
+    : std::true_type {};
 
 template<typename T>
 constexpr auto IsForwardIteratorV = IsForwardIterator<T>::value;
@@ -58,9 +59,9 @@ template<typename T, typename = void>
 struct IsBidirectionalIterator : std::false_type {};
 
 template<typename T>
-struct IsBidirectionalIterator<
-    T,
-    std::enable_if_t<std::is_base_of_v<std::bidirectional_iterator_tag, typename std::iterator_traits<T>::iterator_category>>>
+struct IsBidirectionalIterator<T,
+                               std::enable_if_t<std::is_base_of_v<std::bidirectional_iterator_tag,
+                                                                  typename std::iterator_traits<T>::iterator_category>>>
     : std::true_type {};
 
 template<typename T>
@@ -71,8 +72,8 @@ struct IsRandomAccessIterator : std::false_type {};
 
 template<typename T>
 struct IsRandomAccessIterator<T,
-                               std::enable_if_t<std::is_base_of_v<std::random_access_iterator_tag,
-                                                                  typename std::iterator_traits<T>::iterator_category>>>
+                              std::enable_if_t<std::is_base_of_v<std::random_access_iterator_tag,
+                                                                 typename std::iterator_traits<T>::iterator_category>>>
     : std::true_type {};
 
 template<typename T>
@@ -140,5 +141,4 @@ struct ReplaceFirstTemplateParameter<U<First, Args...>, Replace> {
 template<typename U, typename Replace>
 using ReplaceFirstTemplateParameterT = typename ReplaceFirstTemplateParameter<U, Replace>::type;
 
-}  // namespace core
-}  // namespace nxt
+}  // namespace nxt::core

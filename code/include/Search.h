@@ -9,7 +9,7 @@ template<typename ForwardIter,
          typename T,
          typename Compare,
          typename = std::enable_if_t<IsForwardIteratorV<ForwardIter>>>
-constexpr ForwardIter
+[[nodiscard]] constexpr ForwardIter
 lowerBound(ForwardIter first, ForwardIter last, const T& value, Compare comp) {
     auto distance = std::distance(first, last);
 
@@ -29,7 +29,7 @@ lowerBound(ForwardIter first, ForwardIter last, const T& value, Compare comp) {
 }
 
 template<typename ForwardIter, typename T, typename = std::enable_if_t<IsForwardIteratorV<ForwardIter>>>
-constexpr ForwardIter
+[[nodiscard]] constexpr ForwardIter
 lowerBound(ForwardIter first, ForwardIter last, const T& value) {
     return lowerBound(first, last, value, std::less<>());
 }
@@ -38,7 +38,7 @@ template<typename ForwardIter,
          typename T,
          typename Compare,
          typename = std::enable_if_t<IsForwardIteratorV<ForwardIter>>>
-constexpr ForwardIter
+[[nodiscard]] constexpr ForwardIter
 upperBound(ForwardIter first, ForwardIter last, const T& value, Compare comp) {
     auto distance = std::distance(first, last);
 
@@ -58,7 +58,7 @@ upperBound(ForwardIter first, ForwardIter last, const T& value, Compare comp) {
 }
 
 template<typename ForwardIter, typename T, typename = std::enable_if_t<IsForwardIteratorV<ForwardIter>>>
-constexpr ForwardIter
+[[nodiscard]] constexpr ForwardIter
 upperBound(ForwardIter first, ForwardIter last, const T& value) {
     return upperBound(first, last, value, std::less<>());
 }
@@ -67,7 +67,7 @@ template<typename ForwardIter,
          typename T,
          typename Compare,
          typename = std::enable_if_t<IsForwardIteratorV<ForwardIter>>>
-constexpr bool
+[[nodiscard]] constexpr bool
 binarySearch(ForwardIter first, ForwardIter last, const T& value, Compare comp) {
 	// get the lower bound which is the first element not less than value
     auto result = lowerBound(first, last, value, comp);
@@ -77,7 +77,7 @@ binarySearch(ForwardIter first, ForwardIter last, const T& value, Compare comp) 
 }
 
 template<typename ForwardIter, typename T, typename = std::enable_if_t<IsForwardIteratorV<ForwardIter>>>
-constexpr bool
+[[nodiscard]] constexpr bool
 binarySearch(ForwardIter first, ForwardIter last, const T& value) {
     return binarySearch(first, last, value, std::less<>());
 }

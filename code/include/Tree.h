@@ -3,10 +3,9 @@
 #include <iostream>
 #include <set>
 
-namespace nxt {
-namespace core {
+namespace nxt::core {
 
-template <typename T, typename Comparator = std::less<T>, typename Allocator = std::allocator<T>>
+template<typename T, typename Comparator = std::less<T>, typename Allocator = std::allocator<T>>
 class BinaryTree {
 public:
     struct Node;
@@ -31,9 +30,7 @@ public:
     bool insert(T&& value);
 
     template<typename Args...>
-	bool emplace(Args&& ... args) {
-
-	}
+    bool emplace(Args&&... args) {}
 
 private:
     struct Node {
@@ -41,7 +38,6 @@ private:
         Node* parent;
         Node* left_child;
         Node* right_child;
-
     };
 
     Node* root_node_;
@@ -51,5 +47,4 @@ private:
     node_allocator_type alloc_;
 };
 
-}
-}
+}  // namespace nxt::core

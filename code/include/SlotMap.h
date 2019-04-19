@@ -2,12 +2,10 @@
 
 #include "Key.h"
 
-#include <type_traits>
 #include <iterator>
+#include <type_traits>
 
-namespace nxt {
-namespace core {
-
+namespace nxt::core {
 
 template<class T, class KeyType = Key, std::size_t BlockSize = 1024, Allocator = std::allocator<T>>
 class SlotMap {
@@ -15,7 +13,7 @@ public:
     class SlotMapIterator;
     class ConstSlotMapIterator;
 
-	using value_type = T;
+    using value_type = T;
     using allocator_type = typename std::allocator_traits<Allocator>::template rebind_alloc<value_type>;
     using size_type = typename KeyType::index_type;
     using key_type = KeyType;
@@ -27,8 +25,8 @@ public:
     using iterator = typename SlotMap<T, KeyType, Allocator>::SlotMapIterator;
     using const_iterator = typename SlotMap<T, KeyType, Allocator>::ConstSlotMapIterator;
     using key_allocator = typename std::allocator_traits<Allocator>::template rebind_alloc<key_type>;
-	
-	static constexpr auto block_size = BlockSize;
+
+    static constexpr auto block_size = BlockSize;
 
     SlotMap(size_type capacity = block_size)
         : size_(0)
@@ -163,23 +161,23 @@ public:
         return SlotMapIterator(this, 0);
     }
 
-	const_iterator begin() const noexcept {
+    const_iterator begin() const noexcept {
         return ConstSlotMapIterator(this, 0);
-	}
+    }
 
-	const_iterator cbegin() const noexcept {
-            return ConstSlotMapIterator(this, 0);
-        }
+    const_iterator cbegin() const noexcept {
+        return ConstSlotMapIterator(this, 0);
+    }
 
     iterator end() noexcept {
         return SlotMapIterator(this, MaxValidSize());
     }
 
-	const_iterator end() const noexcept {
+    const_iterator end() const noexcept {
         return ConstSlotMapIterator(this, MaxValidSize());
     }
 
-	const_iterator cend() const noexcept {
+    const_iterator cend() const noexcept {
         return ConstSlotMapIterator(this, MaxValidSize());
     }
 
@@ -265,6 +263,4 @@ private:
     friend class ConstSlotMapIterator;
 };
 
-}  // namespace core
-}  // namespace nxt
-
+}  // namespace nxt::core

@@ -1,7 +1,6 @@
 #pragma once
 
-namespace nxt {
-namespace core {
+namespace nxt::core {
 
 /**
  * @brief Function which returns a invokable
@@ -35,18 +34,13 @@ WhenNone(Predicates... ps) {
 template<typename F, typename... Funcs>
 constexpr auto
 Compose(F f, Funcs... funcs) {
-    return [=](const auto& value) {
-        return f(Compose(funcs...)(value));
-    };
+    return [=](const auto& value) { return f(Compose(funcs...)(value)); };
 }
 
 template<typename F>
 constexpr auto
 Compose(F f) {
-    return [=](const auto& value) {
-        return f(value);
-    };
+    return [=](const auto& value) { return f(value); };
 }
 
-}  // namespace core
-}  // namespace nxt
+}  // namespace nxt::core

@@ -46,7 +46,7 @@ main() {
 
     int test_again[] = {-1, 2, 52, 13, 0, -10, 6};
 
-    nxt::core::insertionSort(std::begin(test_again), std::end(test_again));
+    nxt::core::partition(std::begin(test_again), std::end(test_again), [](int i) { return i > 0; });
 
     std::cout << "vector :\n";
     for (auto value : test_again) {
@@ -60,6 +60,7 @@ main() {
     std::cout << nxt::core::binarySearch(std::begin(test_again), std::end(test_again), 12) << std::endl;
 
     nxt::core::insertionSort(vector.begin(), vector.end(), std::greater<>());
+
 
     std::cout << "vector :\n";
     for (auto value : vector) {
