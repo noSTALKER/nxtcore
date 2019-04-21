@@ -1,6 +1,6 @@
+#include <algorithm>
 #include <array>
 #include <iostream>
-#include <algorithm>
 #include "../include/CompressedPair.h"
 #include "../include/List.h"
 #include "../include/Search.h"
@@ -30,7 +30,7 @@ main() {
     constexpr auto test3 = nxt::core::IsForwardIteratorV<int>;
     constexpr auto test4 = nxt::core::IsForwardIteratorV<decltype(list.begin())>;
 
-	//std::upper_bound
+    // std::upper_bound
     list.insert(list.end(), {20, 30, 40});
 
     for (auto value : list) {
@@ -46,7 +46,13 @@ main() {
 
     int test_again[] = {-1, 2, 0, 52, 13, 0, -10, 6};
 
-    nxt::core::partition(std::begin(test_again), std::end(test_again), [](int i) { return i == 0; });
+    std::cout << std::boolalpha << "Before Sort: " << nxt::core::isSorted(std::begin(test_again), std::end(test_again))
+              << std::endl;
+
+    nxt::core::insertionSort(std::begin(test_again), std::end(test_again));
+
+    std::cout << std::boolalpha << "After Sort: " << nxt::core::isSorted(std::begin(test_again), std::end(test_again))
+              << std::endl;
 
     std::cout << "vector :\n";
     for (auto value : test_again) {
@@ -61,22 +67,23 @@ main() {
 
     nxt::core::insertionSort(vector.begin(), vector.end(), std::greater<>());
 
-
     std::cout << "vector :\n";
     for (auto value : vector) {
         std::cout << value << '\n';
     }
 
-	std::array merge1 = {1, 3, 5, 7};
+    std::array merge1 = {1, 3, 5, 7};
     std::array merge2 = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
     std::array<int, 15> result = {};
 
-	nxt::core::merge(merge1.begin(), merge1.end(), merge2.begin(), merge2.end(), result.begin(), std::less<>());
+    nxt::core::merge(merge1.begin(), merge1.end(), merge2.begin(), merge2.end(), result.begin(), std::less<>());
 
-	std::cout << "Merge Result :\n";
-        for (auto value : result) {
-            std::cout << value << '\n';
-        }
+    std::cout << "Merge Result :\n";
+    for (auto value : result) {
+        std::cout << value << '\n';
+    }
 
+    char stopper;
+    std::cin >> stopper;
     return 0;
 }

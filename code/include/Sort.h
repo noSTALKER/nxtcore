@@ -136,4 +136,41 @@ merge(InputIter1 first1, InputIter1 last1, InputIter2 first2, InputIter2 last2, 
 
     return outputIter;
 }
+
+template<typename ForwardIter, typename Compare>
+constexpr ForwardIter
+isSortedUntil(ForwardIter first, ForwardIter last, Compare comp) {
+    auto next = first;
+    if (next != last) {
+        ++next;
+        while (next != last) {
+            if (comp(*next, *first)) {
+                break;
+            }
+            ++next;
+            ++first;
+        }
+    }
+
+    return next;
+}
+
+template <typename ForwardIter>
+constexpr ForwardIter
+isSortedUntil(ForwardIter first, ForwardIter last) {
+    return isSortedUntil(first, last, std::less<>());
+}
+
+template <typename ForwardIter, typename Compare>
+constexpr bool
+isSorted(ForwardIter first, ForwardIter last, Compare comp) {
+    return isSortedUntil(first, last, comp) == last;
+}
+
+template <typename ForwardIter>
+constexpr bool
+isSorted(ForwardIter first, ForwardIter last) {
+    return isSortedUntil(first, last, std::less<>()) == last;
+}
+
 }  // namespace nxt::core
