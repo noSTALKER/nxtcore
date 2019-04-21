@@ -137,7 +137,7 @@ merge(InputIter1 first1, InputIter1 last1, InputIter2 first2, InputIter2 last2, 
     return outputIter;
 }
 
-template<typename ForwardIter, typename Compare>
+template<typename ForwardIter, typename Compare, typename = std::enable_if_t<IsForwardIteratorV<ForwardIter>>>
 constexpr ForwardIter
 isSortedUntil(ForwardIter first, ForwardIter last, Compare comp) {
     auto next = first;
@@ -155,19 +155,19 @@ isSortedUntil(ForwardIter first, ForwardIter last, Compare comp) {
     return next;
 }
 
-template <typename ForwardIter>
+template<typename ForwardIter, typename = std::enable_if_t<IsForwardIteratorV<ForwardIter>>>
 constexpr ForwardIter
 isSortedUntil(ForwardIter first, ForwardIter last) {
     return isSortedUntil(first, last, std::less<>());
 }
 
-template <typename ForwardIter, typename Compare>
+template<typename ForwardIter, typename Compare, typename = std::enable_if_t<IsForwardIteratorV<ForwardIter>>>
 constexpr bool
 isSorted(ForwardIter first, ForwardIter last, Compare comp) {
     return isSortedUntil(first, last, comp) == last;
 }
 
-template <typename ForwardIter>
+template<typename ForwardIter, typename = std::enable_if_t<IsForwardIteratorV<ForwardIter>>>
 constexpr bool
 isSorted(ForwardIter first, ForwardIter last) {
     return isSortedUntil(first, last, std::less<>()) == last;
