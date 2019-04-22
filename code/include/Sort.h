@@ -173,4 +173,51 @@ isSorted(ForwardIter first, ForwardIter last) {
     return isSortedUntil(first, last, std::less<>()) == last;
 }
 
+template <typename RandomAccessIter, typename Compare, typename = std::enable_if_t<IsRandomAccessIteratorV<RandomAccessIter>>>
+void
+pushHeap(RandomAccessIter first, RandomAccessIter last, Compare comp) {
+
+}
+
+template <typename RandomAccessIter, typename = std::enable_if_t<IsRandomAccessIteratorV<RandomAccessIter>>>
+void
+pushHeap(RandomAccessIter first, RandomAccessIter last) {
+    pushHeap(first, last, std::less<>());
+}
+
+template <typename RandomAccessIter, typename Compare, typename = std::enable_if_t<IsRandomAccessIteratorV<RandomAccessIter>>>
+void
+popHeap(RandomAccessIter first, RandomAccessIter last, Compare comp) {
+}
+
+template <typename RandomAccessIter, typename = std::enable_if_t<IsRandomAccessIteratorV<RandomAccessIter>>>
+void
+popHeap(RandomAccessIter first, RandomAccessIter last) {
+    popHeap(first, last, std::less<>());
+}
+
+template<typename RandomAccessIter, typename Compare, typename = std::enable_if_t<IsRandomAccessIteratorV<RandomAccessIter>>>
+void
+makeHeap(RandomAccessIter first, RandomAccessIter last, Compare comp) {
+
+}
+
+template<typename RandomAccessIter, typename = std::enable_if_t<IsRandomAccessIteratorV<RandomAccessIter>>>
+void
+makeHeap(RandomAccessIter first, RandomAccessIter last) {
+    makeHeap(first, last, std::less<>());
+}
+
+template<typename RandomAccessIter, typename Compare, typename = std::enable_if_t<IsRandomAccessIteratorV<RandomAccessIter>>>
+void
+heapSort(RandomAccessIter first, RandomAccessIter last, Compare comp) {
+
+}
+
+template <typename RandomAccessIter, typename = std::enable_if_t<IsRandomAccessIteratorV<RandomAccessIter>>>
+void
+heapSort(RandomAccessIter first, RandomAccessIter last) {
+    heapSort(first, last, std::less<>());
+}
+
 }  // namespace nxt::core

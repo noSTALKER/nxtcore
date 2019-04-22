@@ -19,7 +19,7 @@ public:
     using iterator = pointer;
     using const_iterator = const_pointer;
 
-    Vector() noexcept(std::is_nothrow_default_constructible_v<Allocator>)
+    Vector() noexcept(std::is_nothrow_default_constructible_v<allocator_type>)
         : size_(0)
         , capacity_(0)
         , data_(nullptr)

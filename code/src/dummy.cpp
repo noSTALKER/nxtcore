@@ -6,6 +6,7 @@
 #include "../include/Search.h"
 #include "../include/Sort.h"
 #include "../include/Vector.h"
+#include "../include/PageVector.h"
 
 int
 main() {
@@ -81,6 +82,21 @@ main() {
     std::cout << "Merge Result :\n";
     for (auto value : result) {
         std::cout << value << '\n';
+    }
+
+    nxt::core::PageVector<int, 4> page_vec;
+    page_vec.pushBack(0);
+    page_vec.pushBack(1);
+    page_vec.pushBack(2);
+    page_vec.pushBack(3);
+    page_vec.pushBack(4);
+    page_vec.pushBack(5);
+    page_vec.pushBack(6);
+
+    std::cout << "Page Vector:\n";
+
+    for (unsigned int i = 0; i < page_vec.size(); ++i) {
+        std::cout << page_vec[i] << '\n';
     }
 
     char stopper;
