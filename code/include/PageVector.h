@@ -8,6 +8,99 @@
 
 namespace nxt::core {
 
+template<typename PageVector>
+class PageVectorConstIterator {
+public:
+    using value_type = typename PageVector::value_type;
+    using difference_type = typename PageVector::difference_type;
+    using pointer = typename PageVector::const_pointer;
+    using reference = typename PageVector::const_reference;
+    using const_reference = typename PageVector::const_reference;
+    using iterator_category = std::random_access_iterator_tag;
+
+    PageVectorConstIterator(PageVector* vector, size_type index)
+        : page_vector_(vector)
+        , current_index_(index) {}
+
+    PageVectorConstIterator& operator++() noexcept {
+        ++current_index_;
+        return *this;
+    }
+
+    PageVectorConstIterator operator++(int) noexcept {
+        PageVectorConstIterator temp(page_vector_, current_index_);
+        ++current_index_;
+        return temp;
+    }
+
+    PageVectorConstIterator& operator--() noexcept {
+        --current_index_;
+        return *this;
+    }
+
+    PageVectorConstIterator operator--(int) noexcept {
+        PageVectorConstIterator temp(page_vector_, current_index_);
+        --current_index_;
+        return temp;
+    }
+
+    [[nodiscard]] reference operator*() const noexcept {
+        return page_vector_->operator[](current_index_);
+    }
+
+    [[nodiscard]] bool operator==(const PageVectorConstIterator& rhs) const noexcept {
+        return page_vector_ == rhs.page_vector_ && current_index_ == rhs.current_index_;
+    }
+
+    [[nodiscard]] bool operator!=(const PageVectorConstIterator& rhs) const noexcept {
+        return page_vector_ != rhs.page_vector_ || current_index_ != rhs.current_index_;
+    }
+
+protected:
+    PageVector page_vector_;
+    size_type current_index_;
+};
+
+template<typename PageVector>
+class PageVectorIterator : public PageVectorConstIterator<PageVector> {
+public:
+    using value_type = typename PageVector::value_type;
+    using difference_type = typename PageVector::difference_type;
+    using pointer = typename PageVector::pointer;
+    using reference = typename PageVector::reference;
+    using const_reference = typename PageVector::const_reference;
+    using iterator_category = std::random_access_iterator_tag;
+
+    PageVectorIterator(PageVector* vector, size_type index)
+        : PageVectorConstIterator(vector, index) {}
+
+    PageVectorIterator& operator++() noexcept {
+        ++current_index_;
+        return *this;
+    }
+
+    PageVectorIterator operator++(int) noexcept {
+        PageVectorIterator temp(page_vector_, current_index_);
+        ++current_index_;
+        return temp;
+    }
+
+    PageVectorConstIterator& operator--() noexcept {
+        --current_index_;
+        return *this;
+    }
+
+    PageVectorIterator operator--(int) noexcept {
+        PageVectorIterator temp(page_vector_, current_index_);
+        --current_index_;
+        return temp;
+    }
+
+    [[nodiscard]] reference operator*() const noexcept {
+        return page_vector_->operator[](current_index_);
+    }
+};
+
 template<typename T, std::size_t PageSize, typename Allocator = std::allocator<T>>
 class PageVector {
 public:
@@ -21,6 +114,8 @@ public:
     using const_pointer = typename allocator_traits::const_pointer;
     using difference_type = typename allocator_traits::difference_type;
     using size_type = typename allocator_traits::size_type;
+    using iterator = PageVectorIterator < PageVector<T, PageSize, Allocator>;
+    using const_iterator = PageVectorConstIterator<PageVector<T, PageSize, Allocator>>;
 
 private:
     using Page = Buffer<value_type, page_size>;
@@ -30,8 +125,8 @@ private:
     using page_pointer_allocator = typename allocator_traits::template rebind_alloc<Page*>;
 
 public:
-    PageVector() noexcept(std::is_nothrow_default_constructible_v<page_allocator> &&
-                          std::is_nothrow_constructible_v<decltype(pages_)>)
+    PageVector() noexcept(
+        std::is_nothrow_default_constructible_v<page_allocator>&& std::is_nothrow_constructible_v<decltype(pages_)>)
         : alloc_()
         , size_(0){}
 
@@ -75,6 +170,13 @@ public:
         page_allocator_traits::construct(
             alloc_, pages_[size_ / page_size]->pointer_to(size_ % page_size), std::forward<Args>(args)...);
         ++size_;
+    }
+
+    void popBack() {
+        if (size_ > 0) {
+            page_allocator_traits::destroy(alloc_, pages_[size_ / page_size]->pointer_to(size_ % page_size));
+            --size_;
+        }
     }
 
 private:

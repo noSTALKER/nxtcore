@@ -92,6 +92,10 @@ main() {
     page_vec.pushBack(4);
     page_vec.pushBack(5);
     page_vec.pushBack(6);
+    page_vec.pushBack(7);
+
+    page_vec.popBack();
+    page_vec.popBack();
 
     std::cout << "Page Vector:\n";
 
