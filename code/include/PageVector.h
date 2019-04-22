@@ -16,6 +16,8 @@ public:
     using pointer = typename PageVector::const_pointer;
     using reference = typename PageVector::const_reference;
     using const_reference = typename PageVector::const_reference;
+    using size_type = typename PageVector::size_type;
+    using difference_type = typename PageVector::difference_type;
     using iterator_category = std::random_access_iterator_tag;
 
     PageVectorConstIterator(PageVector* vector, size_type index)
@@ -48,16 +50,58 @@ public:
         return page_vector_->operator[](current_index_);
     }
 
+    [[nodiscard]] reference operator[](difference_type value) const noexcept {
+        return page_vector_->operator[](current_index_ + value);
+    }
+
+    [[nodiscard]] PageVectorConstIterator operator-(difference_type value) const noexcept {
+        return PageVectorConstIterator(page_vector_, current_index_ - value);
+    }
+
+    PageVectorConstIterator& operator-=(difference_type value) noexcept {
+        current_index_ -= value;
+        return *this;
+    }
+
+    [[nodiscard]] PageVectorConstIterator operator+(difference_type value) const noexcept {
+        return PageVectorConstIterator(page_vector_, current_index_ + value);
+    }
+
+    PageVectorConstIterator& operator+=(difference_type value) noexcept {
+        current_index_ += value;
+        return *this;
+    }
+
+    [[nodiscard]] difference_type operator-(const PageVectorConstIterator& rhs) const noexcept {
+        return current_index_ - rhs.current_index_;
+    }
+
+    [[nodiscard]] bool operator<(const PageVectorConstIterator& rhs) const noexcept {
+        return current_index_ < rhs.current_index_;
+    }
+
+    [[nodiscard]] bool operator<=(const PageVectorConstIterator& rhs) const noexcept {
+        return current_index_ <= rhs.current_index_;
+    }
+
+    [[nodiscard]] bool operator>(const PageVectorConstIterator& rhs) const noexcept {
+        return current_index_ > rhs.current_index_;
+    }
+
+    [[nodiscard]] bool operator>=(const PageVectorConstIterator& rhs) const noexcept {
+        return current_index_ >= rhs.current_index_;
+    }
+
     [[nodiscard]] bool operator==(const PageVectorConstIterator& rhs) const noexcept {
-        return page_vector_ == rhs.page_vector_ && current_index_ == rhs.current_index_;
+        return current_index_ == rhs.current_index_;
     }
 
     [[nodiscard]] bool operator!=(const PageVectorConstIterator& rhs) const noexcept {
-        return page_vector_ != rhs.page_vector_ || current_index_ != rhs.current_index_;
+        return current_index_ != rhs.current_index_;
     }
 
 protected:
-    PageVector page_vector_;
+    PageVector* page_vector_;
     size_type current_index_;
 };
 
@@ -69,6 +113,8 @@ public:
     using pointer = typename PageVector::pointer;
     using reference = typename PageVector::reference;
     using const_reference = typename PageVector::const_reference;
+    using size_type = typename PageVector::size_type;
+    using difference_type = typename PageVector::difference_type;
     using iterator_category = std::random_access_iterator_tag;
 
     PageVectorIterator(PageVector* vector, size_type index)
@@ -85,7 +131,7 @@ public:
         return temp;
     }
 
-    PageVectorConstIterator& operator--() noexcept {
+    PageVectorIterator& operator--() noexcept {
         --current_index_;
         return *this;
     }
@@ -98,6 +144,28 @@ public:
 
     [[nodiscard]] reference operator*() const noexcept {
         return page_vector_->operator[](current_index_);
+    }
+
+    [[nodiscard]] reference operator[](difference_type value) const noexcept {
+        return page_vector_->operator[](current_index_ + value);
+    }
+
+    [[nodiscard]] PageVectorIterator operator-(difference_type value) const noexcept {
+        return PageVectorIterator(page_vector_, current_index_ - value);
+    }
+
+    PageVectorIterator& operator-=(difference_type value) noexcept {
+        current_index_ -= value;
+        return *this;
+    }
+
+    [[nodiscard]] PageVectorIterator operator+(difference_type value) const noexcept {
+        return PageVectorIterator(page_vector_, current_index_ + value);
+    }
+
+    PageVectorIterator& operator+=(difference_type value) noexcept {
+        current_index_ += value;
+        return *this;
     }
 };
 
@@ -114,7 +182,7 @@ public:
     using const_pointer = typename allocator_traits::const_pointer;
     using difference_type = typename allocator_traits::difference_type;
     using size_type = typename allocator_traits::size_type;
-    using iterator = PageVectorIterator < PageVector<T, PageSize, Allocator>;
+    using iterator = PageVectorIterator<PageVector<T, PageSize, Allocator>>;
     using const_iterator = PageVectorConstIterator<PageVector<T, PageSize, Allocator>>;
 
 private:
@@ -128,9 +196,9 @@ public:
     PageVector() noexcept(
         std::is_nothrow_default_constructible_v<page_allocator>&& std::is_nothrow_constructible_v<decltype(pages_)>)
         : alloc_()
-        , size_(0){}
+        , size_(0) {}
 
-              [[nodiscard]] size_type capacity() const noexcept {
+    [[nodiscard]] size_type capacity() const noexcept {
         return pages_.size() * page_size;
     }
 
@@ -177,6 +245,30 @@ public:
             page_allocator_traits::destroy(alloc_, pages_[size_ / page_size]->pointer_to(size_ % page_size));
             --size_;
         }
+    }
+
+    [[nodiscard]] const_iterator cbegin() const noexcept {
+        return const_iterator(this, 0);
+    }
+
+    [[nodiscard]] const_iterator begin() const noexcept {
+        return const_iterator(this, 0);
+    }
+
+    [[nodiscard]] iterator begin() noexcept {
+        return iterator(this, 0);
+    }
+
+    [[nodiscard]] const_iterator cend() const noexcept {
+        return const_iterator(this, size_);
+    }
+
+    [[nodiscard]] const_iterator end() const noexcept {
+        return const_iterator(this, size_);
+    }
+
+    [[nodiscard]] iterator end() noexcept {
+        return iterator(this, size_);
     }
 
 private:

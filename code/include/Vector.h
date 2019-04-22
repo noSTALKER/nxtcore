@@ -54,11 +54,11 @@ public:
     }
 
     [[nodiscard]] const_reference front() const noexcept {
-        return *_data;
+        return *data_;
     }
 
     [[nodiscard]] reference back() noexcept {
-        return *(_data_ + size_ - 1);
+        return data_[size_ - 1];
     }
 
     [[nodiscard]] size_type size() const noexcept {
@@ -70,7 +70,7 @@ public:
     }
 
     [[nodiscard]] bool empty() const noexcept {
-        return size == 0;
+        return size_ == 0;
     }
 
     [[nodiscard]] reference operator[](size_type position) {
@@ -132,11 +132,11 @@ private:
 
             if constexpr (std::is_nothrow_move_constructible_v<value_type>) {
                 for (size_type i = 0; i < size_; ++i) {
-                    allocator_traits::construct(alloc_, new_buffer + i, std::move(*(data_ + i)));
+                    allocator_traits::construct(alloc_, new_buffer + i, std::move(data_[i]));
                 }
             } else {
                 for (size_type i = 0; i < size_; ++i) {
-                    allocator_traits::construct(alloc_, new_buffer + i, data_ + i);
+                    allocator_traits::construct(alloc_, new_buffer + i, data_[i]);
                 }
             }
 

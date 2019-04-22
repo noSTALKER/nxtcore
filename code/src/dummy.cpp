@@ -1,6 +1,7 @@
 #include <algorithm>
 #include <array>
 #include <iostream>
+#include <vector>
 #include "../include/CompressedPair.h"
 #include "../include/List.h"
 #include "../include/Search.h"
@@ -37,6 +38,8 @@ main() {
     for (auto value : list) {
         std::cout << value << '\n';
     }
+
+	std::vector
 
     nxt::core::List<int> vector;
     vector.pushBack(3);
@@ -99,8 +102,8 @@ main() {
 
     std::cout << "Page Vector:\n";
 
-    for (unsigned int i = 0; i < page_vec.size(); ++i) {
-        std::cout << page_vec[i] << '\n';
+    for (auto value : page_vec) {
+        std::cout << value << '\n';
     }
 
     char stopper;
