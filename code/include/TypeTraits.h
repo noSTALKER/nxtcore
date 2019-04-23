@@ -82,9 +82,6 @@ constexpr auto IsRandomAccessIteratorV = IsRandomAccessIterator<T>::value;
 template<typename T>
 using IteratorValueTypeT = typename std::iterator_traits<T>::value_type;
 
-
-template<typename T>
-
 struct NoSuchClass {
     NoSuchClass() = delete;
     ~NoSuchClass() = delete;

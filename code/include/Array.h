@@ -7,6 +7,7 @@ namespace nxt::core {
 template<class T, std::size_t Size>
 class Array {
 public:
+    static_assert(Size > 0, "Can't create Array with size == 0");
     using difference_type = std::ptrdiff_t;
     using value_type = T;
     using size_type = std::size_t;
@@ -73,7 +74,7 @@ public:
         return data_;
     }
 
-    [[nodiscard]] constexpr iterator end() const noexcept {
+    [[nodiscard]] constexpr iterator end() noexcept {
         return (data_ + Size);
     }
 

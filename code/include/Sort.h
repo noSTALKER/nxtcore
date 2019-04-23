@@ -243,7 +243,7 @@ template<typename RandomAccessIter, typename Compare, typename = std::enable_if_
 void
 heapSort(RandomAccessIter first, RandomAccessIter last, Compare comp) {
     makeHeap(first, last, comp);
-    sortHead(first, last, comp);
+    sortHeap(first, last, comp);
 }
 
 template <typename RandomAccessIter, typename = std::enable_if_t<IsRandomAccessIteratorV<RandomAccessIter>>>

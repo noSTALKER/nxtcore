@@ -8,6 +8,7 @@
 #include "../include/Sort.h"
 #include "../include/Vector.h"
 #include "../include/PageVector.h"
+#include "../include/Array.h"
 
 int
 main() {
@@ -25,7 +26,8 @@ main() {
     list.pushBack(10);
     list.pushFront(-10);
 
-    std::array test = {20, 20, 20};
+    nxt::core::Array<int, 3> test = {20, 20, 20};
+    nxt::core::Array<int, 0> testing2;
 
     constexpr auto value = nxt::core::IsIteratorV<decltype(test.begin())>;
     constexpr auto test2 = nxt::core::IsForwardIteratorV<int*>;
@@ -38,8 +40,6 @@ main() {
     for (auto value : list) {
         std::cout << value << '\n';
     }
-
-	std::vector
 
     nxt::core::List<int> vector;
     vector.pushBack(3);
