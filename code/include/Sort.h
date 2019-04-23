@@ -176,7 +176,25 @@ isSorted(ForwardIter first, ForwardIter last) {
 template <typename RandomAccessIter, typename Compare, typename = std::enable_if_t<IsRandomAccessIteratorV<RandomAccessIter>>>
 void
 pushHeap(RandomAccessIter first, RandomAccessIter last, Compare comp) {
+    if (last - first >= 2) {
+        auto hole = last;
+        --hole;
 
+        auto distance = hole - first;
+        IteratorValueTypeT<RandomAccessIter> value = std::move(*iter);
+        while (distance > 0) {
+            distance = (distance - 1) / 2;
+            auto parent = first + distance;
+            if (comp(*parent, value)) {
+                *hole = std::move(*parent);
+                hole = parent;
+            } else { 
+                break;
+            }
+        }
+
+        *hole = std::move(value);
+    }
 }
 
 template <typename RandomAccessIter, typename = std::enable_if_t<IsRandomAccessIteratorV<RandomAccessIter>>>
@@ -188,6 +206,19 @@ pushHeap(RandomAccessIter first, RandomAccessIter last) {
 template <typename RandomAccessIter, typename Compare, typename = std::enable_if_t<IsRandomAccessIteratorV<RandomAccessIter>>>
 void
 popHeap(RandomAccessIter first, RandomAccessIter last, Compare comp) {
+    if (last - first >= 2) {
+        auto hole = last;
+        --last;
+
+        //move the last value to a temporary
+        IteratorValueTypeT<RandomAccessIter> value = std::move(*hole);
+
+        //pop the max value to the last place
+        *hole = std::move(*first);
+
+
+
+    }
 }
 
 template <typename RandomAccessIter, typename = std::enable_if_t<IsRandomAccessIteratorV<RandomAccessIter>>>
@@ -211,7 +242,8 @@ makeHeap(RandomAccessIter first, RandomAccessIter last) {
 template<typename RandomAccessIter, typename Compare, typename = std::enable_if_t<IsRandomAccessIteratorV<RandomAccessIter>>>
 void
 heapSort(RandomAccessIter first, RandomAccessIter last, Compare comp) {
-
+    makeHeap(first, last, comp);
+    sortHead(first, last, comp);
 }
 
 template <typename RandomAccessIter, typename = std::enable_if_t<IsRandomAccessIteratorV<RandomAccessIter>>>
