@@ -35,6 +35,7 @@ main() {
     constexpr auto test4 = nxt::core::IsForwardIteratorV<decltype(list.begin())>;
 
     constexpr auto is_4 = nxt::core::isPowerOf2(4u);
+    constexpr auto is_odd = nxt::core::isEven(3u);
 
     // std::upper_bound
     list.insert(list.end(), {20, 30, 40});
