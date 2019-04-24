@@ -9,6 +9,7 @@
 #include "../include/Vector.h"
 #include "../include/PageVector.h"
 #include "../include/Array.h"
+#include "../include/Math.h"
 
 int
 main() {
@@ -27,12 +28,13 @@ main() {
     list.pushFront(-10);
 
     nxt::core::Array<int, 3> test = {20, 20, 20};
-    nxt::core::Array<int, 0> testing2;
 
     constexpr auto value = nxt::core::IsIteratorV<decltype(test.begin())>;
     constexpr auto test2 = nxt::core::IsForwardIteratorV<int*>;
     constexpr auto test3 = nxt::core::IsForwardIteratorV<int>;
     constexpr auto test4 = nxt::core::IsForwardIteratorV<decltype(list.begin())>;
+
+    constexpr auto is_4 = nxt::core::isPowerOf2(4u);
 
     // std::upper_bound
     list.insert(list.end(), {20, 30, 40});

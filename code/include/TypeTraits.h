@@ -144,4 +144,7 @@ struct ReplaceFirstTemplateParameter<U<First, Args...>, Replace> {
 template<typename U, typename Replace>
 using ReplaceFirstTemplateParameterT = typename ReplaceFirstTemplateParameter<U, Replace>::type;
 
+template<typename T>
+using RemoveCVRefT = typename std::remove_cv_t<std::remove_reference_t<T>>;
+
 }  // namespace nxt::core
