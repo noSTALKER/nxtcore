@@ -100,6 +100,13 @@ public:
         ++size_;
     }
 
+    void clear() noexcept {
+        for (size_type i = 0; i < size_; ++i) {
+            allocator_traits::destroy(alloc_, (data + i));
+        }
+        size_ = 0;
+    }
+
     iterator insert(const_iterator position, const T& value) {}
 
     iterator insert(const_iterator position, T&& value) {}
@@ -113,6 +120,11 @@ public:
 
     [[nodiscard]] const_pointer data() const noexcept {
         return data_;
+    }
+
+    ~Vector() {
+        clear();
+        alloc_.deallocate(data_, capacity_);
     }
 
 private:

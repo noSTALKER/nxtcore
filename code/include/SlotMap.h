@@ -48,6 +48,8 @@ public:
         }
 
         if (data_.Size() > free_index_) {
+            // FIXME : currently we are just delay destructing the item
+            // if it being reinserted or in destructor
             data_[free_index_].~T();
             new (&data_[free_index_]) T(value);
         } else {

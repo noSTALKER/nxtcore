@@ -247,6 +247,14 @@ public:
         }
     }
 
+    void clear() noexcept {
+        for (size_type i = 0; i < size_; ++i) {
+            page_allocator_traits::destroy(alloc_, pages_[size_ / page_size]->pointer_to(size_ % page_size));
+        }
+
+        size_ = 0;
+    }
+
     [[nodiscard]] const_iterator cbegin() const noexcept {
         return const_iterator(this, 0);
     }
@@ -269,6 +277,16 @@ public:
 
     [[nodiscard]] iterator end() noexcept {
         return iterator(this, size_);
+    }
+
+    ~PageVector() {
+        clear();
+
+        for (auto& page : pages_) {
+            alloc_.deallocate(page, 1);
+        }
+
+        pages_.clear();
     }
 
 private:

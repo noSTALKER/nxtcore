@@ -1,5 +1,6 @@
 #pragma once
 
 namespace nxt::core {
-struct DefaultInitializeT {};
+struct DefaultInitializeTag {};
+struct ValueInitializeTag {};
 }  // namespace nxt::core
