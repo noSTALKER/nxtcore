@@ -167,6 +167,10 @@ public:
         current_index_ += value;
         return *this;
     }
+
+    [[nodiscard]] difference_type operator-(const PageVectorIterator& rhs) const noexcept {
+        return current_index_ - rhs.current_index_;
+    }
 };
 
 template<typename T, std::size_t PageSize, typename Allocator = std::allocator<T>>

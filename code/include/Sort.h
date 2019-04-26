@@ -173,64 +173,105 @@ isSorted(ForwardIter first, ForwardIter last) {
     return isSortedUntil(first, last, std::less<>()) == last;
 }
 
-template <typename RandomAccessIter, typename Compare, typename = std::enable_if_t<IsRandomAccessIteratorV<RandomAccessIter>>>
+template<typename RandomAccessIter,
+         typename Compare,
+         typename = std::enable_if_t<IsRandomAccessIteratorV<RandomAccessIter>>>
 void
 pushHeap(RandomAccessIter first, RandomAccessIter last, Compare comp) {
     if (last - first >= 2) {
         auto hole = last;
+
+        // point to the element to push
         --hole;
 
         auto distance = hole - first;
-        IteratorValueTypeT<RandomAccessIter> value = std::move(*iter);
+
+        // move the value to a temporary variable
+        IteratorValueTypeT<RandomAccessIter> value = std::move(*hole);
         while (distance > 0) {
+            // get the parent of the hole
             distance = (distance - 1) / 2;
             auto parent = first + distance;
+
+            // move the value at parent to hole if predicate is true
             if (comp(*parent, value)) {
                 *hole = std::move(*parent);
+
+                // parent is the new hole
                 hole = parent;
-            } else { 
+            } else {
                 break;
             }
         }
 
+        // move the stored value to the hole
         *hole = std::move(value);
     }
 }
 
-template <typename RandomAccessIter, typename = std::enable_if_t<IsRandomAccessIteratorV<RandomAccessIter>>>
+template<typename RandomAccessIter, typename = std::enable_if_t<IsRandomAccessIteratorV<RandomAccessIter>>>
 void
 pushHeap(RandomAccessIter first, RandomAccessIter last) {
     pushHeap(first, last, std::less<>());
 }
 
-template <typename RandomAccessIter, typename Compare, typename = std::enable_if_t<IsRandomAccessIteratorV<RandomAccessIter>>>
+template<typename RandomAccessIter,
+         typename Compare,
+         typename = std::enable_if_t<IsRandomAccessIteratorV<RandomAccessIter>>>
 void
 popHeap(RandomAccessIter first, RandomAccessIter last, Compare comp) {
     if (last - first >= 2) {
-        auto hole = last;
-        --last;
+        auto result = last;
+        --result;
 
-        //move the last value to a temporary
-        IteratorValueTypeT<RandomAccessIter> value = std::move(*hole);
+        // move the last value to a temporary
+        IteratorValueTypeT<RandomAccessIter> value = std::move(*result);
 
-        //pop the max value to the last place
-        *hole = std::move(*first);
+        // pop the max value to the last place
+        *result = std::move(*first);
 
+        auto hole_index = 0;
+        auto child_index = 2 * hole_index + 1;
+        auto max_distance = result - first;
+        while (child_index < max_distance) {
+            // check if second child exist or not
+            if (child_index + 1 < max_distance) {
+                // select the greater child
+                if (comp(first[child_index], first[child_index + 1])) {
+                    ++child_index;
+                }
+            }
 
+            if (comp(first[child_index], value)) {
+                break;
+            }
 
+            first[hole_index] = std::move(first[child_index]);
+            hole_index = child_index;
+            child_index = 2 * hole_index + 1;
+        }
+
+        first[hole_index] = std::move(value);
     }
 }
 
-template <typename RandomAccessIter, typename = std::enable_if_t<IsRandomAccessIteratorV<RandomAccessIter>>>
+template<typename RandomAccessIter, typename = std::enable_if_t<IsRandomAccessIteratorV<RandomAccessIter>>>
 void
 popHeap(RandomAccessIter first, RandomAccessIter last) {
     popHeap(first, last, std::less<>());
 }
 
-template<typename RandomAccessIter, typename Compare, typename = std::enable_if_t<IsRandomAccessIteratorV<RandomAccessIter>>>
+template<typename RandomAccessIter,
+         typename Compare,
+         typename = std::enable_if_t<IsRandomAccessIteratorV<RandomAccessIter>>>
 void
 makeHeap(RandomAccessIter first, RandomAccessIter last, Compare comp) {
-
+    if (last - first >= 2) {
+        auto max_distance = last - first;
+        for (decltype(max_distance) i = max_distance / 2; i >= 0; --i) {
+            popHeap(first + i, last, comp);
+        }
+    }
 }
 
 template<typename RandomAccessIter, typename = std::enable_if_t<IsRandomAccessIteratorV<RandomAccessIter>>>
@@ -239,14 +280,20 @@ makeHeap(RandomAccessIter first, RandomAccessIter last) {
     makeHeap(first, last, std::less<>());
 }
 
-template<typename RandomAccessIter, typename Compare, typename = std::enable_if_t<IsRandomAccessIteratorV<RandomAccessIter>>>
+template<typename RandomAccessIter,
+         typename Compare,
+         typename = std::enable_if_t<IsRandomAccessIteratorV<RandomAccessIter>>>
 void
 heapSort(RandomAccessIter first, RandomAccessIter last, Compare comp) {
     makeHeap(first, last, comp);
-    sortHeap(first, last, comp);
+    auto max_distance = last - first;
+    while (max_distance > 0) {
+        popHeap(first, first + max_distance, comp);
+        --max_distance;
+    }
 }
 
-template <typename RandomAccessIter, typename = std::enable_if_t<IsRandomAccessIteratorV<RandomAccessIter>>>
+template<typename RandomAccessIter, typename = std::enable_if_t<IsRandomAccessIteratorV<RandomAccessIter>>>
 void
 heapSort(RandomAccessIter first, RandomAccessIter last) {
     heapSort(first, last, std::less<>());

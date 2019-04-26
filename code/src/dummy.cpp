@@ -94,18 +94,42 @@ main() {
 
     nxt::core::PageVector<int, 4> page_vec;
     page_vec.pushBack(0);
-    page_vec.pushBack(1);
-    page_vec.pushBack(2);
-    page_vec.pushBack(3);
-    page_vec.pushBack(4);
-    page_vec.pushBack(5);
-    page_vec.pushBack(6);
     page_vec.pushBack(7);
-
-    page_vec.popBack();
-    page_vec.popBack();
+    page_vec.pushBack(4);
+    page_vec.pushBack(4);
+    page_vec.pushBack(7);
+    page_vec.pushBack(3);
+    page_vec.pushBack(6);
+    page_vec.pushBack(5);
+    page_vec.pushBack(2);
+    page_vec.pushBack(0);
+    page_vec.pushBack(1);
 
     std::cout << "Page Vector:\n";
+
+    for (auto value : page_vec) {
+        std::cout << value << '\n';
+    }
+
+    /*for (size_t i = 0; i <= page_vec.size(); ++i) {
+        nxt::core::pushHeap(page_vec.begin(), page_vec.begin() + i);
+    }*/
+
+    /*nxt::core::makeHeap(page_vec.begin(), page_vec.end());
+
+    std::cout << "Page Vector after heapify:\n";
+
+    for (auto value : page_vec) {
+        std::cout << value << '\n';
+    }
+
+    for (size_t i = page_vec.size(); i > 0; --i) {
+        nxt::core::popHeap(page_vec.begin(), page_vec.begin() + i);
+    }*/
+
+    nxt::core::heapSort(page_vec.begin(), page_vec.end(), std::greater<>());
+
+    std::cout << "Page Vector after heapsort:\n";
 
     for (auto value : page_vec) {
         std::cout << value << '\n';
