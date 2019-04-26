@@ -29,6 +29,8 @@ main() {
 
     nxt::core::Array<int, 3> test = {20, 20, 20};
 
+    nxt::core::List testing_list(test.begin(), test.end());
+
     constexpr auto value = nxt::core::IsIteratorV<decltype(test.begin())>;
     constexpr auto test2 = nxt::core::IsForwardIteratorV<int*>;
     constexpr auto test3 = nxt::core::IsForwardIteratorV<int>;

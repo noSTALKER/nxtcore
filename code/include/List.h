@@ -447,4 +447,11 @@ private:
     friend class iterator;
     friend class const_iterator;
 };
+
+//template type deduction for input iterator constructor
+template<class InputIter,
+         class Allocator = std::allocator<IteratorValueTypeT<InputIter>>,
+         typename = std::enable_if_t<IsInputIteratorV<InputIter>>>
+List(InputIter, InputIter, Allocator = Allocator())->List<IteratorValueTypeT<InputIter>, Allocator>;
+
 }  // namespace nxt::core

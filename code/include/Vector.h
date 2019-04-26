@@ -102,7 +102,7 @@ public:
 
     void clear() noexcept {
         for (size_type i = 0; i < size_; ++i) {
-            allocator_traits::destroy(alloc_, (data + i));
+            allocator_traits::destroy(alloc_, (data_ + i));
         }
         size_ = 0;
     }
