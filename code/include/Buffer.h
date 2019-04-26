@@ -5,7 +5,7 @@
 
 namespace nxt::core {
 
-template<typename T, std::size_t Size>
+template<typename T, std::size_t Size, std::size_t Alignment = alignof(T)>
 struct Buffer {
     static_assert(Size > 0, "Can't create a Buffer of size == 0");
 
@@ -18,6 +18,7 @@ struct Buffer {
 
     constexpr static size_type total_size = Size * sizeof(T);
     constexpr static size_type type_size = sizeof(T);
+    constexpr static size_type alignment = Alignment;
 
     [[nodiscard]] const_reference operator[](size_type index) const {
         return *reinterpret_cast<const_pointer>(&data_[type_size * index]);
@@ -58,6 +59,6 @@ struct Buffer {
 
 private:
 
-    alignas(value_type) std::byte data_[total_size];
+    alignas(alignment) std::byte data_[total_size];
 };
 }  // namespace nxt::core
