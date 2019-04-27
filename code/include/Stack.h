@@ -1,7 +1,7 @@
 #pragma once
 
-#include "PageVector.h"
 #include <stack>
+#include "PageVector.h"
 
 namespace nxt::core {
 
@@ -15,15 +15,17 @@ public:
     using size_type = typename Container::size_type;
 
     Stack() noexcept(std::is_nothrow_default_constructible_v<Container>)
-        : container_(){}
+        : container_() {}
 
     Stack(const Container& container) noexcept(std::is_nothrow_copy_constructible_v<Container>)
-        : container_(container){}
+        : container_(container) {}
 
     Stack(Container&& container) noexcept(std::is_nothrow_move_constructible_v<Container>)
-        : container_(std::move(container)){}
+        : container_(std::move(container)) {}
 
-    [[nodiscard]] reference top() { return container_.back(); }
+    [[nodiscard]] reference top() {
+        return container_.back();
+    }
 
     [[nodiscard]] const_reference top() const {
         return container_.back();
