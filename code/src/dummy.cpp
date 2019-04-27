@@ -2,6 +2,7 @@
 #include <array>
 #include <iostream>
 #include <vector>
+#include <random>
 #include "../include/CompressedPair.h"
 #include "../include/List.h"
 #include "../include/Search.h"
@@ -92,18 +93,14 @@ main() {
         std::cout << value << '\n';
     }
 
-    nxt::core::PageVector<int, 4> page_vec;
-    page_vec.pushBack(0);
-    page_vec.pushBack(7);
-    page_vec.pushBack(4);
-    page_vec.pushBack(4);
-    page_vec.pushBack(7);
-    page_vec.pushBack(3);
-    page_vec.pushBack(6);
-    page_vec.pushBack(5);
-    page_vec.pushBack(2);
-    page_vec.pushBack(0);
-    page_vec.pushBack(1);
+    nxt::core::PageVector<int, 32> page_vec;
+    for (int i = 0; i < 100; ++i) {
+        page_vec.pushBack(i);
+    }
+
+    std::random_device rd;
+    std::mt19937 g(rd());
+    std::shuffle(page_vec.begin(), page_vec.end(), g);
 
     std::cout << "Page Vector:\n";
 
@@ -127,13 +124,15 @@ main() {
         nxt::core::popHeap(page_vec.begin(), page_vec.begin() + i);
     }*/
 
-    nxt::core::heapSort(page_vec.begin(), page_vec.end(), std::greater<>());
+    nxt::core::quickSort(page_vec.begin(), page_vec.end());
 
     std::cout << "Page Vector after heapsort:\n";
 
     for (auto value : page_vec) {
         std::cout << value << '\n';
     }
+
+    std::cout << "Is Sorted : " << nxt::core::isSorted(page_vec.begin(), page_vec.end()) << '\n';
 
     char stopper;
     std::cin >> stopper;

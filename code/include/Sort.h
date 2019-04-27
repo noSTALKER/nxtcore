@@ -266,10 +266,16 @@ template<typename RandomAccessIter,
          typename = std::enable_if_t<IsRandomAccessIteratorV<RandomAccessIter>>>
 void
 makeHeap(RandomAccessIter first, RandomAccessIter last, Compare comp) {
-    if (last - first >= 2) {
+    /*if (last - first >= 2) {
         auto max_distance = last - first;
         for (decltype(max_distance) i = max_distance / 2; i >= 0; --i) {
             popHeap(first + i, last, comp);
+        }
+    }*/
+    if (last - first >= 2) {
+        auto max_distance = last - first;
+        for (decltype(max_distance) i = 0; i <= max_distance; ++i) {
+            pushHeap(first, first + i, comp);
         }
     }
 }
@@ -297,6 +303,74 @@ template<typename RandomAccessIter, typename = std::enable_if_t<IsRandomAccessIt
 void
 heapSort(RandomAccessIter first, RandomAccessIter last) {
     heapSort(first, last, std::less<>());
+}
+
+template<typename RandomAccessIter,
+         typename Compare,
+         typename = std::enable_if_t<IsRandomAccessIteratorV<RandomAccessIter>>>
+void
+quickSort(RandomAccessIter first, RandomAccessIter last, Compare comp) {
+    static constexpr IteratorDifferenceTypeT<RandomAccessIter> kInsertionSortLimit = 16;
+    if (kInsertionSortLimit >= last - first) {
+        insertionSort(first, last, comp);
+        return;
+    }
+
+
+    auto last_element = last;
+    --last_element;
+
+    auto distance = last - first;
+    auto mid = first + (distance / 2);
+    using std::swap;
+
+    // do swaps to place the median of 3 in the middle
+    if (comp(*mid, *first)) {
+        swap(*mid, *first);
+    }
+
+    if (comp(*last_element, *mid)) {
+        swap(*mid, *last_element);
+    }
+
+    if (comp(*mid, *first)) {
+        swap(*mid, *first);
+    }
+
+    // replace the median to place it in the last place
+    swap(*mid, *last_element);
+
+    auto low = first;
+    auto high = last_element;
+    --high;
+
+    while (true) {
+        while (comp(*low, *last_element)) {
+            ++low;
+        }
+
+        while (comp(*last_element, *high)) {
+            --high;
+        }
+
+        if (low < high) {
+            swap(*low, *high);
+            ++low;
+            --high;
+        } else {
+            break;
+        }
+    }
+
+    swap(*low, *last_element);
+    quickSort(first, low, comp);
+    quickSort(low + 1, last, comp);
+}
+
+template<typename RandomAccessIter, typename = std::enable_if_t<IsRandomAccessIteratorV<RandomAccessIter>>>
+void
+quickSort(RandomAccessIter first, RandomAccessIter last) {
+    quickSort(first, last, std::less<>());
 }
 
 }  // namespace nxt::core

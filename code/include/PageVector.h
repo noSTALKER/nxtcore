@@ -225,8 +225,8 @@ public:
     void pushBack(const T& value) {
         growIfNeeded();
 
-        page_allocator_traits::construct(alloc_, pages[size_ / page_size]->pointer_to(size_ % page_size), value);
-        size_ = new_size;
+        page_allocator_traits::construct(alloc_, pages_[size_ / page_size]->pointer_to(size_ % page_size), value);
+        ++size_;
     }
 
     void pushBack(T&& value) {
