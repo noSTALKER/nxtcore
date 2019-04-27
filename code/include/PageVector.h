@@ -200,9 +200,9 @@ public:
     PageVector() noexcept(
         std::is_nothrow_default_constructible_v<page_allocator>&& std::is_nothrow_constructible_v<decltype(pages_)>)
         : alloc_()
-        , size_(0) {}
+        , size_(0){}
 
-    [[nodiscard]] size_type capacity() const noexcept {
+              [[nodiscard]] size_type capacity() const noexcept {
         return pages_.size() * page_size;
     }
 
@@ -220,6 +220,18 @@ public:
 
     [[nodiscard]] bool empty() const noexcept {
         return size_ == 0;
+    }
+
+    [[nodiscard]] reference front() { return pages_.front()->operator[](0); }
+
+    [[nodiscard]] const_reference front() const {
+        return pages_.front()->operator[](0);
+    }
+
+    [[nodiscard]] reference back() { return pages_.back()->operator[](size_ % page_size); }
+
+    [[nodiscard]] const_reference back() const {
+        return pages_.back()->operator[](size_ % page_size);
     }
 
     void pushBack(const T& value) {

@@ -345,6 +345,7 @@ quickSort(RandomAccessIter first, RandomAccessIter last, Compare comp) {
     --high;
 
     while (true) {
+        //swap lower and higher values when they don't satisfy the predicate
         while (comp(*low, *last_element)) {
             ++low;
         }
@@ -353,6 +354,8 @@ quickSort(RandomAccessIter first, RandomAccessIter last, Compare comp) {
             --high;
         }
 
+        //check if lower is smaller than high, if yes, swap the values or else
+        //we found the place for the pivot value
         if (low < high) {
             swap(*low, *high);
             ++low;
@@ -362,7 +365,10 @@ quickSort(RandomAccessIter first, RandomAccessIter last, Compare comp) {
         }
     }
 
+    //swap the pivot value to place it at its place
     swap(*low, *last_element);
+
+    //recursively sort lower and higher partition now
     quickSort(first, low, comp);
     quickSort(low + 1, last, comp);
 }
