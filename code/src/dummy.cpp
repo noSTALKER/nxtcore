@@ -94,7 +94,7 @@ main() {
     }
 
     nxt::core::PageVector<int, 32> page_vec;
-    for (int i = 0; i < 10; ++i) {
+    for (int i = 0; i < 100; ++i) {
         page_vec.pushBack(i);
     }
 
@@ -104,8 +104,7 @@ main() {
 
     std::cout << "Page Vector:\n";
 
-    nxt::core::heapSort(page_vec.begin(), page_vec.end());
-    nxt::core::reverse(page_vec.begin(), page_vec.end());
+    nxt::core::partialSort(page_vec.begin(), page_vec.begin() + 21, page_vec.end());
 
     std::cout << "Page Vector after sort:\n";
 

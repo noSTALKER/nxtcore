@@ -303,23 +303,24 @@ makeHeap(RandomAccessIter first, RandomAccessIter last) {
     makeHeap(first, last, std::less<>());
 }
 
-template<typename RandomAccessIter, typename Compare, typename = std::enable_if_t<IsRandomAccessIteratorV<RandomAccessIter>>>
+template<typename RandomAccessIter,
+         typename Compare,
+         typename = std::enable_if_t<IsRandomAccessIteratorV<RandomAccessIter>>>
 RandomAccessIter
 isHeapUntil(RandomAccessIter first, RandomAccessIter last, Compare comp) {
     auto max_distance = last - first;
-	//check if each element is 
+    // check if each element is
     for (decltype(max_distance) i = 1; i < max_distance; ++i) {
-        auto parent = (i - 1)/ 2 ;
-		if (comp(first[parent], first[i])) {
+        auto parent = (i - 1) / 2;
+        if (comp(first[parent], first[i])) {
             return (first + i);
-		}
+        }
     }
 
-	return last;
+    return last;
 }
 
-template<typename RandomAccessIter,
-         typename = std::enable_if_t<IsRandomAccessIteratorV<RandomAccessIter>>>
+template<typename RandomAccessIter, typename = std::enable_if_t<IsRandomAccessIteratorV<RandomAccessIter>>>
 RandomAccessIter
 isHeapUntil(RandomAccessIter first, RandomAccessIter last) {
     isHeapUntil(first, last, std::less<>());
@@ -339,8 +340,6 @@ isHeap(RandomAccessIter first, RandomAccessIter last) {
     return isHeapUntil(first, last, std::less<>()) == last;
 }
 
-
-
 template<typename RandomAccessIter,
          typename Compare,
          typename = std::enable_if_t<IsRandomAccessIteratorV<RandomAccessIter>>>
@@ -358,6 +357,59 @@ template<typename RandomAccessIter, typename = std::enable_if_t<IsRandomAccessIt
 void
 heapSort(RandomAccessIter first, RandomAccessIter last) {
     heapSort(first, last, std::less<>());
+}
+
+template<typename RandomAccessIter,
+         typename Compare,
+         typename = std::enable_if_t<IsRandomAccessIteratorV<RandomAccessIter>>>
+void
+partialSort(RandomAccessIter first, RandomAccessIter mid, RandomAccessIter last, Compare comp) {
+    makeHeap(first, mid, comp);
+
+    auto iter = mid;
+    while (iter != last) {
+        if (comp(*iter, *first)) {
+            IteratorValueTypeT<RandomAccessIter> value = std::move(*iter);
+            *iter = std::move(*first);
+
+			auto hole_index = 0;
+            auto child_index = 2 * hole_index + 1;
+            auto max_distance = mid - first;
+            while (child_index < max_distance) {
+                // check if second child exist or not
+                if (child_index + 1 < max_distance) {
+                    // select the greater child
+                    if (comp(first[child_index], first[child_index + 1])) {
+                        ++child_index;
+                    }
+                }
+
+                if (comp(first[child_index], value)) {
+                    break;
+                }
+
+                first[hole_index] = std::move(first[child_index]);
+                hole_index = child_index;
+                child_index = 2 * hole_index + 1;
+            }
+
+            first[hole_index] = std::move(value);
+
+        }
+        ++iter;
+    }
+
+    auto mid_distance = mid - first;
+    while (mid_distance > 0) {
+        popHeap(first, first + mid_distance, comp);
+        --mid_distance;
+    }
+}
+
+template<typename RandomAccessIter, typename = std::enable_if_t<IsRandomAccessIteratorV<RandomAccessIter>>>
+void
+partialSort(RandomAccessIter first, RandomAccessIter mid, RandomAccessIter last) {
+    partialSort(first, mid, last, std::less<>());
 }
 
 template<typename RandomAccessIter,
@@ -433,7 +485,9 @@ quickSort(RandomAccessIter first, RandomAccessIter last) {
     quickSort(first, last, std::less<>());
 }
 
-template<typename RandomAccessIter, typename Compare, typename = std::enable_if_t<IsRandomAccessIteratorV<RandomAccessIter>>>
+template<typename RandomAccessIter,
+         typename Compare,
+         typename = std::enable_if_t<IsRandomAccessIteratorV<RandomAccessIter>>>
 void
 nthElement(RandomAccessIter first, RandomAccessIter last, RandomAccessIter nth, Compare comp) {
     static constexpr IteratorDifferenceTypeT<RandomAccessIter> kInsertionSortLimit = 16;
@@ -512,8 +566,8 @@ nthElement(RandomAccessIter first, RandomAccessIter last, RandomAccessIter nth) 
 template<typename BiDirectionalIter, typename = std::enable_if_t<IsBidirectionalIteratorV<BiDirectionalIter>>>
 void
 reverse(BiDirectionalIter first, BiDirectionalIter last) {
-	//this condition takes care that first never crosses last for all
-	//even-odd length
+    // this condition takes care that first never crosses last for all
+    // even-odd length
     while (first != last && first != --last) {
         using std::swap;
         swap(*first, *last);
