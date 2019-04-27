@@ -137,8 +137,8 @@ public:
         Node* previous;
         value_type value;
 
-        Node(const Node*) = delete;
-        Node& operator=(const Node*) = delete;
+        Node(const Node&) = delete;
+        Node& operator=(const Node&) = delete;
     };
 
     List()

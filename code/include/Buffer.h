@@ -15,25 +15,28 @@ struct Buffer {
     using pointer = T*;
     using const_pointer = const T*;
     using size_type = std::size_t;
+    using iterator = pointer;
+    using const_iterator = const_pointer;
 
     constexpr static size_type total_size = Size * sizeof(T);
     constexpr static size_type type_size = sizeof(T);
     constexpr static size_type alignment = Alignment;
+    constexpr static size_type size = Size;
 
     [[nodiscard]] const_reference operator[](size_type index) const {
-        return *reinterpret_cast<const_pointer>(&data_[type_size * index]);
+        return data()[index];
     }
 
     [[nodiscard]] reference operator[](size_type index) {
-        return *reinterpret_cast<pointer>(&data_[type_size * index]);
+        return data()[index];
     }
 
     [[nodiscard]] const_pointer pointer_to(size_type index) const noexcept {
-        return reinterpret_cast<const_pointer>(&data_[type_size * index]);
+        return data() + index;
     }
 
     [[nodiscard]] pointer pointer_to(size_type index) noexcept {
-        return reinterpret_cast<pointer>(&data_[type_size * index]);
+        return data() + index;
     }
 
     template<typename... Args>
@@ -57,8 +60,35 @@ struct Buffer {
         return reinterpret_cast<const_pointer>(data_);
     }
 
-private:
+    [[nodiscard]] iterator begin() noexcept {
+        return data();
+    }
 
+    [[nodiscard]] const_iterator begin() const noexcept {
+        return data();
+    }
+
+
+    [[nodiscard]] const_iterator cbegin() const noexcept {
+        return data();
+    }
+
+    [[nodiscard]] const_iterator end() noexcept {
+        return data() + size;
+    }
+
+    [[nodiscard]] const_iterator end() const noexcept {
+        return data() + size;
+    }
+
+    [[nodiscard]] const_iterator cend() const noexcept {
+        return data() + size;
+    }
+
+	Buffer(const Buffer&) = delete;
+    Buffer& operator=(const Buffer&) = delete;
+
+private:
     alignas(alignment) std::byte data_[total_size];
 };
 }  // namespace nxt::core
