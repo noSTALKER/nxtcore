@@ -303,6 +303,44 @@ makeHeap(RandomAccessIter first, RandomAccessIter last) {
     makeHeap(first, last, std::less<>());
 }
 
+template<typename RandomAccessIter, typename Compare, typename = std::enable_if_t<IsRandomAccessIteratorV<RandomAccessIter>>>
+RandomAccessIter
+isHeapUntil(RandomAccessIter first, RandomAccessIter last, Compare comp) {
+    auto max_distance = last - first;
+	//check if each element is 
+    for (decltype(max_distance) i = 1; i < max_distance; ++i) {
+        auto parent = (i - 1)/ 2 ;
+		if (comp(first[parent], first[i])) {
+            return (first + i);
+		}
+    }
+
+	return last;
+}
+
+template<typename RandomAccessIter,
+         typename = std::enable_if_t<IsRandomAccessIteratorV<RandomAccessIter>>>
+RandomAccessIter
+isHeapUntil(RandomAccessIter first, RandomAccessIter last) {
+    isHeapUntil(first, last, std::less<>());
+}
+
+template<typename RandomAccessIter,
+         typename Compare,
+         typename = std::enable_if_t<IsRandomAccessIteratorV<RandomAccessIter>>>
+bool
+isHeap(RandomAccessIter first, RandomAccessIter last, Compare comp) {
+    return isHeapUntil(first, last, comp) == last;
+}
+
+template<typename RandomAccessIter, typename = std::enable_if_t<IsRandomAccessIteratorV<RandomAccessIter>>>
+bool
+isHeap(RandomAccessIter first, RandomAccessIter last) {
+    return isHeapUntil(first, last, std::less<>()) == last;
+}
+
+
+
 template<typename RandomAccessIter,
          typename Compare,
          typename = std::enable_if_t<IsRandomAccessIteratorV<RandomAccessIter>>>
@@ -475,7 +513,7 @@ template<typename BiDirectionalIter, typename = std::enable_if_t<IsBidirectional
 void
 reverse(BiDirectionalIter first, BiDirectionalIter last) {
 	//this condition takes care that first never crosses last for all
-	//even-odd cases
+	//even-odd length
     while (first != last && first != --last) {
         using std::swap;
         swap(*first, *last);

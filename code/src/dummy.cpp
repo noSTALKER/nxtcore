@@ -1,16 +1,16 @@
 #include <algorithm>
 #include <array>
 #include <iostream>
-#include <vector>
 #include <random>
+#include <vector>
+#include "../include/Array.h"
 #include "../include/CompressedPair.h"
 #include "../include/List.h"
+#include "../include/Math.h"
+#include "../include/PageVector.h"
 #include "../include/Search.h"
 #include "../include/Sort.h"
 #include "../include/Vector.h"
-#include "../include/PageVector.h"
-#include "../include/Array.h"
-#include "../include/Math.h"
 
 int
 main() {
@@ -107,13 +107,36 @@ main() {
     nxt::core::heapSort(page_vec.begin(), page_vec.end());
     nxt::core::reverse(page_vec.begin(), page_vec.end());
 
-    std::cout << "Page Vector after heapsort:\n";
+    std::cout << "Page Vector after sort:\n";
 
     for (auto value : page_vec) {
         std::cout << value << '\n';
     }
 
     std::cout << "Is Sorted : " << nxt::core::isSorted(page_vec.begin(), page_vec.end()) << '\n';
+
+    nxt::core::PageVector<int, 32> page_vec_heap;
+    page_vec_heap.pushBack(0);
+    page_vec_heap.pushBack(7);
+    page_vec_heap.pushBack(1);
+    page_vec_heap.pushBack(5);
+    page_vec_heap.pushBack(3);
+    page_vec_heap.pushBack(7);
+    page_vec_heap.pushBack(4);
+    page_vec_heap.pushBack(4);
+    page_vec_heap.pushBack(2);
+    page_vec_heap.pushBack(0);
+    page_vec_heap.pushBack(6);
+
+    nxt::core::makeHeap(page_vec_heap.begin(), page_vec_heap.end());
+
+    std::cout << "Page Vector after heapify:\n";
+
+    for (auto value : page_vec_heap) {
+        std::cout << value << '\n';
+    }
+
+	std::cout << "Is Heap : " << nxt::core::isHeap(page_vec_heap.begin(), page_vec_heap.end()) << '\n';
 
     char stopper;
     std::cin >> stopper;
