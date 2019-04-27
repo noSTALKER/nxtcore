@@ -1,6 +1,7 @@
 #pragma once
 #include <iterator>
 #include <type_traits>
+#include <vector>
 
 namespace nxt::core {
 
@@ -61,6 +62,10 @@ public:
         return data_[size_ - 1];
     }
 
+	[[nodiscard]] const_reference back() const noexcept {
+        return data_[size_ - 1];
+	}
+
     [[nodiscard]] size_type size() const noexcept {
         return size_;
     }
@@ -98,6 +103,13 @@ public:
         growIfNeeded();
         allocator_traits::construct(alloc_, data_ + size_, std::forward<Args>(args)...);
         ++size_;
+    }
+
+    void popBack() {
+        if (size_ > 0) {
+            allocator__traits::destroy(alloc_, (data + size_ - 1));
+            --size_;
+        }
     }
 
     void clear() noexcept {

@@ -266,16 +266,34 @@ template<typename RandomAccessIter,
          typename = std::enable_if_t<IsRandomAccessIteratorV<RandomAccessIter>>>
 void
 makeHeap(RandomAccessIter first, RandomAccessIter last, Compare comp) {
-    /*if (last - first >= 2) {
-        auto max_distance = last - first;
-        for (decltype(max_distance) i = max_distance / 2; i >= 0; --i) {
-            popHeap(first + i, last, comp);
-        }
-    }*/
     if (last - first >= 2) {
         auto max_distance = last - first;
-        for (decltype(max_distance) i = 0; i <= max_distance; ++i) {
-            pushHeap(first, first + i, comp);
+        for (decltype(max_distance) i = max_distance / 2; i >= 0; --i) {
+            // move the last value to a temporary
+            auto hole_index = i;
+            IteratorValueTypeT<RandomAccessIter> value = std::move(first[hole_index]);
+
+            
+            auto child_index = 2 * hole_index + 1;
+            while (child_index < max_distance) {
+                // check if second child exist or not
+                if (child_index + 1 < max_distance) {
+                    // select the greater child
+                    if (comp(first[child_index], first[child_index + 1])) {
+                        ++child_index;
+                    }
+                }
+
+                if (comp(first[child_index], value)) {
+                    break;
+                }
+
+                first[hole_index] = std::move(first[child_index]);
+                hole_index = child_index;
+                child_index = 2 * hole_index + 1;
+            }
+
+            first[hole_index] = std::move(value);
         }
     }
 }
