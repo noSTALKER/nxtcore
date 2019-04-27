@@ -94,7 +94,7 @@ main() {
     }
 
     nxt::core::PageVector<int, 32> page_vec;
-    for (int i = 0; i < 1000; ++i) {
+    for (int i = 0; i < 10; ++i) {
         page_vec.pushBack(i);
     }
 
@@ -104,27 +104,8 @@ main() {
 
     std::cout << "Page Vector:\n";
 
-    /*for (auto value : page_vec) {
-        std::cout << value << '\n';
-    }*/
-
-    /*for (size_t i = 0; i <= page_vec.size(); ++i) {
-        nxt::core::pushHeap(page_vec.begin(), page_vec.begin() + i);
-    }*/
-
-    /*nxt::core::makeHeap(page_vec.begin(), page_vec.end());
-
-    std::cout << "Page Vector after heapify:\n";
-
-    for (auto value : page_vec) {
-        std::cout << value << '\n';
-    }
-
-    for (size_t i = page_vec.size(); i > 0; --i) {
-        nxt::core::popHeap(page_vec.begin(), page_vec.begin() + i);
-    }*/
-
     nxt::core::heapSort(page_vec.begin(), page_vec.end());
+    nxt::core::reverse(page_vec.begin(), page_vec.end());
 
     std::cout << "Page Vector after heapsort:\n";
 

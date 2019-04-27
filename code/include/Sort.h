@@ -273,7 +273,6 @@ makeHeap(RandomAccessIter first, RandomAccessIter last, Compare comp) {
             auto hole_index = i;
             IteratorValueTypeT<RandomAccessIter> value = std::move(first[hole_index]);
 
-            
             auto child_index = 2 * hole_index + 1;
             while (child_index < max_distance) {
                 // check if second child exist or not
@@ -394,6 +393,94 @@ template<typename RandomAccessIter, typename = std::enable_if_t<IsRandomAccessIt
 void
 quickSort(RandomAccessIter first, RandomAccessIter last) {
     quickSort(first, last, std::less<>());
+}
+
+template<typename RandomAccessIter, typename Compare, typename = std::enable_if_t<IsRandomAccessIteratorV<RandomAccessIter>>>
+void
+nthElement(RandomAccessIter first, RandomAccessIter last, RandomAccessIter nth, Compare comp) {
+    static constexpr IteratorDifferenceTypeT<RandomAccessIter> kInsertionSortLimit = 16;
+    if (kInsertionSortLimit >= last - first) {
+        insertionSort(first, last, comp);
+        return;
+    }
+
+    auto last_element = last;
+    --last_element;
+
+    auto distance = last - first;
+    auto mid = first + (distance / 2);
+    using std::swap;
+
+    // do swaps to place the median of 3 in the middle
+    if (comp(*mid, *first)) {
+        swap(*mid, *first);
+    }
+
+    if (comp(*last_element, *mid)) {
+        swap(*mid, *last_element);
+    }
+
+    if (comp(*mid, *first)) {
+        swap(*mid, *first);
+    }
+
+    // replace the median to place it in the last place
+    swap(*mid, *last_element);
+
+    auto low = first;
+    auto high = last_element;
+    --high;
+
+    while (true) {
+        // swap lower and higher values when they don't satisfy the predicate
+        while (comp(*low, *last_element)) {
+            ++low;
+        }
+
+        while (comp(*last_element, *high)) {
+            --high;
+        }
+
+        // check if lower is smaller than high, if yes, swap the values or else
+        // we found the place for the pivot value
+        if (low < high) {
+            swap(*low, *high);
+            ++low;
+            --high;
+        } else {
+            break;
+        }
+    }
+
+    // swap the pivot value to place it at its place
+    swap(*low, *last_element);
+
+    // check nth position fall in which partition
+    if (low > nth) {
+        nthElement(first, low, nth, comp);
+    } else if (nth > low) {
+        nthElement(low + 1, last, nth, comp);
+    } else {
+        return;
+    }
+}
+
+template<typename RandomAccessIter, typename = std::enable_if_t<IsRandomAccessIteratorV<RandomAccessIter>>>
+void
+nthElement(RandomAccessIter first, RandomAccessIter last, RandomAccessIter nth) {
+    nthElement(first, last, nth, std::less<>());
+}
+
+template<typename BiDirectionalIter, typename = std::enable_if_t<IsBidirectionalIteratorV<BiDirectionalIter>>>
+void
+reverse(BiDirectionalIter first, BiDirectionalIter last) {
+	//this condition takes care that first never crosses last for all
+	//even-odd cases
+    while (first != last && first != --last) {
+        using std::swap;
+        swap(*first, *last);
+        ++first;
+    }
 }
 
 }  // namespace nxt::core
