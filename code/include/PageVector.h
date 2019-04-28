@@ -210,6 +210,10 @@ public:
         return size_;
     }
 
+	[[nodiscard]] bool empty() const noexcept {
+        return size_ == 0;
+	}
+
     [[nodiscard]] reference operator[](size_type index) noexcept {
         return pages_[index / page_size]->operator[](index % page_size);
     }
@@ -218,20 +222,16 @@ public:
         return pages_[index / page_size]->operator[](index % page_size);
     }
 
-    [[nodiscard]] bool empty() const noexcept {
-        return size_ == 0;
-    }
-
     [[nodiscard]] reference front() { return pages_.front()->operator[](0); }
 
     [[nodiscard]] const_reference front() const {
         return pages_.front()->operator[](0);
     }
 
-    [[nodiscard]] reference back() { return pages_.back()->operator[](size_ % page_size); }
+    [[nodiscard]] reference back() { return pages_.back()->operator[]((size_ - 1) % page_size); }
 
     [[nodiscard]] const_reference back() const {
-        return pages_.back()->operator[](size_ % page_size);
+        return pages_.back()->operator[]((size_ - 1) % page_size);
     }
 
     void pushBack(const T& value) {

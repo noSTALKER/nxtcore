@@ -107,7 +107,7 @@ public:
 
     void popBack() {
         if (size_ > 0) {
-            allocator__traits::destroy(alloc_, (data + size_ - 1));
+            allocator_traits::destroy(alloc_, (data_ + size_ - 1));
             --size_;
         }
     }

@@ -372,7 +372,7 @@ partialSort(RandomAccessIter first, RandomAccessIter mid, RandomAccessIter last,
             IteratorValueTypeT<RandomAccessIter> value = std::move(*iter);
             *iter = std::move(*first);
 
-			auto hole_index = 0;
+            auto hole_index = 0;
             auto child_index = 2 * hole_index + 1;
             auto max_distance = mid - first;
             while (child_index < max_distance) {
@@ -394,7 +394,6 @@ partialSort(RandomAccessIter first, RandomAccessIter mid, RandomAccessIter last,
             }
 
             first[hole_index] = std::move(value);
-
         }
         ++iter;
     }

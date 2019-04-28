@@ -35,6 +35,12 @@ public:
         container_.popBack();
     }
 
+    [[nodiscard]] value_type popAndExtract() {
+        value_type result = std::move(container_.back());
+        container_.popBack();
+        return result;
+    }
+
     void push(const T& value) {
         container_.pushBack(value);
     }

@@ -8,6 +8,7 @@
 #include "../include/List.h"
 #include "../include/Math.h"
 #include "../include/PageVector.h"
+#include "../include/PriorityQueue.h"
 #include "../include/Search.h"
 #include "../include/Sort.h"
 #include "../include/Vector.h"
@@ -135,7 +136,19 @@ main() {
         std::cout << value << '\n';
     }
 
-	std::cout << "Is Heap : " << nxt::core::isHeap(page_vec_heap.begin(), page_vec_heap.end()) << '\n';
+    std::cout << "Is Heap : " << nxt::core::isHeap(page_vec_heap.begin(), page_vec_heap.end()) << '\n';
+
+    nxt::core::PriorityQueue<int> queue;
+    queue.push(2);
+    queue.push(4);
+    queue.push(0);
+    queue.push(7);
+    std::cout << "Queue empty : " << queue.empty() << '\n';
+    std::cout << "Queue size : " << queue.size() << '\n';
+    
+	while (!queue.empty()) {
+        std::cout << queue.popAndExtract() << '\n';
+	}
 
     char stopper;
     std::cin >> stopper;
