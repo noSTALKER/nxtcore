@@ -200,9 +200,9 @@ public:
     PageVector() noexcept(
         std::is_nothrow_default_constructible_v<page_allocator>&& std::is_nothrow_constructible_v<decltype(pages_)>)
         : alloc_()
-        , size_(0){}
+        , size_(0) {}
 
-              [[nodiscard]] size_type capacity() const noexcept {
+    [[nodiscard]] size_type capacity() const noexcept {
         return pages_.size() * page_size;
     }
 
@@ -210,9 +210,9 @@ public:
         return size_;
     }
 
-	[[nodiscard]] bool empty() const noexcept {
+    [[nodiscard]] bool empty() const noexcept {
         return size_ == 0;
-	}
+    }
 
     [[nodiscard]] reference operator[](size_type index) noexcept {
         return pages_[index / page_size]->operator[](index % page_size);
@@ -222,13 +222,17 @@ public:
         return pages_[index / page_size]->operator[](index % page_size);
     }
 
-    [[nodiscard]] reference front() { return pages_.front()->operator[](0); }
+    [[nodiscard]] reference front() {
+        return pages_.front()->operator[](0);
+    }
 
     [[nodiscard]] const_reference front() const {
         return pages_.front()->operator[](0);
     }
 
-    [[nodiscard]] reference back() { return pages_.back()->operator[]((size_ - 1) % page_size); }
+    [[nodiscard]] reference back() {
+        return pages_.back()->operator[]((size_ - 1) % page_size);
+    }
 
     [[nodiscard]] const_reference back() const {
         return pages_.back()->operator[]((size_ - 1) % page_size);
@@ -258,14 +262,16 @@ public:
 
     void popBack() {
         if (size_ > 0) {
-            page_allocator_traits::destroy(alloc_, pages_[size_ / page_size]->pointer_to(size_ % page_size));
+            auto last_element = (size_ - 1);
+            page_allocator_traits::destroy(alloc_,
+                                           pages_[last_element / page_size]->pointer_to(last_element % page_size));
             --size_;
         }
     }
 
     void clear() noexcept {
         for (size_type i = 0; i < size_; ++i) {
-            page_allocator_traits::destroy(alloc_, pages_[size_ / page_size]->pointer_to(size_ % page_size));
+            page_allocator_traits::destroy(alloc_, pages_[i / page_size]->pointer_to(i % page_size));
         }
 
         size_ = 0;

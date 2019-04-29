@@ -145,10 +145,13 @@ main() {
     queue.push(7);
     std::cout << "Queue empty : " << queue.empty() << '\n';
     std::cout << "Queue size : " << queue.size() << '\n';
-    
-	while (!queue.empty()) {
+
+    while (!queue.empty()) {
         std::cout << queue.popAndExtract() << '\n';
-	}
+    }
+
+    constexpr auto test_value = nxt::core::IsTemplateInstanceOf<std::array, std::array<int, 10>>::value;
+    constexpr auto test_value1 = nxt::core::IsTemplateInstanceOf<std::vector, std::vector<int>>::value;
 
     char stopper;
     std::cin >> stopper;
