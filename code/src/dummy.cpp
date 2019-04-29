@@ -150,9 +150,6 @@ main() {
         std::cout << queue.popAndExtract() << '\n';
     }
 
-    constexpr auto test_value = nxt::core::IsTemplateInstanceOf<std::array, std::array<int, 10>>::value;
-    constexpr auto test_value1 = nxt::core::IsTemplateInstanceOf<std::vector, std::vector<int>>::value;
-
     char stopper;
     std::cin >> stopper;
     return 0;
