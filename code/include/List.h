@@ -343,19 +343,16 @@ public:
     void reverse() noexcept {
 		//start from the head node
         auto node = head_;
-        while (true) {
+        do {
 			//reverse the links of the node
             auto next_node = node->next;
             node->next = node->previous; 
             node->previous = next_node;
 
-			//stop when reached the head node
-			if (next_node == head_)
-                break;
-
 			//move to the next node
 			node = next_node;
-        }
+		//stop if reached the head
+        } while (node != head_);
     }
 
     ~List() {
