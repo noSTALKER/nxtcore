@@ -200,13 +200,28 @@ public:
         : alloc_(std::move(list.alloc_))
         , size_(0) {
         constructHeadNode();
+
         std::swap(head_, list.head_);
+        std::swap(size_, list.size_);
     }
 
     List(List&& list, const Allocator& alloc)
         : alloc_(alloc)
         , size_(0) {
         constructHeadNode();
+
+        // in case the allocators are not equal, move the elements from the list to the new list using move
+        // iterators
+        constexpr if (!node_allocator_traits::is_always_equal::value) {
+            if (alloc_ != right.alloc_) {
+                insertFromIterator(
+                    head->next, std::make_move_iterator(list.begin()), std::make_move_iterator(list.end()));
+                return;
+            }
+        }
+
+        std::swap(head_, list.head_);
+        std::swap(size_, list.size_);
     }
 
     [[nodiscard]] bool empty() const noexcept {
@@ -325,6 +340,24 @@ public:
         size_ = 0;
     }
 
+    void reverse() noexcept {
+		//start from the head node
+        auto node = head_;
+        while (true) {
+			//reverse the links of the node
+            auto next_node = node->next;
+            node->next = node->previous; 
+            node->previous = next_node;
+
+			//stop when reached the head node
+			if (next_node == head_)
+                break;
+
+			//move to the next node
+			node = next_node;
+        }
+    }
+
     ~List() {
         clear();
         destroyHeadNode();
@@ -434,8 +467,6 @@ private:
         return node;
     }
 
-    void clearList() noexcept {}
-
     void destroyHeadNode() noexcept {
         node_allocator_traits::deallocate(alloc_, head_, 1);
     }
@@ -448,7 +479,7 @@ private:
     friend class const_iterator;
 };
 
-//template type deduction for input iterator constructor
+// template type deduction for input iterator constructor
 template<class InputIter,
          class Allocator = std::allocator<IteratorValueTypeT<InputIter>>,
          typename = std::enable_if_t<IsInputIteratorV<InputIter>>>
