@@ -119,7 +119,8 @@ public:
         size_ = 0;
     }
 
-    iterator insert(const_iterator position, const T& value) {}
+    iterator insert(const_iterator position, const T& value) {
+	}
 
     iterator insert(const_iterator position, T&& value) {}
 

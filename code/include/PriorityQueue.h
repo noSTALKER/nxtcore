@@ -1,6 +1,8 @@
 #pragma once
 
-#include <queue>
+#include <functional>
+
+#include "PageVector.h"
 
 namespace nxt::core {
 

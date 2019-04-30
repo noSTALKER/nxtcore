@@ -48,14 +48,16 @@ main() {
         std::cout << value << '\n';
     }
 
-	list.reverse();
+    list.reverse();
+    list.assign(test.begin(), test.end());
+    list.resize(10, 1);
+    list.resize(5);
 
     std::cout << "List after reversing :\n";
 
     for (auto value : list) {
         std::cout << value << '\n';
     }
-
 
     nxt::core::List<int> vector;
     vector.pushBack(3);

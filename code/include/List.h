@@ -369,17 +369,17 @@ public:
                 return;
             }
 
-			//if we run of values to append, erase remaining nodes
+            // if we run of values to append, erase remaining nodes
             if (first == last) {
                 eraseNodes(old_node, head_);
                 return;
             }
 
-			//if value is copy assignable, use it
+            // if value is copy assignable, use it
             if constexpr (std::is_copy_assignable_v<value_type>) {
                 old_node->value = *first;
             } else {
-				//else try using copy constructor after calling the destructor
+                // else try using copy constructor after calling the destructor
                 node_allocator_traits::destroy(alloc_, std::addressof(old_node->value));
                 node_allocator_traits::construct(alloc_, std::addressof(old_node->value), *first);
             }
@@ -414,7 +414,33 @@ public:
             old_node = old_node->next;
             --count;
         }
-	}
+    }
+
+    void resize(size_type new_size) {
+        if (new_size > size_) {
+            insertCountNode(head_, new_size - size_);
+        } else {
+            auto node = head_->next;
+            for (size_type i = 0; i < new_size; ++i) {
+				node = node->next;
+			}
+
+			eraseNodes(node, head_);
+        }
+    }
+
+	void resize(size_type new_size, const T& value) {
+        if (new_size > size_) {
+            insertCountNode(head_, new_size - size_, value);
+        } else {
+            auto node = head_->next;
+            for (size_type i = 0; i < new_size; ++i) {
+                node = node->next;
+            }
+
+            eraseNodes(node, head_);
+        }
+    }
 
     ~List() {
         clear();

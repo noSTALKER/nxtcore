@@ -4,7 +4,7 @@
 
 namespace nxt::core {
 
-template <typename T, typename Allocator = std::allocator<T>>
+template<typename T, typename Allocator = std::allocator<T>>
 class RingBuffer {
 public:
     using value_type = T;
@@ -17,6 +17,12 @@ public:
     using size_type = typename allocator_traits::size_type;
     using difference_type = typename allocator_traits::difference_type;
 
+    RingBuffer() noexcept(std::is_nothrow_default_constructible_v<allocator_type>)
+		:alloc_() {}
 
+
+
+private:
+    allocator_type alloc_;
 };
-}
+}  // namespace nxt::core

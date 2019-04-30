@@ -15,6 +15,7 @@ struct Buffer {
     using pointer = T*;
     using const_pointer = const T*;
     using size_type = std::size_t;
+    using difference_type = std::ptrdiff_t;
     using iterator = pointer;
     using const_iterator = const_pointer;
 
