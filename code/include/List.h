@@ -1,7 +1,6 @@
 #pragma once
 #include <iterator>
 #include <list>
-#include <type_traits>
 #include "TypeTraits.h"
 
 namespace nxt::core {
@@ -212,7 +211,7 @@ public:
 
         // in case the allocators are not equal, move the elements from the list to the new list using move
         // iterators
-        constexpr if (!node_allocator_traits::is_always_equal::value) {
+        if constexpr (!node_allocator_traits::is_always_equal::value) {
             if (alloc_ != right.alloc_) {
                 insertFromIterator(
                     head->next, std::make_move_iterator(list.begin()), std::make_move_iterator(list.end()));
@@ -317,6 +316,11 @@ public:
         return iterator(this, next_node);
     }
 
+    iterator erase(const_iterator first, const_iterator last) {
+        auto next_node = eraseNodes(first.node_, last.node_);
+        return iterator(this, next_node);
+    }
+
     void popBack() {
         eraseNode(head_->previous);
     }
@@ -341,19 +345,76 @@ public:
     }
 
     void reverse() noexcept {
-		//start from the head node
+        // start from the head node
         auto node = head_;
         do {
-			//reverse the links of the node
+            // reverse the links of the node
             auto next_node = node->next;
-            node->next = node->previous; 
+            node->next = node->previous;
             node->previous = next_node;
 
-			//move to the next node
-			node = next_node;
-		//stop if reached the head
+            // move to the next node
+            node = next_node;
+            // stop if reached the head
         } while (node != head_);
     }
+
+    template<typename InputIter, typename = std::enable_if_t<IsInputIteratorV<InputIter>>>
+    void assign(InputIter first, InputIter last) {
+        auto old_node = head_->next;
+        while (true) {
+            // if we run out of old nodes, append the rest of the values in the end of the list
+            if (old_node == head_) {
+                insertFromIterator(old_node, first, last);
+                return;
+            }
+
+			//if we run of values to append, erase remaining nodes
+            if (first == last) {
+                eraseNodes(old_node, head_);
+                return;
+            }
+
+			//if value is copy assignable, use it
+            if constexpr (std::is_copy_assignable_v<value_type>) {
+                old_node->value = *first;
+            } else {
+				//else try using copy constructor after calling the destructor
+                node_allocator_traits::destroy(alloc_, std::addressof(old_node->value));
+                node_allocator_traits::construct(alloc_, std::addressof(old_node->value), *first);
+            }
+            old_node = old_node->next;
+            ++first;
+        }
+    }
+
+    void assign(const T& value, size_type count) {
+        auto old_node = head_->next;
+        while (true) {
+            // if we run out of old nodes, append the rest of the values in the end of the list
+            if (old_node == head_) {
+                insertCountNode(old_node, count, value);
+                return;
+            }
+
+            // if we run of values to append, erase remaining nodes
+            if (count == 0) {
+                eraseNodes(old_node, head_);
+                return;
+            }
+
+            // if value is copy assignable, use it
+            if constexpr (std::is_copy_assignable_v<value_type>) {
+                old_node->value = value;
+            } else {
+                // else try using copy constructor after calling the destructor
+                node_allocator_traits::destroy(alloc_, std::addressof(old_node->value));
+                node_allocator_traits::construct(alloc_, std::addressof(old_node->value), value);
+            }
+            old_node = old_node->next;
+            --count;
+        }
+	}
 
     ~List() {
         clear();
@@ -462,6 +523,24 @@ private:
         }
 
         return node;
+    }
+
+    Node* eraseNodes(Node* first, Node* last) noexcept {
+        auto previous_node = first->previous;
+        while (first != last) {
+            auto next_node = first->next;
+
+            node_allocator_traits::destroy(alloc_, std::addressof(first->value));
+            node_allocator_traits::deallocate(alloc_, first, 1);
+
+            --size_;
+
+            first = next_node;
+        }
+
+        previous_node->next = last;
+        last->previous = previous_node;
+        return last;
     }
 
     void destroyHeadNode() noexcept {
