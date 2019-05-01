@@ -26,6 +26,78 @@ public:
         , data_(nullptr)
         , alloc_() {}
 
+    explicit Vector(const allocator_type& alloc) noexcept
+        : size_(0)
+        , capacity_(0)
+        , data_(nullptr)
+        , alloc_(alloc) {}
+
+    explicit Vector(size_type count, const allocator_type& alloc = Allocator_type())
+        : size_(0)
+        , capacity_(0)
+        , data_(nullptr)
+        , alloc_(alloc) {
+        constructCountValues(count);
+    }
+
+    Vector(size_type count, const T& value, const allocator_type& alloc = allocator_type())
+        : size_(0)
+        , capacity_(0)
+        , data_(nullptr)
+        , alloc_(alloc) {
+        constructCountValues(count, value);
+    }
+
+    template<typename InputIter, typename = std::enable_if_t<IsInputIteratorV<InputIter>>>
+    Vector(InputIter first, InputIter last)
+        : size_(0)
+        , capacity_(0)
+        , data_(nullptr)
+        , alloc_(alloc) {
+        if constexpr (IsForwardIteratorV<InputIter>) {
+            while (first != last) {
+                emplaceBack(*first);
+                ++first;
+            }
+        } else {
+            auto count = std::distance(last, first);
+            if (count > 0) {
+                auto buffer = allocator_traits::allocate(alloc_, count);
+
+                for (decltype(count) i = 0; i < count; ++i) {
+                    allocator_traits::construct(alloc_, buffer + i, *first);
+                    ++first;
+                }
+
+                size_ = count;
+                capacity_ = count;
+                data_ = buffer;
+            }
+            
+        }
+    }
+
+    Vector(const Vector& rhs)
+        : size_(0)
+        , capacity_(0)
+        , data_(nullptr)
+        , alloc_(allocator_traits::select_on_container_copy_construction(rhs.alloc_)) {
+        auto size = rhs.size();
+
+		if (size > 0) {
+            auto buffer = allocator_traits::allocate(alloc_, size);
+
+            for (size_type i = 0; i < size; ++i) {
+                allocator_traits::construct(alloc_, buffer + i, *(rhs.data_ + i));
+            }
+
+            size_ = size;
+            capacity_ = size;
+            data_ = buffer;
+        }
+        
+    }
+
     [[nodiscard]] iterator begin() noexcept {
         return data_;
     }
@@ -62,9 +134,9 @@ public:
         return data_[size_ - 1];
     }
 
-	[[nodiscard]] const_reference back() const noexcept {
+    [[nodiscard]] const_reference back() const noexcept {
         return data_[size_ - 1];
-	}
+    }
 
     [[nodiscard]] size_type size() const noexcept {
         return size_;
@@ -119,8 +191,7 @@ public:
         size_ = 0;
     }
 
-    iterator insert(const_iterator position, const T& value) {
-	}
+    iterator insert(const_iterator position, const T& value) {}
 
     iterator insert(const_iterator position, T&& value) {}
 
@@ -145,6 +216,17 @@ private:
         if (size_ == capacity_) {
             growBuffer(capacity_ * 2);
         }
+    }
+
+    template<typename... Args>
+    void constructCountValues(size_type count, Args&&... args) {
+        auto buffer = allocator_traits::allocate(alloc_, count);
+        for (size_type i = 0; i < count; ++i) {
+            allocator_traits::construct(alloc_, buffer + i, std::forward<Args>(args)...);
+        }
+        size_ = count;
+        capacity_ = count;
+        data_ = buffer;
     }
 
     void growBuffer(size_type new_capacity) {

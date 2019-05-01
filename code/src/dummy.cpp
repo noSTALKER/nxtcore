@@ -161,6 +161,14 @@ main() {
         std::cout << queue.popAndExtract() << '\n';
     }
 
+    nxt::core::Vector count_vec(10, 1);
+
+    std::cout << "Count Vector:" << '\n';
+
+    for (auto value : count_vec) {
+        std::cout << value << '\n';
+    }
+
     char stopper;
     std::cin >> stopper;
     return 0;
