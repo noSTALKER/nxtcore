@@ -32,25 +32,25 @@ struct Buffer {
         return data()[index];
     }
 
-    [[nodiscard]] const_pointer pointer_to(size_type index) const noexcept {
+    [[nodiscard]] const_pointer pointerAt(size_type index) const noexcept {
         return data() + index;
     }
 
-    [[nodiscard]] pointer pointer_to(size_type index) noexcept {
+    [[nodiscard]] pointer pointerAt(size_type index) noexcept {
         return data() + index;
     }
 
     template<typename... Args>
     void construct(size_type index, Args&&... args) noexcept(std::is_nothrow_constructible_v<T, Args...>) {
-        new (pointer_to(index)) T(std::forward<Args>(args)...);
+        new (pointerAt(index)) T(std::forward<Args>(args)...);
     }
 
     void construct(size_type index, DefaultInitializeTag) noexcept(std::is_nothrow_default_constructible_v<T>) {
-        new (pointer_to(index)) T;
+        new (pointerAt(index)) T;
     }
 
     void destroy(size_type index) noexcept(std::is_nothrow_destructible_v<T>) {
-        pointer_to(index)->~T();
+        pointerAt(index)->~T();
     }
 
     [[nodiscard]] pointer data() noexcept {

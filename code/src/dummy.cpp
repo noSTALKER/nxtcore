@@ -10,6 +10,7 @@
 #include "../include/PageVector.h"
 #include "../include/PriorityQueue.h"
 #include "../include/Search.h"
+#include "../include/SlotMap.h"
 #include "../include/Sort.h"
 #include "../include/Vector.h"
 
@@ -166,6 +167,26 @@ main() {
     std::cout << "Count Vector:" << '\n';
 
     for (auto value : count_vec) {
+        std::cout << value << '\n';
+    }
+
+    nxt::core::SlotMap<int> slot_map;
+    auto key = slot_map.insert(0);
+    slot_map.insert(1);
+    slot_map.insert(2);
+    slot_map.insert(3);
+    auto key2 = slot_map.insert(4);
+    slot_map.insert(5);
+
+	slot_map.erase(key);
+    slot_map.erase(key2);
+
+	slot_map.insert(6);
+    slot_map.insert(7);
+
+    std::cout << "Slotmap :\n";
+
+    for (const auto& value : slot_map) {
         std::cout << value << '\n';
     }
 

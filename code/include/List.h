@@ -47,7 +47,7 @@ public:
     }
 
     [[nodiscard]] pointer operator->() const noexcept {
-        return pointer_traits<pointer>::pointer_to(node->value);
+        return pointer_traits<pointer>::pointerAt(node->value);
     }
 
     [[nodiscard]] bool operator==(const ConstListIterator& rhs) const noexcept {
@@ -105,7 +105,7 @@ public:
     }
 
     [[nodiscard]] pointer operator->() const noexcept {
-        return pointer_traits<pointer>::pointer_to(node_->value);
+        return pointer_traits<pointer>::pointerAt(node_->value);
     }
 };
 

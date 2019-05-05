@@ -241,14 +241,14 @@ public:
     void pushBack(const T& value) {
         growIfNeeded();
 
-        page_allocator_traits::construct(alloc_, pages_[size_ / page_size]->pointer_to(size_ % page_size), value);
+        page_allocator_traits::construct(alloc_, pages_[size_ / page_size]->pointerAt(size_ % page_size), value);
         ++size_;
     }
 
     void pushBack(T&& value) {
         growIfNeeded();
         page_allocator_traits::construct(
-            alloc_, pages_[size_ / page_size]->pointer_to(size_ % page_size), std::move(value));
+            alloc_, pages_[size_ / page_size]->pointerAt(size_ % page_size), std::move(value));
         ++size_;
     }
 
@@ -256,7 +256,7 @@ public:
     void emplaceBack(Args&&... args) {
         growIfNeeded();
         page_allocator_traits::construct(
-            alloc_, pages_[size_ / page_size]->pointer_to(size_ % page_size), std::forward<Args>(args)...);
+            alloc_, pages_[size_ / page_size]->pointerAt(size_ % page_size), std::forward<Args>(args)...);
         ++size_;
     }
 
@@ -264,14 +264,14 @@ public:
         if (size_ > 0) {
             auto last_element = (size_ - 1);
             page_allocator_traits::destroy(alloc_,
-                                           pages_[last_element / page_size]->pointer_to(last_element % page_size));
+                                           pages_[last_element / page_size]->pointerAt(last_element % page_size));
             --size_;
         }
     }
 
     void clear() noexcept {
         for (size_type i = 0; i < size_; ++i) {
-            page_allocator_traits::destroy(alloc_, pages_[i / page_size]->pointer_to(i % page_size));
+            page_allocator_traits::destroy(alloc_, pages_[i / page_size]->pointerAt(i % page_size));
         }
 
         size_ = 0;

@@ -2,7 +2,6 @@
 
 #include <cstddef>
 #include <cstdint>
-#include "Export.h"
 
 namespace nxt::core {
 /**
@@ -10,7 +9,6 @@ namespace nxt::core {
  *
  */
 struct Key {
-    static constexpr Key kInvalidKey;
 
     using index_type = uint32_t;
     using generation_type = uint32_t;
@@ -21,7 +19,7 @@ struct Key {
      * @brief
      *
      */
-    Key(index_type index, generation_type generation)
+    Key(index_type index, generation_type generation) noexcept
         : index(index)
         , generation(generation) {}
 
