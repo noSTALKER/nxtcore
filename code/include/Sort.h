@@ -7,32 +7,38 @@ namespace nxt::core {
 template<typename BiDirectionalIter,
          typename Compare,
          typename = std::enable_if_t<IsBidirectionalIteratorV<BiDirectionalIter>>>
-void
+constexpr void
 insertionSort(BiDirectionalIter first, BiDirectionalIter last, Compare comp) {
     using std::swap;
     auto start = first;
     while (start != last) {
+        // select the last element in subrange [first, start]
+        // every element in subrange [first, start) is sorted
         for (auto iter = start; iter != first; --iter) {
             auto previous = iter;
             --previous;
+            // move the element to right if the predicate is true
+            // else we found the position and move to the next item
+            // to be inserted in the sorted subrange
             if (comp(*iter, *previous)) {
                 swap(*iter, *previous);
             } else {
                 break;
             }
         }
+        // grow the subrange [first, start]
         ++start;
     }
 }
 
 template<typename BiDirectionalIter, typename = std::enable_if_t<IsBidirectionalIteratorV<BiDirectionalIter>>>
-void
+constexpr void
 insertionSort(BiDirectionalIter first, BiDirectionalIter last) {
     insertionSort(first, last, std::less<>());
 }
 
 template<typename ForwardIter, typename Compare, typename = std::enable_if_t<IsForwardIteratorV<ForwardIter>>>
-void
+constexpr void
 selectionSort(ForwardIter first, ForwardIter last, Compare comp) {
     auto iter = first;
 
@@ -60,7 +66,7 @@ selectionSort(ForwardIter first, ForwardIter last, Compare comp) {
 }
 
 template<typename ForwardIter, typename = std::enable_if_t<IsForwardIteratorV<ForwardIter>>>
-void
+constexpr void
 selectionSort(ForwardIter first, ForwardIter last) {
     insertionSort(first, last, std::less<>());
 }
@@ -68,7 +74,7 @@ selectionSort(ForwardIter first, ForwardIter last) {
 template<typename BiDirectionalIter,
          typename Compare,
          typename = std::enable_if_t<IsBidirectionalIteratorV<BiDirectionalIter>>>
-BiDirectionalIter
+constexpr BiDirectionalIter
 partition(BiDirectionalIter first, BiDirectionalIter last, Compare comp) {
     auto lower = first;
     auto higher = last;
@@ -111,7 +117,7 @@ template<typename InputIter1, typename InputIter2, typename OutputIter, typename
 constexpr OutputIter
 merge(InputIter1 first1, InputIter1 last1, InputIter2 first2, InputIter2 last2, OutputIter outputIter, Compare comp) {
     while (first1 != last1 && first2 != last2) {
-        // order of comparision is important for stable merge
+        // order of comparison is important for stable merge
         if (comp(*first2, *first1)) {
             *outputIter = *first2;
             ++first2;
@@ -122,12 +128,14 @@ merge(InputIter1 first1, InputIter1 last1, InputIter2 first2, InputIter2 last2, 
         ++outputIter;
     }
 
+    // copy the remaining items if left in first iterator to the output
     while (first1 != last1) {
         *outputIter = *first1;
         ++first1;
         ++outputIter;
     }
 
+    // copy the remaining items if left in second iterator to the output
     while (first2 != last2) {
         *outputIter = *first2;
         ++first2;
@@ -138,7 +146,7 @@ merge(InputIter1 first1, InputIter1 last1, InputIter2 first2, InputIter2 last2, 
 }
 
 template<typename ForwardIter, typename Compare, typename = std::enable_if_t<IsForwardIteratorV<ForwardIter>>>
-constexpr ForwardIter
+[[nodiscard]] constexpr ForwardIter
 isSortedUntil(ForwardIter first, ForwardIter last, Compare comp) {
     auto next = first;
     if (next != last) {
@@ -156,19 +164,19 @@ isSortedUntil(ForwardIter first, ForwardIter last, Compare comp) {
 }
 
 template<typename ForwardIter, typename = std::enable_if_t<IsForwardIteratorV<ForwardIter>>>
-constexpr ForwardIter
+[[nodiscard]] constexpr ForwardIter
 isSortedUntil(ForwardIter first, ForwardIter last) {
     return isSortedUntil(first, last, std::less<>());
 }
 
 template<typename ForwardIter, typename Compare, typename = std::enable_if_t<IsForwardIteratorV<ForwardIter>>>
-constexpr bool
+[[nodiscard]] constexpr bool
 isSorted(ForwardIter first, ForwardIter last, Compare comp) {
     return isSortedUntil(first, last, comp) == last;
 }
 
 template<typename ForwardIter, typename = std::enable_if_t<IsForwardIteratorV<ForwardIter>>>
-constexpr bool
+[[nodiscard]] constexpr bool
 isSorted(ForwardIter first, ForwardIter last) {
     return isSortedUntil(first, last, std::less<>()) == last;
 }
@@ -176,7 +184,7 @@ isSorted(ForwardIter first, ForwardIter last) {
 template<typename RandomAccessIter,
          typename Compare,
          typename = std::enable_if_t<IsRandomAccessIteratorV<RandomAccessIter>>>
-void
+constexpr void
 pushHeap(RandomAccessIter first, RandomAccessIter last, Compare comp) {
     if (last - first >= 2) {
         auto hole = last;
@@ -210,7 +218,7 @@ pushHeap(RandomAccessIter first, RandomAccessIter last, Compare comp) {
 }
 
 template<typename RandomAccessIter, typename = std::enable_if_t<IsRandomAccessIteratorV<RandomAccessIter>>>
-void
+constexpr void
 pushHeap(RandomAccessIter first, RandomAccessIter last) {
     pushHeap(first, last, std::less<>());
 }
@@ -218,7 +226,7 @@ pushHeap(RandomAccessIter first, RandomAccessIter last) {
 template<typename RandomAccessIter,
          typename Compare,
          typename = std::enable_if_t<IsRandomAccessIteratorV<RandomAccessIter>>>
-void
+constexpr void
 popHeap(RandomAccessIter first, RandomAccessIter last, Compare comp) {
     if (last - first >= 2) {
         auto result = last;
@@ -256,7 +264,7 @@ popHeap(RandomAccessIter first, RandomAccessIter last, Compare comp) {
 }
 
 template<typename RandomAccessIter, typename = std::enable_if_t<IsRandomAccessIteratorV<RandomAccessIter>>>
-void
+constexpr void
 popHeap(RandomAccessIter first, RandomAccessIter last) {
     popHeap(first, last, std::less<>());
 }
@@ -264,7 +272,7 @@ popHeap(RandomAccessIter first, RandomAccessIter last) {
 template<typename RandomAccessIter,
          typename Compare,
          typename = std::enable_if_t<IsRandomAccessIteratorV<RandomAccessIter>>>
-void
+constexpr void
 makeHeap(RandomAccessIter first, RandomAccessIter last, Compare comp) {
     if (last - first >= 2) {
         auto max_distance = last - first;
@@ -298,7 +306,7 @@ makeHeap(RandomAccessIter first, RandomAccessIter last, Compare comp) {
 }
 
 template<typename RandomAccessIter, typename = std::enable_if_t<IsRandomAccessIteratorV<RandomAccessIter>>>
-void
+constexpr void
 makeHeap(RandomAccessIter first, RandomAccessIter last) {
     makeHeap(first, last, std::less<>());
 }
@@ -306,7 +314,7 @@ makeHeap(RandomAccessIter first, RandomAccessIter last) {
 template<typename RandomAccessIter,
          typename Compare,
          typename = std::enable_if_t<IsRandomAccessIteratorV<RandomAccessIter>>>
-RandomAccessIter
+[[nodiscard]] constexpr RandomAccessIter
 isHeapUntil(RandomAccessIter first, RandomAccessIter last, Compare comp) {
     auto max_distance = last - first;
     // check if each element is
@@ -321,7 +329,7 @@ isHeapUntil(RandomAccessIter first, RandomAccessIter last, Compare comp) {
 }
 
 template<typename RandomAccessIter, typename = std::enable_if_t<IsRandomAccessIteratorV<RandomAccessIter>>>
-RandomAccessIter
+[[nodiscard]] constexpr RandomAccessIter
 isHeapUntil(RandomAccessIter first, RandomAccessIter last) {
     isHeapUntil(first, last, std::less<>());
 }
@@ -329,13 +337,13 @@ isHeapUntil(RandomAccessIter first, RandomAccessIter last) {
 template<typename RandomAccessIter,
          typename Compare,
          typename = std::enable_if_t<IsRandomAccessIteratorV<RandomAccessIter>>>
-bool
+[[nodiscard]] constexpr bool
 isHeap(RandomAccessIter first, RandomAccessIter last, Compare comp) {
     return isHeapUntil(first, last, comp) == last;
 }
 
 template<typename RandomAccessIter, typename = std::enable_if_t<IsRandomAccessIteratorV<RandomAccessIter>>>
-bool
+[[nodiscard]] constexpr bool
 isHeap(RandomAccessIter first, RandomAccessIter last) {
     return isHeapUntil(first, last, std::less<>()) == last;
 }
@@ -343,7 +351,7 @@ isHeap(RandomAccessIter first, RandomAccessIter last) {
 template<typename RandomAccessIter,
          typename Compare,
          typename = std::enable_if_t<IsRandomAccessIteratorV<RandomAccessIter>>>
-void
+constexpr void
 heapSort(RandomAccessIter first, RandomAccessIter last, Compare comp) {
     makeHeap(first, last, comp);
     auto max_distance = last - first;
@@ -354,7 +362,7 @@ heapSort(RandomAccessIter first, RandomAccessIter last, Compare comp) {
 }
 
 template<typename RandomAccessIter, typename = std::enable_if_t<IsRandomAccessIteratorV<RandomAccessIter>>>
-void
+constexpr void
 heapSort(RandomAccessIter first, RandomAccessIter last) {
     heapSort(first, last, std::less<>());
 }
@@ -362,7 +370,7 @@ heapSort(RandomAccessIter first, RandomAccessIter last) {
 template<typename RandomAccessIter,
          typename Compare,
          typename = std::enable_if_t<IsRandomAccessIteratorV<RandomAccessIter>>>
-void
+constexpr void
 partialSort(RandomAccessIter first, RandomAccessIter mid, RandomAccessIter last, Compare comp) {
     makeHeap(first, mid, comp);
 
@@ -406,7 +414,7 @@ partialSort(RandomAccessIter first, RandomAccessIter mid, RandomAccessIter last,
 }
 
 template<typename RandomAccessIter, typename = std::enable_if_t<IsRandomAccessIteratorV<RandomAccessIter>>>
-void
+constexpr void
 partialSort(RandomAccessIter first, RandomAccessIter mid, RandomAccessIter last) {
     partialSort(first, mid, last, std::less<>());
 }
@@ -414,7 +422,7 @@ partialSort(RandomAccessIter first, RandomAccessIter mid, RandomAccessIter last)
 template<typename RandomAccessIter,
          typename Compare,
          typename = std::enable_if_t<IsRandomAccessIteratorV<RandomAccessIter>>>
-void
+constexpr void
 quickSort(RandomAccessIter first, RandomAccessIter last, Compare comp) {
     static constexpr IteratorDifferenceTypeT<RandomAccessIter> kInsertionSortLimit = 16;
     if (kInsertionSortLimit >= last - first) {
@@ -480,14 +488,14 @@ quickSort(RandomAccessIter first, RandomAccessIter last, Compare comp) {
 
 template<typename RandomAccessIter, typename = std::enable_if_t<IsRandomAccessIteratorV<RandomAccessIter>>>
 void
-quickSort(RandomAccessIter first, RandomAccessIter last) {
+constexpr quickSort(RandomAccessIter first, RandomAccessIter last) {
     quickSort(first, last, std::less<>());
 }
 
 template<typename RandomAccessIter,
          typename Compare,
          typename = std::enable_if_t<IsRandomAccessIteratorV<RandomAccessIter>>>
-void
+constexpr void
 nthElement(RandomAccessIter first, RandomAccessIter last, RandomAccessIter nth, Compare comp) {
     static constexpr IteratorDifferenceTypeT<RandomAccessIter> kInsertionSortLimit = 16;
     if (kInsertionSortLimit >= last - first) {
@@ -557,13 +565,13 @@ nthElement(RandomAccessIter first, RandomAccessIter last, RandomAccessIter nth, 
 }
 
 template<typename RandomAccessIter, typename = std::enable_if_t<IsRandomAccessIteratorV<RandomAccessIter>>>
-void
+constexpr void
 nthElement(RandomAccessIter first, RandomAccessIter last, RandomAccessIter nth) {
     nthElement(first, last, nth, std::less<>());
 }
 
 template<typename BiDirectionalIter, typename = std::enable_if_t<IsBidirectionalIteratorV<BiDirectionalIter>>>
-void
+constexpr void
 reverse(BiDirectionalIter first, BiDirectionalIter last) {
     // this condition takes care that first never crosses last for all
     // even-odd length

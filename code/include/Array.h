@@ -8,6 +8,8 @@ template<class T, std::size_t Size>
 class Array {
 public:
     static_assert(Size > 0, "Can't create Array with size == 0");
+
+	// define all type definitions used by different traits like iterator_traits and pointer traits
     using difference_type = std::ptrdiff_t;
     using value_type = T;
     using size_type = std::size_t;
@@ -86,6 +88,7 @@ public:
         return (data_ + Size);
     }
 
+	// the field is public so that it can be used for aggregate initialization
     T data_[Size];
 };
 

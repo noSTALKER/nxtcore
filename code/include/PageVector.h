@@ -125,7 +125,7 @@ public:
         return *this;
     }
 
-    PageVectorIterator operator++(int) noexcept {
+    [[nodiscard]] PageVectorIterator operator++(int) noexcept {
         PageVectorIterator temp(page_vector_, current_index_);
         ++current_index_;
         return temp;
@@ -136,7 +136,7 @@ public:
         return *this;
     }
 
-    PageVectorIterator operator--(int) noexcept {
+    [[nodiscard]] PageVectorIterator operator--(int) noexcept {
         PageVectorIterator temp(page_vector_, current_index_);
         --current_index_;
         return temp;
@@ -313,6 +313,7 @@ public:
 
 private:
     void growIfNeeded() {
+		// allocate a new page if the size is equal to the capacity
         if (size_ == capacity()) {
             auto new_page = page_allocator_traits::allocate(alloc_, 1);
             pages_.pushBack(new_page);
