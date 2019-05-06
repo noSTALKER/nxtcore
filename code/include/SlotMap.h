@@ -326,6 +326,25 @@ public:
         }
     }
 
+	void clear() noexcept {
+        // destroy items which are valid and increment the generation
+        for (size_type i = 0; i < capacity(); ++i) {
+            if (valid_list_[i]) {
+                page_allocator_traits::destroy(alloc_, pointerAt(i));
+                ++next_list_[i].generation;
+            }
+
+            // reset the list to point to next item
+            next_list_[i].index = i + 1;
+            valid_list_[i] = false;
+        }
+
+        min_valid_index_ = 0;
+        max_valid_index_ = 0;
+        size_ = 0;
+        free_index_ = 0;
+    }
+
     iterator begin() noexcept {
         return iterator(this, min_valid_index_);
     }
@@ -348,6 +367,16 @@ public:
 
     const_iterator cend() const noexcept {
         return const_iterator(this, max_valid_index_);
+    }
+
+	~SlotMap() {
+        clear();
+
+        for (auto& page : pages_) {
+            page_allocator_traits::deallocate(alloc_, page, 1);
+        }
+
+        pages_.clear();
     }
 
 private:
