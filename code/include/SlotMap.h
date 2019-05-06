@@ -1,13 +1,11 @@
 #pragma once
 
-#include "Vector.h"
-#include "PageVector.h"
 #include "Key.h"
+#include "PageVector.h"
+#include "Vector.h"
 
 #include <iterator>
 #include <type_traits>
-
-
 
 namespace nxt::core {
 
@@ -31,11 +29,11 @@ public:
         return slot_map_->valueAt(current_index_);
     }
 
-	reference operator*() {
+    reference operator*() {
         return slot_map_->valueAt(current_index_);
     }
 
-    SlotMapConstIterator& operator++() {
+    SlotMapConstIterator& operator++() noexcept {
         size_t max_index = slot_map_->maxValidIndex();
         ++current_index_;
         while (current_index_ < max_index) {
@@ -46,7 +44,13 @@ public:
         return *this;
     }
 
-    SlotMapConstIterator& operator--() {
+    SlotMapConstIterator operator++(int) noexcept {
+        SlotMapContIterator temp(slot_map_, current_index_);
+        this->operator++();
+        return temp;
+    }
+
+    SlotMapConstIterator& operator--() noexcept {
         size_t min_index = slot_map_->minValidIndex();
         --current_index_;
         while (current_index_ > min_index) {
@@ -55,6 +59,12 @@ public:
             --current_index_;
         }
         return *this;
+    }
+
+    SlotMapConstIterator operator--(int) {
+        SlotMapConstIterator temp(slot_map_, current_index_);
+        this->operator--();
+        return temp;
     }
 
     bool operator==(const SlotMapConstIterator& rhs) const noexcept {
@@ -104,7 +114,13 @@ public:
         return *this;
     }
 
-    SlotMapIterator& operator--() {
+    SlotMapIterator operator++(int) noexcept {
+        SlotMapIterator temp(slot_map_, current_index_);
+        this->operator++();
+        return temp;
+    }
+
+    SlotMapIterator& operator--() noexcept {
         size_t min_index = slot_map_->minValidIndex();
         --current_index_;
         while (current_index_ > min_index) {
@@ -113,6 +129,12 @@ public:
             --current_index_;
         }
         return *this;
+    }
+
+    SlotMapIterator operator--(int) noexcept {
+        SlotMapIterator temp(slot_map_, current_index_);
+        this->operator--();
+        return temp;
     }
 };
 
@@ -142,12 +164,10 @@ private:
     using bool_allocator = typename std::allocator_traits<allocator_type>::template rebind_alloc<bool>;
 
 public:
-   
-
     SlotMap(size_type capacity = block_size) noexcept(
-        std::is_nothrow_default_constructible_v<page_allocator> &&
-        std::is_nothrow_default_constructible_v<PageVector<key_type, block_size, key_type_allocator>> &&
-        std::is_nothrow_default_constructible_v<PageVector<bool, block_size, bool_allocator>>)
+    std::is_nothrow_default_constructible_v<page_allocator> &&
+    std::is_nothrow_default_constructible_v<PageVector<key_type, block_size, key_type_allocator>> &&
+    std::is_nothrow_default_constructible_v<PageVector<bool, block_size, bool_allocator>>)
         : size_(0)
         , free_index_(0)
         , max_valid_index_(0)
@@ -201,7 +221,7 @@ public:
         return key;
     }
 
-    bool exist(const key_type& key) const {
+    bool exist(const key_type& key) const noexcept {
         return key == next_list_[key.index];
     }
 
@@ -364,9 +384,8 @@ private:
     size_type size_;
     page_allocator alloc_;
 
-	friend class const_iterator;
+    friend class const_iterator;
     friend class iterator;
-    
 };
 
 }  // namespace nxt::core
