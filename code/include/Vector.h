@@ -73,7 +73,6 @@ public:
                 capacity_ = count;
                 data_ = buffer;
             }
-            
         }
     }
 
@@ -84,7 +83,7 @@ public:
         , alloc_(allocator_traits::select_on_container_copy_construction(rhs.alloc_)) {
         auto size = rhs.size();
 
-		if (size > 0) {
+        if (size > 0) {
             auto buffer = allocator_traits::allocate(alloc_, size);
 
             for (size_type i = 0; i < size; ++i) {
@@ -95,8 +94,25 @@ public:
             capacity_ = size;
             data_ = buffer;
         }
-        
     }
+
+    Vector(Vector&& rhs) noexcept
+        : size_(0)
+        , capacity_(0)
+        , data_(nullptr)
+        , alloc_(std::move(rhs.alloc_)) {
+        using std::swap;
+        swap(data_, rhs.data_);
+        swap(size_, rhs.size_);
+        swap(capacity_, rhs.capacity_);
+    }
+
+	Vector& operator=(const Vector& rhs) {
+	}
+
+	Vector& operator=(Vector&& rhs) {
+
+	}
 
     [[nodiscard]] iterator begin() noexcept {
         return data_;
@@ -208,7 +224,11 @@ public:
 
     ~Vector() {
         clear();
-        alloc_.deallocate(data_, capacity_);
+
+		if (capacity > 0) {
+            alloc_.deallocate(data_, capacity_);
+        }
+        
     }
 
 private:

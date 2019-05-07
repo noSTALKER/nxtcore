@@ -165,15 +165,40 @@ private:
 
 public:
     SlotMap(size_type capacity = block_size) noexcept(
-    std::is_nothrow_default_constructible_v<page_allocator> &&
-    std::is_nothrow_default_constructible_v<PageVector<key_type, block_size, key_type_allocator>> &&
-    std::is_nothrow_default_constructible_v<PageVector<bool, block_size, bool_allocator>>)
+        std::is_nothrow_default_constructible_v<page_allocator>&&
+            std::is_nothrow_default_constructible_v<PageVector<key_type, block_size, key_type_allocator>>&&
+                std::is_nothrow_default_constructible_v<PageVector<bool, block_size, bool_allocator>>)
         : size_(0)
         , free_index_(0)
         , max_valid_index_(0)
         , min_valid_index_(0)
         , alloc_() {
         reserve(capacity);
+    }
+
+    SlotMap(const SlotMap& rhs) 
+		: size_(0)
+		, free_index_(0)
+		, max_valid_index_(0)
+		, min_valid_index_(0)
+		, alloc_() {
+
+	}
+
+    SlotMap(SlotMap&& rhs)
+        : size_(0)
+        , free_index_(0)
+        , max_valid_index_(0)
+        , min_valid_index_(0)
+        , alloc_(std::move(rhs.alloc_)) {
+        using std::swap;
+        swap(size_, rhs.size_);
+        swap(free_index_, rhs.free_index_);
+        swap(max_valid_index_, rhs.max_valid_index_);
+        swap(min_valid_index_, rhs.min_valid_index_);
+        swap(pages_, rhs.pages_);
+        swap(next_list_, rhs.next_list_);
+        swap(valid_list_, rhs.valid_list_);
     }
 
     key_type insert(const T& value) {
@@ -326,7 +351,7 @@ public:
         }
     }
 
-	void clear() noexcept {
+    void clear() noexcept {
         // destroy items which are valid and increment the generation
         for (size_type i = 0; i < capacity(); ++i) {
             if (valid_list_[i]) {
@@ -369,7 +394,7 @@ public:
         return const_iterator(this, max_valid_index_);
     }
 
-	~SlotMap() {
+    ~SlotMap() {
         clear();
 
         for (auto& page : pages_) {

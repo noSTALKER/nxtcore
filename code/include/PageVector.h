@@ -202,6 +202,18 @@ public:
         : alloc_()
         , size_(0) {}
 
+    PageVector(const PageVector& rhs)
+        : size_(0)
+        , alloc_(page_allocator_traits::select_on_container_copy_construction(rhs.alloc_)) {}
+
+    PageVector(PageVector&& rhs)
+        : size_(0)
+        , alloc_(std::move(rhs.alloc_)) {
+        using std::swap;
+        swap(pages_, rhs.pages_);
+        swap(size_, rhs.size_);
+    }
+
     [[nodiscard]] size_type capacity() const noexcept {
         return pages_.size() * page_size;
     }
@@ -313,7 +325,7 @@ public:
 
 private:
     void growIfNeeded() {
-		// allocate a new page if the size is equal to the capacity
+        // allocate a new page if the size is equal to the capacity
         if (size_ == capacity()) {
             auto new_page = page_allocator_traits::allocate(alloc_, 1);
             pages_.pushBack(new_page);
