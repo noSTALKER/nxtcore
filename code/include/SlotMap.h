@@ -77,7 +77,7 @@ public:
 
 protected:
     SlotMap* slot_map_;
-    size_t current_index_;
+    size_type current_index_;
 };
 
 template<typename SlotMap>
@@ -324,7 +324,7 @@ public:
     }
 
     size_type capacity() const noexcept {
-        return pages_.size() * block_size;
+        return static_cast<size_type>(pages_.size()) * block_size;
     }
 
     void reserve(size_type new_capacity) {
@@ -333,7 +333,7 @@ public:
             return;
 
         // round up the capacity to next block_size multiple
-        auto remainder = new_capacity % block_size;
+        size_type remainder = new_capacity % block_size;
         if (remainder != 0) {
             new_capacity += (block_size - remainder);
         }
@@ -345,7 +345,7 @@ public:
             pages_.pushBack(page);
         }
 
-        for (size_type i = next_list_.size(); i < new_capacity; ++i) {
+        for (size_type i = static_cast<size_type>(next_list_.size()); i < new_capacity; ++i) {
             next_list_.emplaceBack(i + 1, 1);
             valid_list_.emplaceBack(false);
         }

@@ -55,11 +55,6 @@ public:
         , data_(nullptr)
         , alloc_(alloc) {
         if constexpr (IsForwardIteratorV<InputIter>) {
-            while (first != last) {
-                emplaceBack(*first);
-                ++first;
-            }
-        } else {
             auto count = std::distance(last, first);
             if (count > 0) {
                 auto buffer = allocator_traits::allocate(alloc_, count);
@@ -72,6 +67,11 @@ public:
                 size_ = count;
                 capacity_ = count;
                 data_ = buffer;
+            }
+        } else {
+            while (first != last) {
+                emplaceBack(*first);
+                ++first;
             }
         }
     }
@@ -101,18 +101,183 @@ public:
         , capacity_(0)
         , data_(nullptr)
         , alloc_(std::move(rhs.alloc_)) {
-        using std::swap;
-        swap(data_, rhs.data_);
-        swap(size_, rhs.size_);
-        swap(capacity_, rhs.capacity_);
+        takeData(std::move(rhs));
     }
 
-	Vector& operator=(const Vector& rhs) {
+    Vector& operator=(const Vector& rhs) {
+        if (this != std::addressof(rhs)) {
+            if constexpr (ChoosePOCCA<allocator_type>) {
+                // if allocator needs to be propogated, we need to cleanup the
+                // allocation before making a copy of the allocator
+                if (alloc_ != rhs.alloc_) {
+                    cleanup();
+                    alloc_ = rhs.alloc_;
+                }
+            }
+        }
+
+        assign(rhs.data_, rhs.data_ + rhs.size_);
+        return *this;
+    }
+
+    Vector& operator=(Vector&& rhs) noexcept(allocator_traits::propagate_on_container_move_assignment::value ||
+                                             allocator_traits::is_always_equal::value) {
+        if (this != std::addressof(rhs)) {
+            if constexpr (ChoosePOCMA<allocator_type>) {
+                if (alloc_ != rhs.alloc_) {
+                    auto new_size = rhs.size_;
+                    if (new_size > size_) {
+                        if (new_size > capacity_) {
+                            cleanup();
+                            growBuffer(new_size, true);
+                        }
+
+						size_type current_index = 0;
+                        while (current_index < size_) {
+                            data_ + current_index = std::move(*(rhs.data_ + current_index));
+                            ++current_index;
+                        }
+
+                        while (current_index < new_size) {
+                            allocator_traits::construct(
+                                alloc_, data_ + current_index, std::move(*(rhs.data_ + current_index)));
+                            ++current_index;
+                        }   
+                    } else {
+                        size_type current_index = 0;
+                        while (current_index < new_size) {
+                            data_ + current_index = std::move(*(rhs.data_ + current_index));
+                            ++current_index;
+                        }
+
+                        while (current_index < size_) {
+                            allocator_traits::destroy(alloc_, data_ + current_index);
+                        }
+                    }
+                    size_ = new_size;
+                    return;
+                } else {
+                    cleanup();
+                }
+            } else {
+                cleanup();
+                alloc_ = std::move(rhs.alloc_);
+            }
+
+            takeData(std::move(rhs));
+        }
+    }
+
+    template<typename InputIter, typename = std::enable_if_t<IsInputIteratorV<InputIter>>>
+    void assign(InputIter first, InputIter last) {
+        if constexpr (IsForwardIteratorV<InputIter>) {
+            auto item_count = std::distance(last, first);
+            if (item_count > size_) {
+                if (item_count > capacity_) {
+                    cleanup();
+                    growBuffer(item_count, true);
+                }
+
+                size_type current_index = 0;
+                while (current_index < size_) {
+                    if constexpr (std::is_assignable_v<value_type, decltype(*first)>) {
+                        *(data_ + current_index) = *first;
+                    } else {
+                        // else try using copy constructor after calling the destructor
+                        node_allocator_traits::destroy(alloc_, data_ + current_index);
+                        node_allocator_traits::construct(alloc_, data_ + current_index, *first);
+                    }
+                    ++current_index;
+                    ++first;
+                }
+
+                for (current_index < item_count) {
+                    allocator_traits::construct(alloc_, data_ + current_index, *first);
+                }
+                size_ = item_count;
+
+            } else {
+                size_type current_index = 0;
+                while (current_index < item_count) {
+                    if constexpr (std::is_assignable_v<value_type, decltype(*first)>) {
+                        *(data_ + current_index) = *first;
+                    } else {
+                        // else try using copy constructor after calling the destructor
+                        allocator_traits::destroy(alloc_, data_ + current_index);
+                        allocator_traits::construct(alloc_, data_ + current_index, *first);
+                    }
+                    ++current_index;
+                    ++first;
+                }
+
+                while (current_index < size_) {
+                    allocator_traits::destroy(alloc_, data_ + current_index);
+                }
+                size_ = item_count;
+            }
+        } else {
+        }
+    }
+
+    void assign(size_type new_size, const T& value) {
+        if (new_size > size_) {
+            if (new_size > capacity_) {
+                cleanup();
+                growBuffer(new_size, true);
+            }
+
+            size_type current_index = 0;
+            while (current_index < size_) {
+                if constexpr (std::is_assignable_v<value_type, decltype(value)>) {
+                    *(data_ + current_index) = value;
+                } else {
+                    // else try using copy constructor after calling the destructor
+                    node_allocator_traits::destroy(alloc_, data_ + current_index);
+                    node_allocator_traits::construct(alloc_, data_ + current_index, value);
+                }
+                ++current_index;
+                ++first;
+            }
+
+            for (current_index < item_count) {
+                allocator_traits::construct(alloc_, data_ + current_index, value);
+                ++current_index;
+            }
+            size_ = new_size;
+
+        } else {
+            size_type current_index = 0;
+            while (current_index < new_size) {
+                if constexpr (std::is_assignable_v<value_type, value>) {
+                    *(data_ + current_index) = *first;
+                } else {
+                    // else try using copy constructor after calling the destructor
+                    allocator_traits::destroy(alloc_, data_ + current_index);
+                    allocator_traits::construct(alloc_, data_ + current_index, value);
+                }
+                ++current_index;
+                ++first;
+            }
+
+            while (current_index < size_) {
+                allocator_traits::destroy(alloc_, data_ + current_index);
+                ++current_index;
+            }
+            size_ = new_size;
+        }
+    }
+
+	void assign(std::initializer_list<T> values) {
+        assign(values.begin(), values.end());
 	}
 
-	Vector& operator=(Vector&& rhs) {
+    void resize(size_type new_size) {
+        resizeInternal(new_size);
+    }
 
-	}
+    void resize(size_type new_size, const T& value) {
+        resizeInternal(new_size, value);
+    }
 
     [[nodiscard]] iterator begin() noexcept {
         return data_;
@@ -175,15 +340,11 @@ public:
     }
 
     void pushBack(const T& value) {
-        growIfNeeded();
-        allocator_traits::construct(alloc_, data_ + size_, value);
-        ++size_;
+        emplaceBack(value);
     }
 
     void pushBack(T&& value) {
-        growIfNeeded();
-        allocator_traits::construct(alloc_, data_ + size_, std::move(value));
-        ++size_;
+        emplaceBack(std::move(value));
     }
 
     template<typename... Args>
@@ -207,6 +368,18 @@ public:
         size_ = 0;
     }
 
+    void reserve(size_type new_capacity) {
+        if (new_capacity > capacity_) {
+            growBuffer(new_capacity, true);
+        }
+    }
+
+    void shrinkToFit() {
+        if (capacity_ > size_) {
+            growBuffer(size_, true);
+        }
+    }
+
     iterator insert(const_iterator position, const T& value) {}
 
     iterator insert(const_iterator position, T&& value) {}
@@ -223,19 +396,22 @@ public:
     }
 
     ~Vector() {
-        clear();
-
-		if (capacity > 0) {
-            alloc_.deallocate(data_, capacity_);
-        }
-        
+        cleanup();
     }
 
 private:
     void growIfNeeded() {
         if (size_ == capacity_) {
-            growBuffer(capacity_ * 2);
+            growBuffer(capacity_ + 1, false);
         }
+    }
+
+    void cleanup() noexcept {
+        clear();
+        if (capacity_ > 0) {
+            alloc_.deallocate(data_, capacity_);
+        }
+        capacity_ = 0;
     }
 
     template<typename... Args>
@@ -249,32 +425,67 @@ private:
         data_ = buffer;
     }
 
-    void growBuffer(size_type new_capacity) {
-        constexpr size_type kMinSize = 8;
-        auto buffer_size = new_capacity;
-        if (new_capacity > capacity_ || new_capacity < kMinSize) {
-            auto actual_capacity = std::max(new_capacity, capacity_ * 2);
-            actual_capacity = std::max(actual_capacity, kMinSize);
-            auto new_buffer = allocator_traits::allocate(alloc_, actual_capacity);
-
-            if constexpr (std::is_nothrow_move_constructible_v<value_type>) {
-                for (size_type i = 0; i < size_; ++i) {
-                    allocator_traits::construct(alloc_, new_buffer + i, std::move(data_[i]));
-                }
-            } else {
-                for (size_type i = 0; i < size_; ++i) {
-                    allocator_traits::construct(alloc_, new_buffer + i, data_[i]);
-                }
+    template<typename... Args>
+    void resizeInternal(size_type new_size, Args&&... args) {
+        if (new_size > size_) {
+            if (new_size > capacity_) {
+                growBuffer(new_size, true);
             }
 
-            for (size_type i = 0; i < size_; ++i) {
-                allocator_traits::destroy(alloc_, data_ + i);
+            size_type current_index = size_;
+            for (current_index < item_count) {
+                allocator_traits::construct(alloc_, data_ + current_index, std::forward<Args>(args)...);
+                ++current_index;
             }
+            size_ = new_size;
 
-            allocator_traits::deallocate(alloc_, data_, capacity_);
-            data_ = new_buffer;
-            capacity_ = actual_capacity;
+        } else {
+            size_type current_index = new_size;
+            while (current_index < size_) {
+                allocator_traits::destroy(alloc_, data_ + current_index);
+                ++current_index;
+            }
+            size_ = new_size;
         }
+    }
+
+    void growBuffer(size_type new_capacity, bool exact) {
+        constexpr size_type kMinSize = 8;
+        auto actual_capacity = new_capacity;
+        if (!exact) {
+            actual_capacity = std::max(new_capacity, capacity_ * 2);
+            actual_capacity = std::max(actual_capacity, kMinSize);
+        }
+
+        auto new_buffer = allocator_traits::allocate(alloc_, actual_capacity);
+
+        if constexpr (std::is_nothrow_move_constructible_v<value_type>) {
+            for (size_type i = 0; i < size_; ++i) {
+                allocator_traits::construct(alloc_, new_buffer + i, std::move(data_[i]));
+            }
+        } else {
+            for (size_type i = 0; i < size_; ++i) {
+                allocator_traits::construct(alloc_, new_buffer + i, data_[i]);
+            }
+        }
+
+        for (size_type i = 0; i < size_; ++i) {
+            allocator_traits::destroy(alloc_, data_ + i);
+        }
+
+        allocator_traits::deallocate(alloc_, data_, capacity_);
+        data_ = new_buffer;
+        capacity_ = actual_capacity;
+    }
+
+    void takeData(Vector&& rhs) {
+        data_ = rhs.data_;
+        size_ = rhs.size_;
+        capacity_ = rhs.capacity_;
+
+        rhs.data_ = nullptr;
+        rhs.size_ = 0;
+        rhs.capacity_ = 0;
     }
 
     pointer data_;

@@ -375,8 +375,8 @@ public:
                 return;
             }
 
-            // if value is copy assignable, use it
-            if constexpr (std::is_copy_assignable_v<value_type>) {
+            // if value is assignable from the iterator value_type, use it
+            if constexpr (std::is_assignable_v<value_type, decltype(*first)>) {
                 old_node->value = *first;
             } else {
                 // else try using copy constructor after calling the destructor
@@ -415,6 +415,10 @@ public:
             --count;
         }
     }
+
+	void assign(std::initializer_list<T> values) {
+        assign(values.begin(), values.end());
+	}
 
     void resize(size_type new_size) {
         if (new_size > size_) {

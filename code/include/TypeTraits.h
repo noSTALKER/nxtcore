@@ -150,4 +150,12 @@ using ReplaceFirstTemplateParameterT = typename ReplaceFirstTemplateParameter<U,
 template<typename T>
 using RemoveCVRefT = typename std::remove_cv_t<std::remove_reference_t<T>>;
 
+template<typename Allocator>
+constexpr auto ChoosePOCCA = std::allocator_traits<Allocator>::propagate_on_container_copy_assignment::value &&
+                             !std::allocator_traits<Allocator>::is_always_equal::value;
+
+template<typename Allocator>
+constexpr auto ChoosePOCMA = std::allocator_traits<Allocator>::propagate_on_container_move_assignment::value &&
+                             !std::allocator_traits<Allocator>::is_always_equal::value;
+
 }  // namespace nxt::core
