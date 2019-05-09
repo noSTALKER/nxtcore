@@ -5,7 +5,7 @@
 
 namespace nxt::core {
 
-template<typename T, typename Comparator = std::less<T>, typename Allocator = std::allocator<T>>
+template<typename T, typename Comparator = std::less<>, typename Allocator = std::allocator<T>>
 class BinaryTree {
 public:
     struct Node;
@@ -21,16 +21,25 @@ public:
     using pointer = typename allocator_traits::pointer;
     using const_pointer = typename allocator_traits::const_pointer;
     using difference_type = typename allocator_traits::difference_type;
+    using compare_type = Comparator;
 
     BinaryTree();
     BinaryTree(Tree&&);
     BinaryTree(const Tree&);
 
-    bool insert(const T& value);
-    bool insert(T&& value);
+    bool insert(const T& value) {
+        emplace(value);
+    }
+    bool insert(T&& value) {
+        emplace(std::move(value));
+    }
 
     template<typename Args...>
-    bool emplace(Args&&... args) {}
+    bool emplace(Args&&... args) {
+        
+	}
+
+	iterator find() 
 
 private:
     struct Node {

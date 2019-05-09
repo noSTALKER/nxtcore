@@ -32,7 +32,7 @@ public:
         , data_(nullptr)
         , alloc_(alloc) {}
 
-    explicit Vector(size_type count, const allocator_type& alloc = Allocator_type())
+    explicit Vector(size_type count, const allocator_type& alloc = allocator_type())
         : size_(0)
         , capacity_(0)
         , data_(nullptr)
@@ -437,7 +437,7 @@ private:
             }
 
             size_type current_index = size_;
-            for (current_index < item_count) {
+            while (current_index < new_size) {
                 allocator_traits::construct(alloc_, data_ + current_index, std::forward<Args>(args)...);
                 ++current_index;
             }
