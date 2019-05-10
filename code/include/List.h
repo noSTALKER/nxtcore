@@ -376,13 +376,8 @@ public:
             }
 
             // if value is assignable from the iterator value_type, use it
-            if constexpr (std::is_assignable_v<value_type, decltype(*first)>) {
-                old_node->value = *first;
-            } else {
-                // else try using copy constructor after calling the destructor
-                node_allocator_traits::destroy(alloc_, std::addressof(old_node->value));
-                node_allocator_traits::construct(alloc_, std::addressof(old_node->value), *first);
-            }
+            old_node->value = *first;
+
             old_node = old_node->next;
             ++first;
         }
@@ -416,9 +411,9 @@ public:
         }
     }
 
-	void assign(std::initializer_list<T> values) {
+    void assign(std::initializer_list<T> values) {
         assign(values.begin(), values.end());
-	}
+    }
 
     void resize(size_type new_size) {
         if (new_size > size_) {
@@ -426,14 +421,14 @@ public:
         } else {
             auto node = head_->next;
             for (size_type i = 0; i < new_size; ++i) {
-				node = node->next;
-			}
+                node = node->next;
+            }
 
-			eraseNodes(node, head_);
+            eraseNodes(node, head_);
         }
     }
 
-	void resize(size_type new_size, const T& value) {
+    void resize(size_type new_size, const T& value) {
         if (new_size > size_) {
             insertCountNode(head_, new_size - size_, value);
         } else {

@@ -55,13 +55,13 @@ public:
         , data_(nullptr)
         , alloc_(alloc) {
         if constexpr (IsForwardIteratorV<InputIter>) {
-			// if it is forward iterator, we can calculate the distance and make copies
+            // if it is forward iterator, we can calculate the distance and make copies
             auto count = std::distance(last, first);
             if (count > 0) {
-				//allocate the buffer
+                // allocate the buffer
                 auto buffer = allocator_traits::allocate(alloc_, count);
 
-				// construct new items by invoking copy contructor one by one
+                // construct new items by invoking copy contructor one by one
                 for (decltype(count) i = 0; i < count; ++i) {
                     allocator_traits::construct(alloc_, buffer + i, *first);
                     ++first;
@@ -72,7 +72,7 @@ public:
                 data_ = buffer;
             }
         } else {
-			// else for input iterator type, just emplace back one by one
+            // else for input iterator type, just emplace back one by one
             while (first != last) {
                 emplaceBack(*first);
                 ++first;
@@ -131,7 +131,7 @@ public:
                 cleanup();
                 alloc_ = std::move(rhs.alloc_);
             } else {
-				if (alloc_ != rhs.alloc_) {
+                if (alloc_ != rhs.alloc_) {
                     auto new_size = rhs.size_;
                     if (new_size > size_) {
                         if (new_size > capacity_) {
@@ -184,13 +184,8 @@ public:
 
                 size_type current_index = 0;
                 while (current_index < size_) {
-                    if constexpr (std::is_assignable_v<value_type, decltype(*first)>) {
-                        *(data_ + current_index) = *first;
-                    } else {
-                        // else try using copy constructor after calling the destructor
-                        node_allocator_traits::destroy(alloc_, data_ + current_index);
-                        node_allocator_traits::construct(alloc_, data_ + current_index, *first);
-                    }
+                    *(data_ + current_index) = *first;
+
                     ++current_index;
                     ++first;
                 }
@@ -203,13 +198,8 @@ public:
             } else {
                 size_type current_index = 0;
                 while (current_index < item_count) {
-                    if constexpr (std::is_assignable_v<value_type, decltype(*first)>) {
-                        *(data_ + current_index) = *first;
-                    } else {
-                        // else try using copy constructor after calling the destructor
-                        allocator_traits::destroy(alloc_, data_ + current_index);
-                        allocator_traits::construct(alloc_, data_ + current_index, *first);
-                    }
+                    *(data_ + current_index) = *first;
+
                     ++current_index;
                     ++first;
                 }
@@ -232,13 +222,8 @@ public:
 
             size_type current_index = 0;
             while (current_index < size_) {
-                if constexpr (std::is_assignable_v<value_type, decltype(value)>) {
-                    *(data_ + current_index) = value;
-                } else {
-                    // else try using copy constructor after calling the destructor
-                    node_allocator_traits::destroy(alloc_, data_ + current_index);
-                    node_allocator_traits::construct(alloc_, data_ + current_index, value);
-                }
+                *(data_ + current_index) = value;
+
                 ++current_index;
                 ++first;
             }
@@ -252,13 +237,8 @@ public:
         } else {
             size_type current_index = 0;
             while (current_index < new_size) {
-                if constexpr (std::is_assignable_v<value_type, value>) {
-                    *(data_ + current_index) = *first;
-                } else {
-                    // else try using copy constructor after calling the destructor
-                    allocator_traits::destroy(alloc_, data_ + current_index);
-                    allocator_traits::construct(alloc_, data_ + current_index, value);
-                }
+                *(data_ + current_index) = *first;
+
                 ++current_index;
                 ++first;
             }
@@ -271,9 +251,9 @@ public:
         }
     }
 
-	void assign(std::initializer_list<T> values) {
+    void assign(std::initializer_list<T> values) {
         assign(values.begin(), values.end());
-	}
+    }
 
     void resize(size_type new_size) {
         resizeInternal(new_size);
