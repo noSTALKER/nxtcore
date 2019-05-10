@@ -487,8 +487,7 @@ quickSort(RandomAccessIter first, RandomAccessIter last, Compare comp) {
 }
 
 template<typename RandomAccessIter, typename = std::enable_if_t<IsRandomAccessIteratorV<RandomAccessIter>>>
-void
-constexpr quickSort(RandomAccessIter first, RandomAccessIter last) {
+void constexpr quickSort(RandomAccessIter first, RandomAccessIter last) {
     quickSort(first, last, std::less<>());
 }
 
@@ -580,6 +579,48 @@ reverse(BiDirectionalIter first, BiDirectionalIter last) {
         swap(*first, *last);
         ++first;
     }
+}
+
+template<typename BiDirectionalIter,
+         typename Compare,
+         typename = std::enable_if_t<IsBidirectionalIteratorV<BiDirectionalIter>>>
+[[nodiscard]] constexpr BiDirectionalIter
+palindromeUntil(BiDirectionalIter first, BiDirectionalIter last, Compare comp) {
+    auto last_saved = last;
+    while (first != last && first != --last) {
+        if (!comp(*first, *last))
+            return first;
+        ++first;
+    }
+
+	return last_saved;
+}
+
+template<typename BiDirectionalIter,
+         typename = std::enable_if_t<IsBidirectionalIteratorV<BiDirectionalIter>>>
+[[nodiscard]] constexpr BiDirectionalIter
+palindromeUntil(BiDirectionalIter first, BiDirectionalIter last) {
+    return palindromeUntil(first, last, std::equal_to<>());
+}
+
+template<typename BiDirectionalIter,
+         typename Compare,
+         typename = std::enable_if_t<IsBidirectionalIteratorV<BiDirectionalIter>>>
+[[nodiscard]] constexpr bool
+isPalindrome(BiDirectionalIter first, BiDirectionalIter last, Compare comp) {
+    while (first != last && first != --last) {
+        if (!comp(*first, *last))
+            return false;
+        ++first;
+    }
+
+    return true;
+}
+
+template<typename BiDirectionalIter, typename = std::enable_if_t<IsBidirectionalIteratorV<BiDirectionalIter>>>
+[[nodiscard]] constexpr bool
+isPalindrome(BiDirectionalIter first, BiDirectionalIter last) {
+    return isPalindrome(first, last, std::equal_to<>());
 }
 
 }  // namespace nxt::core
