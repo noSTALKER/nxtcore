@@ -77,7 +77,7 @@ public:
 
 protected:
     SlotMap* slot_map_;
-    size_t current_index_;
+    size_type current_index_;
 };
 
 template<typename SlotMap>
@@ -165,9 +165,9 @@ private:
 
 public:
     SlotMap(size_type capacity = block_size) noexcept(
-        std::is_nothrow_default_constructible_v<page_allocator>&&
-            std::is_nothrow_default_constructible_v<PageVector<key_type, block_size, key_type_allocator>>&&
-                std::is_nothrow_default_constructible_v<PageVector<bool, block_size, bool_allocator>>)
+        std::is_nothrow_default_constructible_v<page_allocator> &&
+        std::is_nothrow_default_constructible_v<PageVector<key_type, block_size, key_type_allocator>> &&
+        std::is_nothrow_default_constructible_v<PageVector<bool, block_size, bool_allocator>>)
         : size_(0)
         , free_index_(0)
         , max_valid_index_(0)
@@ -176,14 +176,12 @@ public:
         reserve(capacity);
     }
 
-    SlotMap(const SlotMap& rhs) 
-		: size_(0)
-		, free_index_(0)
-		, max_valid_index_(0)
-		, min_valid_index_(0)
-		, alloc_() {
-
-	}
+    SlotMap(const SlotMap& rhs)
+        : size_(0)
+        , free_index_(0)
+        , max_valid_index_(0)
+        , min_valid_index_(0)
+        , alloc_() {}
 
     SlotMap(SlotMap&& rhs)
         : size_(0)
@@ -191,14 +189,14 @@ public:
         , max_valid_index_(0)
         , min_valid_index_(0)
         , alloc_(std::move(rhs.alloc_)) {
-        using std::swap;
-        swap(size_, rhs.size_);
-        swap(free_index_, rhs.free_index_);
-        swap(max_valid_index_, rhs.max_valid_index_);
-        swap(min_valid_index_, rhs.min_valid_index_);
-        swap(pages_, rhs.pages_);
-        swap(next_list_, rhs.next_list_);
-        swap(valid_list_, rhs.valid_list_);
+        pages_ = std::move(rhs.pages_);
+        next_list_ = std::move(rhs.next_list_);
+        valid_list_ = std::move(rhs.valid_list_);
+
+        size_ = rhs.size_;
+        free_index_ = rhs.free_index_;
+        min_valid_index_ = rhs.min_valid_index_;
+        max_valid_index_ = rhs.max_valid_index_;
     }
 
     key_type insert(const T& value) {
@@ -324,7 +322,7 @@ public:
     }
 
     size_type capacity() const noexcept {
-        return pages_.size() * block_size;
+        return static_cast<size_type>(pages_.size()) * block_size;
     }
 
     void reserve(size_type new_capacity) {
@@ -333,7 +331,7 @@ public:
             return;
 
         // round up the capacity to next block_size multiple
-        auto remainder = new_capacity % block_size;
+        size_type remainder = new_capacity % block_size;
         if (remainder != 0) {
             new_capacity += (block_size - remainder);
         }
@@ -345,7 +343,7 @@ public:
             pages_.pushBack(page);
         }
 
-        for (size_type i = next_list_.size(); i < new_capacity; ++i) {
+        for (size_type i = static_cast<size_type>(next_list_.size()); i < new_capacity; ++i) {
             next_list_.emplaceBack(i + 1, 1);
             valid_list_.emplaceBack(false);
         }

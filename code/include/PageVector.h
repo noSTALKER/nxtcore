@@ -215,8 +215,9 @@ public:
     PageVector(PageVector&& rhs)
         : size_(0)
         , alloc_(std::move(rhs.alloc_)) {
-        pages_ = std::move(rhs.pages_);
+        pages_ = std::move(pages_);
         size_ = rhs.size_;
+		rhs.size_ = 0;
     }
 
     [[nodiscard]] size_type capacity() const noexcept {
