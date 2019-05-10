@@ -204,14 +204,19 @@ public:
 
     PageVector(const PageVector& rhs)
         : size_(0)
-        , alloc_(page_allocator_traits::select_on_container_copy_construction(rhs.alloc_)) {}
+        , alloc_(page_allocator_traits::select_on_container_copy_construction(rhs.alloc_)) {
+        reserve(rhs.capacity());
+
+		for (const auto& value : rhs) {
+            pushBack(value);
+        }
+	}
 
     PageVector(PageVector&& rhs)
         : size_(0)
         , alloc_(std::move(rhs.alloc_)) {
-        using std::swap;
-        swap(pages_, rhs.pages_);
-        swap(size_, rhs.size_);
+        pages_ = std::move(rhs.pages_);
+        size_ = rhs.size_;
     }
 
     [[nodiscard]] size_type capacity() const noexcept {
@@ -288,6 +293,23 @@ public:
 
         size_ = 0;
     }
+
+	void reserve(size_type new_capacity) {
+        auto old_capacity = capacity();
+        if (new_capacity > old_capacity) {
+            auto remainder = new_capacity % page_size;
+            if (remainder > 0) {
+                new_capacity += (page_size - remainder);
+            }
+
+			auto pages_to_add = (new_capacity - old_capacity) / page_size;
+            for (size_type i = 0; i < pages_to_add; ++i) {
+				auto page = page_allocator_traits::allocate(alloc_, 1);
+                pages_.pushBack(page);
+            }
+
+        }
+	}
 
     [[nodiscard]] const_iterator cbegin() const noexcept {
         return const_iterator(this, 0);
