@@ -60,7 +60,7 @@ public:
         }
     }
 
-    value_type popFrontAndExtract() {
+    [[nodiscard]] value_type popFrontAndExtract() {
         if (!empty()) {
             value_type result = std::move(data_[front_]);
             allocator_traits::destroy(alloc_, data_ + front_);
@@ -94,29 +94,29 @@ public:
         }
     }
 
-    bool empty() const noexcept {
+    [[nodiscard]] bool empty() const noexcept {
         return back_ == front_;
     }
 
-    bool full() const noexcept {
+    [[nodiscard]] bool full() const noexcept {
         if (capacity_ > 0)
             return getNext(back_) == front_;
         return true;
     }
 
-    reference front() {
+    [[nodiscard]] reference front() {
         return data_[front_];
     }
 
-    const_reference front() const {
+    [[nodiscard]] const_reference front() const {
         return data_[front_];
     }
 
-    reference back() {
+    [[nodiscard]] reference back() {
         return data_[getLast(back_)];
     }
 
-    const_reference back() const {
+    [[nodiscard]] const_reference back() const {
         return data_[getLast(back_)];
     }
 
@@ -127,11 +127,11 @@ public:
         }
     }
 
-    size_type capacity() const noexcept {
+    [[nodiscard]] size_type capacity() const noexcept {
         return capacity_;
     }
 
-    size_type size() const noexcept {
+    [[nodiscard]] size_type size() const noexcept {
         return mask(back_ - front_);
     }
 
@@ -167,5 +167,5 @@ private:
     size_type back_;
     size_type capacity_;
     allocator_type alloc_;
-};  // namespace nxt::core
+};
 }  // namespace nxt::core
