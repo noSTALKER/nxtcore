@@ -2,6 +2,8 @@
 
 #include <iterator>
 
+#include "Math.h"
+
 namespace nxt::core {
 
 template<typename T, typename Allocator = std::allocator<T>>
@@ -18,11 +20,152 @@ public:
     using difference_type = typename allocator_traits::difference_type;
 
     RingBuffer() noexcept(std::is_nothrow_default_constructible_v<allocator_type>)
-		:alloc_() {}
+        : back_(0)
+        , front_(0)
+        , capacity_(0)
+        , data_(nullptr)
+        , alloc_() {}
 
+    RingBuffer(size_type capacity)
+        : back_(0)
+        , front_(0)
+        , capacity_(0)
+        , data_(nullptr)
+        , alloc_() {
+        reserve(capacity);
+    }
 
+    void pushBack(const T& value) {
+        emplaceBack(value);
+    }
+
+    void pushBack(T&& value) {
+        emplaceBack(std::move(value));
+    }
+
+    template<typename... Args>
+    void emplaceBack(Args&&... args) {
+        if (full()) {
+            reserve(capacity_ + 1);
+        }
+
+        allocator_traits::construct(alloc_, data_ + back_, std::forward<Args>(args)...);
+        back_ = getNext(back_);
+    }
+
+    void popFront() {
+        if (!empty()) {
+            allocator_traits::destroy(alloc_, data_ + front_);
+            front_ = getNext(front_);
+        }
+    }
+
+    value_type popFrontAndExtract() {
+        if (!empty()) {
+            value_type result = std::move(data_[front_]);
+            allocator_traits::destroy(alloc_, data_ + front_);
+            front_ = getNext(front_);
+            return result;
+        }
+    }
+
+    void reserve(size_type new_capacity) {
+        if (new_capacity > capacity_) {
+            new_capacity = getNextPowerOf2(new_capacity);
+
+            auto new_buffer = allocator_traits::allocate(alloc_, new_capacity);
+            auto index = front_;
+            for (size_type start = front_; start != back_; start = getNext(start)) {
+                if constexpr (std::is_nothrow_move_constructible_v<value_type>) {
+                    allocator_traits::construct(alloc_, new_buffer + index, std::move(data_[start]));
+                } else {
+                    allocator_traits::construct(alloc_, new_buffer + start, data_[start]);
+                }
+                index = mask(index + 1, new_capacity);
+            }
+
+            for (size_type i = front_; i != back_; i = getNext(i)) {
+                allocator_traits::destroy(alloc_, data_ + i);
+            }
+
+            back_ = index;
+            data_ = new_buffer;
+            capacity_ = new_capacity;
+        }
+    }
+
+    bool empty() const noexcept {
+        return back_ == front_;
+    }
+
+    bool full() const noexcept {
+        if (capacity_ > 0)
+            return getNext(back_) == front_;
+        return true;
+    }
+
+    reference front() {
+        return data_[front_];
+    }
+
+    const_reference front() const {
+        return data_[front_];
+    }
+
+    reference back() {
+        return data_[getLast(back_)];
+    }
+
+    const_reference back() const {
+        return data_[getLast(back_)];
+    }
+
+    void clear() noexcept {
+        while (back_ != front_) {
+            allocator_traits::destroy(alloc_, data_ + front_);
+            front_ = getNext(front_);
+        }
+    }
+
+    size_type capacity() const noexcept {
+        return capacity_;
+    }
+
+    size_type size() const noexcept {
+        return mask(back_ - front_);
+    }
+
+    ~RingBuffer() {
+        clear();
+
+        if (capacity_ > 0) {
+            allocator_traits::deallocate(alloc_, data_, capacity_);
+            capacity_ = 0;
+            data_ = nullptr;
+        }
+    }
 
 private:
+    size_type mask(size_type value) const noexcept {
+        return value & (capacity_ - 1);
+    }
+
+    size_type mask(size_type value, size_type capacity) const noexcept {
+        return value & (capacity - 1);
+    }
+
+    size_type getNext(size_type index) const noexcept {
+        return mask(index + 1);
+    }
+
+    size_type getLast(size_type index) const noexcept {
+        return mask(index - 1);
+    }
+
+    pointer data_;
+    size_type front_;
+    size_type back_;
+    size_type capacity_;
     allocator_type alloc_;
-};
+};  // namespace nxt::core
 }  // namespace nxt::core
