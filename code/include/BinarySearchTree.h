@@ -13,8 +13,6 @@ public:
     using difference_type = typename Tree::difference_type;
     using pointer = typename Tree::const_pointer;
     using reference = typename Tree::const_reference;
-    using const_reference = typename Tree::const_reference;
-    using size_type = typename Tree::size_type;
     using difference_type = typename Tree::difference_type;
     using node_type = typename Tree::node_type;
     using tree_type = Tree;
@@ -28,22 +26,26 @@ public:
         return node->value;
     }
 
+    [[nodiscard]] pointer operator->() const {
+        return std::pointer_traits<pointer>::pointer_to(node->value);
+    }
+
     TreeConstIterator& operator++() {
         if (node_->right_child != nullptr) {
             // find the min element in right subtree
-            auto min_node = node->right_child;
+            auto min_node = node_->right_child;
             while (min_node->left_child != nullptr) {
                 min_node = min_node->left_child;
             }
             node_ = min_node;
         } else {
-            auto parent_node = node->parent;
-            while (parent_node->parent != nullptr && node == parent_node->right_child) {
-                node = parent_node;
-                parent_node = node->parent;
+            auto parent_node = node_->parent;
+            while (parent_node->parent != nullptr && node_ == parent_node->right_child) {
+                node_ = parent_node;
+                parent_node = node_->parent;
             }
 
-            node = parent_node;
+            node_ = parent_node;
         }
 
         return *this;
@@ -64,12 +66,25 @@ public:
                 max_node = result->right_child;
             }
 
-			node_ = max_node;
+            node_ = max_node;
         } else {
+            node_type* parent_node = node_->parent;
+            while (parent_node != nullptr && node_ == parent_node->left_child) {
+                node_ = parent_node;
+                parent_node = node_->parent;
+            }
+
+            if (node_ != head_node_) {
+                node_ = parent_node;
+            }
         }
     }
 
-    TreeConstIterator operator--(int) {}
+    [[nodiscard]] TreeConstIterator operator--(int) {
+        TreeConstIterator result(tree_, node_);
+        this->operator--();
+        return result;
+    }
 
     [[nodiscard]] bool operator==(const TreeConstIterator& rhs) {
         return node_ == rhs.node_;
@@ -82,6 +97,67 @@ public:
 protected:
     tree_type* tree_;
     node_type* node_;
+};
+
+template<typename Key, typename Compare = std::less<>, typename Allocator = std::allocator<Key>>
+struct SimpleTreeTraits {
+    using value_type = Key;
+    using key_type = Key;
+    using reference = value_type&;
+    using const_reference = const value_type&;
+	using compare_type = Compare;
+    using allocator_type = typename std::allocator_traits<Allocator>::template rebind_alloc<value_type>;
+
+	static const key_type& key(const value_type& value) {
+        return value;
+	}
+};
+
+template<typename Tree>
+class TreeIterator : public TreeConstIterator<Tree> {
+public:
+    using value_type = typename Tree::value_type;
+    using difference_type = typename Tree::difference_type;
+    using pointer = typename Tree::pointer;
+    using reference = typename Tree::reference;
+    using difference_type = typename Tree::difference_type;
+    using node_type = typename Tree::node_type;
+    using tree_type = Tree;
+    using iterator_category = std::bidirectional_iterator_tag;
+    using Base = TreeConstIterator<Tree>;
+
+    TreeIterator(tree_type* tree, node_type* node)
+        : Base(tree, node) {}
+
+    [[nodiscard]] reference operator*() const {
+        return node_->value;
+    }
+
+    [[nodiscard]] pointer operator->() const {
+        return std::pointer_traits<pointer>::pointer_to(node_->value);
+    }
+
+    TreeIterator& operator++() {
+        ++(static_cast<Base&>(*this));
+        return *this;
+    }
+
+    [[nodiscard]] TreeIterator operator++(int) {
+        TreeIterator result(tree_, node_);
+        this->operator++();
+        return result;
+    }
+
+    TreeIterator& operator--() {
+        --(static_cast<Base&>(*this));
+        return *this;
+    }
+
+    [[nodiscard]] TreeIterator operator--(int) {
+        TreeIterator result(tree_, node_);
+        this->operator--();
+        return result;
+    }
 };
 
 template<typename TreeTraits>
@@ -101,6 +177,8 @@ public:
     using pointer = typename allocator_traits::pointer;
     using const_pointer = typename allocator_traits::const_pointer;
     using difference_type = typename allocator_traits::difference_type;
+    using const_iterator = TreeConstIterator<BinarySearchTree<TreeTraits>>;
+    using iterator = TreeIterator<BinarySearchTree<TreeTraits>>;
 
 protected:
     using node_allocator_type = typename allocator_traits::template rebind_alloc<node_type>;
@@ -108,15 +186,15 @@ protected:
     using tree_traits = TreeTraits;
 
 public:
-    BinaryTree() noexcept(std::is_nothrow_default_constructible_v<node_allocator_type>)
-        : root_node_(nullptr)
-        , leftmost_node_(nullptr)
-        , rightmost_node_(nullptr)
+    BinarySearchTree() noexcept(std::is_nothrow_default_constructible_v<node_allocator_type>)
+        : head_node_(nullptr)
         , size_(0)
-        , alloc_() {}
+        , alloc_() {
+        createHeadNode();
+    }
 
-    BinaryTree(Tree&&) {}
-    BinaryTree(const Tree&) {}
+    BinarySearchTree(BinarySearchTree&&) {}
+    BinarySearchTree(const BinarySearchTree&) {}
 
     std::pair<iterator, bool> insert(const value_type& value) {
         return insert(head_node_->parent, head_node_, true, value);
@@ -126,53 +204,57 @@ public:
         return insert(head_node_->parent, head_node_, true, std::move(value));
     }
 
-    template<typename Args...>
+    template<typename... Args>
     std::pair<iterator, bool> emplace(Args&&... args) {
         auto node = node_allocator_traits::allocate(alloc_, 1);
         node_allocator_traits::construct(alloc_, std::addressof(node->value), std::forward<Args>(args)...);
         return emplace(head_node_->parent, head_node_, true, node);
     }
 
-    const_iterator find(const key_value& value) const {
+    [[nodiscard]] const_iterator find(const key_type& value) const {
         return const_iterator(this, findNode(value));
     }
 
-    iterator find(const key_value& value) {
+    [[nodiscard]] iterator find(const key_type& value) {
         return iterator(this, findNode(value));
     }
 
     template<typename Key, typename = typename compare_type::is_transparent>
-    const_iterator find(const Key& value) const {
+    [[nodiscard]] const_iterator find(const Key& value) const {
         return const_iterator(this, findNode(value));
     }
 
     template<typename Key, typename = typename compare_type::is_transparent>
-    iterator find(const Key& value) {
+    [[nodiscard]] iterator find(const Key& value) {
         return iterator(this, findNode(value));
     }
 
-    iterator begin() {
+    [[nodiscard]] iterator begin() {
         return iterator(this, head_node_->left_child);
     }
 
-    const_iterator begin() const {
+    [[nodiscard]] const_iterator begin() const {
         return const_iterator(this, head_node_->left_child);
     }
 
-    const_iterator cbegin() const {
+    [[nodiscard]] const_iterator cbegin() const {
         return const_iterator(this, head_node_->left_child);
     }
 
-    iterator end() {
+    [[nodiscard]] iterator end() {
         return iterator(this, head_node_);
     }
 
-    const_iterator end() const {
+    [[nodiscard]] const_iterator end() const {
         return const_iterator(this, head_node_);
     }
 
-    const_iterator cend() const {
+    [[nodiscard]] const_iterator cend() const {
         return const_iterator(this, head_node_);
+    }
+
+    [[nodiscard]] size_type size() const noexcept {
+        return size_;
     }
 
 private:
@@ -187,7 +269,7 @@ private:
     std::pair<iterator, bool> insert(Node* node, Node* parent, bool is_left, Arg&& arg) {
         if (node == nullptr) {
             auto node = node_allocator_traits::allocate(alloc_, 1);
-            allocator_traits::construct(alloc_, std::addressof(node->value), std::forward<Args>(arg));
+            node_allocator_traits::construct(alloc_, std::addressof(node->value), std::forward<Arg>(arg));
 
             node->parent = parent;
             node->left_child = nullptr;
@@ -213,12 +295,12 @@ private:
             return {iterator(this, node), true};
         }
 
-        if (compare_(value, tree_traits::key(node->value)) {
+        if (compare_(arg, tree_traits::key(node->value))) {
             return insert(node->left_child, node, true, std::forward<Arg>(arg));
-        } else if (compare_(tree_traits::key(node->value), value)) {
+        } else if (compare_(tree_traits::key(node->value), arg)) {
             return insert(node->right_child, node, false, std::forward<Arg>(arg));
         } else {
-            return (iterator(this, head_node_), false);
+            return {iterator(this, head_node_), false};
         }
     }
 
@@ -314,10 +396,20 @@ private:
         return head_node_;
     }
 
+    void createHeadNode() {
+        head_node_ = node_allocator_traits::allocate(alloc_, 1);
+        head_node_->left_child = nullptr;
+        head_node_->right_child = nullptr;
+        head_node_->parent = nullptr;
+    }
+
     Node* head_node_;
     size_type size_;
     node_allocator_type alloc_;
     compare_type compare_;
+
+    friend iterator;
+    friend const_iterator;
 };
 
 }  // namespace nxt::core
