@@ -1,7 +1,6 @@
 #pragma once
 
-#include <array>
-#include <iostream>
+#include <type_traits>
 
 template <typename T, size_t... Ns>
 class MultiArray;
@@ -12,23 +11,40 @@ public:
     using internal_type = typename std::array<MultiArray<T, Ns...>, N0>;
     using reference = typename internal_type::reference;
     using const_reference = typename internal_type::const_reference;
+    using size_type = typename internal_type::size_type;
 
-    reference operator[](size_t index) {
+    reference operator[](size_type index) {
         return array_[index];
     }
 
-    constexpr size_t size() const {
+	const_reference operator[](size_type index) const {
+        return array_[index];
+	}
+
+    constexpr size_t size() const noexcept {
         return array_.size();
     }
 
     template<typename SizeT, typename... Args>
-    auto operator()(SizeT i, Args... args) {
+    decltype(auto) operator()(SizeT i, Args... args) {
         static_assert(std::is_convertible_v<SizeT, size_t>, "Invalid index type");
         return array_[i](args...);
     }
 
     template<typename SizeT>
-    auto operator()(SizeT i) {
+    decltype(auto) operator()(SizeT i) {
+        static_assert(std::is_convertible_v<SizeT, size_t>, "Invalid index type");
+        return array_[i];
+    }
+
+	template<typename SizeT, typename... Args>
+    decltype(auto) operator() const (SizeT i, Args... args) {
+        static_assert(std::is_convertible_v<SizeT, size_t>, "Invalid index type");
+        return array_[i](args...);
+    }
+
+    template<typename SizeT>
+    decltype(auto) operator() const (SizeT i) {
         static_assert(std::is_convertible_v<SizeT, size_t>, "Invalid index type");
         return array_[i];
     }
@@ -42,17 +58,28 @@ class MultiArray<T, N0> {
 public:
     using internal_type = typename std::array<T, N0>;
     using reference = typename internal_type::reference;
+    using const_reference = typename internal_type::const_reference;
+    using size_type = typename internal_type::size_type;
+
     reference operator[](size_t index) {
         return array_[index];
     }
 
-    constexpr size_t size() const {
+	const_reference operator[](size_type index) const {
+        return array_[index];
+	}
+
+    constexpr size_t size() const noexcept {
         return array_.size();
     }
 
     reference operator()(size_t index) {
         return array_[index];
     }
+
+	const_reference operator()(size_type index) const {
+        return array_[index];
+	}
 
 private:
     internal_type array_;
