@@ -26,5 +26,9 @@ TEST_CASE("BinarySeachTree Tests", "[binary_search_tree]") {
         REQUIRE(bst.size() == 6);
         REQUIRE(*bst.begin() == 0);
 
+		bst.clear();
+
+		REQUIRE(bst.size() == 0);
+
     }
 }

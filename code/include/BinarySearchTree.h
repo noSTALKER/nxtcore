@@ -186,15 +186,28 @@ protected:
     using tree_traits = TreeTraits;
 
 public:
-    BinarySearchTree() noexcept(std::is_nothrow_default_constructible_v<node_allocator_type>)
+    BinarySearchTree() noexcept(std::is_nothrow_default_constructible_v<node_allocator_type> &&
+                                std::is_nothrow_default_constructible_v<compare_type>)
         : head_node_(nullptr)
         , size_(0)
+        , compare_()
         , alloc_() {
         createHeadNode();
     }
 
-    BinarySearchTree(BinarySearchTree&&) {}
-    BinarySearchTree(const BinarySearchTree&) {}
+    BinarySearchTree(BinarySearchTree&& rhs)
+        : head_node_(nullptr)
+        , size_(0)
+        , compare_(rhs.compare_)
+		, alloc_(std::move(rhs.alloc_) {
+        createHeadNode();
+        using std::swap;
+        swap(head_node_, rhs.head_node_);
+        size_ = rhs.size_;
+        rhs.size_ = 0;
+	}
+
+    BinarySearchTree(const BinarySearchTree& ) {}
 
     std::pair<iterator, bool> insert(const value_type& value) {
         return insert(head_node_->parent, head_node_, true, value);
@@ -219,6 +232,24 @@ public:
             eraseNode(node);
             return 1;
         }
+    }
+
+    void clear() noexcept {
+        if (head_node_->parent != head_node_) {
+            freeTree(head_node_->parent);
+
+            head_node_->parent = head_node_;
+            head_node_->left_child = nullptr;
+            head_node_->right_child = nullptr;
+
+            size_ = 0;
+        }
+    }
+
+    ~BinarySearchTree() {
+        clear();
+
+        node_allocator_traits::deallocate(alloc_, head_node_, 1);
     }
 
     template<typename Key, typename = typename compare_type::is_transparent>
@@ -280,7 +311,7 @@ private:
 
     template<typename Arg>
     std::pair<iterator, bool> insert(Node* node, Node* parent, bool is_left, Arg&& arg) {
-        if (node == nullptr) {
+        if (node == head_node_ || node == nullptr) {
             auto node = node_allocator_traits::allocate(alloc_, 1);
             node_allocator_traits::construct(alloc_, std::addressof(node->value), std::forward<Arg>(arg));
 
@@ -318,7 +349,7 @@ private:
     }
 
     std::pair<iterator, bool> emplace(Node* node, Node* parent, bool is_left, Node* node_to_add) {
-        if (node == nullptr) {
+        if (node == head_node_ || node == nullptr) {
             node_to_add->parent = parent;
             node_to_add->left_child = nullptr;
             node_to_add->right_child = nullptr;
@@ -413,7 +444,7 @@ private:
         head_node_ = node_allocator_traits::allocate(alloc_, 1);
         head_node_->left_child = nullptr;
         head_node_->right_child = nullptr;
-        head_node_->parent = nullptr;
+        head_node_->parent = head_node_;
     }
 
     void eraseNode(Node* node) {
@@ -425,7 +456,7 @@ private:
             if (parent_node == head_node_) {
                 head_node_->left_child = nullptr;
                 head_node_->right_child = nullptr;
-                head_node_->parent = nullptr;
+                head_node_->parent = head_node_;
             } else if (parent_node->left_child == node) {
                 parent_node->left_child = nullptr;
             } else {
@@ -490,6 +521,16 @@ private:
 
         node_allocator_traits::destroy(alloc_, std::addressof(node->value));
         node_allocator_traits::deallocate(alloc_, node, 1);
+    }
+
+    void freeTree(Node* node) {
+        if (node != nullptr) {
+            freeTree(node->left_child);
+            freeTree(node->right_child);
+
+            node_allocator_traits::destroy(alloc_, std::addressof(node->value));
+            node_allocator_traits::deallocate(alloc_, node, 1);
+        }
     }
 
     Node* head_node_;
