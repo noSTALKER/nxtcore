@@ -105,12 +105,12 @@ struct SimpleTreeTraits {
     using key_type = Key;
     using reference = value_type&;
     using const_reference = const value_type&;
-	using compare_type = Compare;
+    using compare_type = Compare;
     using allocator_type = typename std::allocator_traits<Allocator>::template rebind_alloc<value_type>;
 
-	static const key_type& key(const value_type& value) {
+    static const key_type& key(const value_type& value) {
         return value;
-	}
+    }
 };
 
 template<typename Tree>
@@ -210,6 +210,11 @@ public:
         node_allocator_traits::construct(alloc_, std::addressof(node->value), std::forward<Args>(args)...);
         return emplace(head_node_->parent, head_node_, true, node);
     }
+
+    iterator erase(const key_type& key) {}
+
+    template<typename Key, typename = typename compare_type::is_transparent>
+    iterator erase(const Key& key) {}
 
     [[nodiscard]] const_iterator find(const key_type& value) const {
         return const_iterator(this, findNode(value));
@@ -402,6 +407,10 @@ private:
         head_node_->right_child = nullptr;
         head_node_->parent = nullptr;
     }
+
+	void eraseNode(Node* node) {
+
+	}
 
     Node* head_node_;
     size_type size_;
