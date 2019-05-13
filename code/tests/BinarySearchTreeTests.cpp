@@ -21,6 +21,10 @@ TEST_CASE("BinarySeachTree Tests", "[binary_search_tree]") {
             ++i;
         }
 
+        REQUIRE(bst.erase(-5) == 1);
+        REQUIRE(bst.erase(-10) == 0);
+        REQUIRE(bst.size() == 6);
+        REQUIRE(*bst.begin() == 0);
 
     }
 }

@@ -211,7 +211,15 @@ public:
         return emplace(head_node_->parent, head_node_, true, node);
     }
 
-    iterator erase(const key_type& key) {}
+    size_type erase(const key_type& key) {
+        auto node = findNode(key);
+        if (node == head_node_) {
+            return 0;
+        } else {
+            eraseNode(node);
+            return 1;
+        }
+    }
 
     template<typename Key, typename = typename compare_type::is_transparent>
     iterator erase(const Key& key) {}
@@ -408,9 +416,81 @@ private:
         head_node_->parent = nullptr;
     }
 
-	void eraseNode(Node* node) {
+    void eraseNode(Node* node) {
+        auto parent_node = node->parent;
 
-	}
+        if (node->left_child == nullptr && node->right_child == nullptr) {
+            // if the node being removed has no childs, then just remove the link
+            // in the parent node
+            if (parent_node == head_node_) {
+                head_node_->left_child = nullptr;
+                head_node_->right_child = nullptr;
+                head_node_->parent = nullptr;
+            } else if (parent_node->left_child == node) {
+                parent_node->left_child = nullptr;
+            } else {
+                parent_node->right_child = nullptr;
+            }
+        } else if (node->left_child != nullptr && node->right_child == nullptr) {
+            // if node being removed has a left child only, move up the left child so that it
+            // it is child of parent node now
+            auto replace_node = node->left_child;
+            replace_node->parent = parent_node;
+            if (parent_node == head_node_) {
+                head_node_->parent = replace_node;
+            } else if (parent_node->left_child == node) {
+                parent_node->left_child = replace_node;
+            } else {
+                parent_node->right_child = replace_node;
+            }
+        } else if (node->right_child != nullptr && node->left_child == nullptr) {
+            // if node being removed has a right child only, move up the right child so that it
+            // it is child of parent node now
+            auto replace_node = node->right_child;
+            replace_node->parent = parent_node;
+            if (parent_node == head_node_) {
+                head_node_->parent = replace_node;
+            } else if (parent_node->left_child == node) {
+                parent_node->left_child = replace_node;
+            } else {
+                parent_node->right_child = replace_node;
+            }
+        } else {
+            // if both child are present, find the max element in the left subtree
+            auto replace_node = node->left_child;
+            while (replace_node->right_child != nullptr) {
+                replace_node = replace_node->right_child;
+            }
+
+            auto replace_parent = replace_node->parent;
+            replace_parent->left_child = replace_node->left_child;
+
+            replace_node->parent = parent_node;
+            replace_node->left_child = node->left_child;
+            replace_node->right_child = node->right_child;
+
+            if (parent_node == head_node_) {
+                head_node_->parent = replace_node;
+            } else if (parent_node->left_child == node) {
+                parent_node->left_child = replace_node;
+            } else {
+                parent_node->left_child = replace_node;
+            }
+        }
+
+        if (node == head_node_->left_child) {
+            head_node_->left_child = node->parent;
+        }
+
+        if (node == head_node_->right_child) {
+            head_node_->right_child = node->parent;
+        }
+
+        --size_;
+
+        node_allocator_traits::destroy(alloc_, std::addressof(node->value));
+        node_allocator_traits::deallocate(alloc_, node, 1);
+    }
 
     Node* head_node_;
     size_type size_;
