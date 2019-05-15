@@ -1,7 +1,6 @@
 #pragma once
 #include <iterator>
-#include <type_traits>
-#include <vector>
+#include "TypeTraits.h"
 
 namespace nxt::core {
 
@@ -472,9 +471,9 @@ private:
         rhs.capacity_ = 0;
     }
 
-    pointer data_;
     size_type size_;
     size_type capacity_;
+    pointer data_;
     allocator_type alloc_;
 };
 }  // namespace nxt::core

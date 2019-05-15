@@ -62,7 +62,7 @@ protected:
     List* list_;
     node_type* node_;
 
-    friend typename List;
+    friend List;
 };
 
 template<typename List>
@@ -74,6 +74,7 @@ public:
     using pointer = typename List::pointer;
     using reference = typename List::reference;
     using iterator_category = std::bidirectional_iterator_tag;
+	using base_class = ConstListIterator<List>;
 
     ListIterator(List* list, node_type* node)
         : ConstListIterator<List>(list, node) {}
@@ -107,6 +108,10 @@ public:
     [[nodiscard]] pointer operator->() const noexcept {
         return pointer_traits<pointer>::pointerAt(node_->value);
     }
+
+protected:
+	// needed as its a dependent name
+	using base_class::node_;
 };
 
 template<typename T, typename Allocator = std::allocator<T>>
@@ -141,42 +146,42 @@ public:
     };
 
     List()
-        : alloc_()
-        , size_(0) {
+        : size_(0)
+        , alloc_() {
         constructHeadNode();
     }
 
     explicit List(const Allocator& alloc)
-        : alloc_(alloc)
-        , size_(0) {
+        : size_(0)
+        , alloc_(alloc) {
         constructHeadNode();
     }
 
     explicit List(size_type count, const Allocator& alloc = Allocator())
-        : alloc_(alloc)
-        , size_(0) {
+        : size_(0)
+        , alloc_(alloc) {
         constructHeadNode();
         insertCountNode(head_->next, count);
     }
 
     List(size_type count, const value_type& value, const Allocator& alloc = Allocator())
-        : alloc_(alloc)
-        , size_(0) {
+        : size_(0)
+        , alloc_(alloc) {
         constructHeadNode();
         insertCountNode(head_->next, count, value);
     }
 
     template<typename InputIter, typename = std::enable_if_t<IsIteratorV<InputIter>>>
     List(InputIter first, InputIter last, const Allocator& alloc = Allocator())
-        : alloc_(alloc)
-        , size_(0) {
+        : size_(0)
+        , alloc_(alloc) {
         constructHeadNode();
         insertFromIterator(head_->next, first, last);
     }
 
     List(const List& list)
-        : alloc_(node_allocator_traits::select_on_container_copy_construction(list.alloc_))
-        , size_(0) {
+        : size_(0)
+        , alloc_(node_allocator_traits::select_on_container_copy_construction(list.alloc_)) {
         constructHeadNode();
         insertFromIterator(head_->next, list.begin(), list.end());
     }
@@ -576,8 +581,8 @@ private:
     size_type size_;
     node_allocator_type alloc_;
 
-    friend class iterator;
-    friend class const_iterator;
+    friend iterator;
+    friend const_iterator;
 };
 
 // template type deduction for input iterator constructor

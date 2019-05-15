@@ -78,8 +78,8 @@ private:
 
     std::string name_;
     std::queue<std::shared_ptr<Task>> tasks_;
-    uint32_t max_threads_;
     std::atomic<uint32_t> current_threads_;
+    uint32_t max_threads_;
     std::atomic<bool> queue_running_;
     std::mutex mutex_;
     std::condition_variable conditional_variable_;

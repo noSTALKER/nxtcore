@@ -20,15 +20,16 @@ public:
     using difference_type = typename allocator_traits::difference_type;
 
     RingBuffer() noexcept(std::is_nothrow_default_constructible_v<allocator_type>)
-        : back_(0)
-        , front_(0)
+        : data_(nullptr)
+		, front_(0)
+        , back_(0)
         , capacity_(0)
-        , data_(nullptr)
         , alloc_() {}
 
     RingBuffer(size_type capacity)
-        : back_(0)
-        , front_(0)
+        : data(nullptr)
+		, front_(0)
+        , back_(0)
         , capacity_(0)
         , data_(nullptr)
         , alloc_() {

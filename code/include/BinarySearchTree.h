@@ -130,7 +130,7 @@ public:
         : Base(tree, node) {}
 
     [[nodiscard]] reference operator*() const {
-        return node_->value;
+        return this->node_->value;
     }
 
     [[nodiscard]] pointer operator->() const {
@@ -162,8 +162,10 @@ public:
 
 template<typename TreeTraits>
 class BinarySearchTree {
-public:
+private:
     struct Node;
+
+public:
 
     using value_type = typename TreeTraits::value_type;
     using key_type = typename TreeTraits::key_type;
@@ -199,7 +201,7 @@ public:
         : head_node_(nullptr)
         , size_(0)
         , compare_(rhs.compare_)
-		, alloc_(std::move(rhs.alloc_) {
+		, alloc_(std::move(rhs.alloc_)) {
         createHeadNode();
         using std::swap;
         swap(head_node_, rhs.head_node_);
@@ -535,8 +537,8 @@ private:
 
     Node* head_node_;
     size_type size_;
-    node_allocator_type alloc_;
     compare_type compare_;
+    node_allocator_type alloc_;
 
     friend iterator;
     friend const_iterator;

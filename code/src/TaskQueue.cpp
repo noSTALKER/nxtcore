@@ -6,7 +6,8 @@ namespace nxt::core {
 TaskQueue::TaskQueue(const std::string& name)
     : name_(name)
     , current_threads_(0)
-    , max_threads_(std::max(std::thread::hardware_concurrency(), 2u) - 1) {}
+    , max_threads_(std::max(std::thread::hardware_concurrency(), 2u) - 1)
+	, queue_running_(false) {}
 
 const std::string&
 TaskQueue::getName() const noexcept {

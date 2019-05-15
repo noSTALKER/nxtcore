@@ -130,7 +130,7 @@ struct FirstTemplateParameter;
 
 template<template<typename...> typename U, typename First, typename... Args>
 struct FirstTemplateParameter<U<First, Args...>> {
-    using type = typename First;
+    using type = First;
 };
 
 template<typename U>
@@ -141,7 +141,7 @@ struct ReplaceFirstTemplateParameter;
 
 template<template<typename...> typename U, typename Replace, typename First, typename... Args>
 struct ReplaceFirstTemplateParameter<U<First, Args...>, Replace> {
-    using type = typename U<Replace, Args...>;
+    using type = U<Replace, Args...>;
 };
 
 template<typename U, typename Replace>

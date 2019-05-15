@@ -91,9 +91,10 @@ public:
     using reference = typename SlotMap::const_reference;
     using const_reference = typename SlotMap::const_reference;
     using iterator_category = std::bidirectional_iterator_tag;
+	using base_class = SlotMapConstIterator<SlotMap>;
 
     SlotMapIterator(SlotMap* slot_map, size_type current_index)
-        : SlotMapConstIterator(slot_map, current_index) {}
+            : base_class(slot_map, current_index) {}
 
     const_reference operator*() const {
         return slot_map_->valueAt(current_index_);
@@ -136,6 +137,10 @@ public:
         this->operator--();
         return temp;
     }
+
+protected:
+    using base_class::slot_map_;
+    using base_class::current_index_;
 };
 
 template<typename T, typename KeyType = Key, std::size_t BlockSize = 1024, typename Allocator = std::allocator<T>>
@@ -151,8 +156,8 @@ public:
     using pointer = typename std::allocator_traits<Allocator>::pointer;
     using const_pointer = typename std::allocator_traits<Allocator>::const_pointer;
     using difference_type = typename std::allocator_traits<Allocator>::difference_type;
-    using iterator = typename SlotMapIterator<SlotMap<T, Key, BlockSize, Allocator>>;
-    using const_iterator = typename SlotMapConstIterator<SlotMap<T, Key, BlockSize, Allocator>>;
+    using iterator = SlotMapIterator<SlotMap<T, Key, BlockSize, Allocator>>;
+    using const_iterator = SlotMapConstIterator<SlotMap<T, Key, BlockSize, Allocator>>;
     using key_type_allocator = typename std::allocator_traits<Allocator>::template rebind_alloc<key_type>;
     static constexpr auto block_size = BlockSize;
 
@@ -430,14 +435,14 @@ private:
     Vector<Page*, page_pointer_allocator> pages_;
     PageVector<key_type, block_size, key_type_allocator> next_list_;
     PageVector<bool, block_size, bool_allocator> valid_list_;
+    size_type size_;
     size_type free_index_;
     size_type max_valid_index_;
     size_type min_valid_index_;
-    size_type size_;
     page_allocator alloc_;
 
-    friend class const_iterator;
-    friend class iterator;
+    friend const_iterator;
+    friend iterator;
 };
 
 }  // namespace nxt::core

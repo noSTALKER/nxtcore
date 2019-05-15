@@ -116,9 +116,10 @@ public:
     using size_type = typename PageVector::size_type;
     using difference_type = typename PageVector::difference_type;
     using iterator_category = std::random_access_iterator_tag;
+	using base_class = PageVectorConstIterator<PageVector>;
 
     PageVectorIterator(PageVector* vector, size_type index)
-        : PageVectorConstIterator(vector, index) {}
+            : base_class(vector, index) {}
 
     PageVectorIterator& operator++() noexcept {
         ++current_index_;
@@ -171,6 +172,10 @@ public:
     [[nodiscard]] difference_type operator-(const PageVectorIterator& rhs) const noexcept {
         return current_index_ - rhs.current_index_;
     }
+
+protected:
+    using base_class::page_vector_;
+    using base_class::current_index_;
 };
 
 template<typename T, std::size_t PageSize, typename Allocator = std::allocator<T>>
@@ -199,8 +204,8 @@ private:
 public:
     PageVector() noexcept(
         std::is_nothrow_default_constructible_v<page_allocator>&& std::is_nothrow_constructible_v<decltype(pages_)>)
-        : alloc_()
-        , size_(0) {}
+        : size_(0)
+        , alloc_() {}
 
     PageVector(const PageVector& rhs)
         : size_(0)

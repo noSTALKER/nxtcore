@@ -424,7 +424,7 @@ template<typename RandomAccessIter,
          typename = std::enable_if_t<IsRandomAccessIteratorV<RandomAccessIter>>>
 constexpr void
 quickSort(RandomAccessIter first, RandomAccessIter last, Compare comp) {
-    static constexpr IteratorDifferenceTypeT<RandomAccessIter> kInsertionSortLimit = 16;
+    constexpr IteratorDifferenceTypeT<RandomAccessIter> kInsertionSortLimit = 16;
     if (kInsertionSortLimit >= last - first) {
         insertionSort(first, last, comp);
         return;
@@ -496,7 +496,7 @@ template<typename RandomAccessIter,
          typename = std::enable_if_t<IsRandomAccessIteratorV<RandomAccessIter>>>
 constexpr void
 nthElement(RandomAccessIter first, RandomAccessIter last, RandomAccessIter nth, Compare comp) {
-    static constexpr IteratorDifferenceTypeT<RandomAccessIter> kInsertionSortLimit = 16;
+    constexpr IteratorDifferenceTypeT<RandomAccessIter> kInsertionSortLimit = 16;
     if (kInsertionSortLimit >= last - first) {
         insertionSort(first, last, comp);
         return;
