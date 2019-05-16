@@ -6,7 +6,7 @@
 namespace nxt::core {
 
 template<typename List>
-class ConstListIterator {
+class ListConstIterator {
 public:
     using node_type = typename List::node_type;
     using value_type = typename List::value_type;
@@ -16,28 +16,28 @@ public:
     using const_reference = typename List::const_reference;
     using iterator_category = std::bidirectional_iterator_tag;
 
-    ConstListIterator(List* list, node_type* node)
+    ListConstIterator(List* list, node_type* node)
         : list_(list)
         , node_(node) {}
 
-    ConstListIterator& operator++() noexcept {
+    ListConstIterator& operator++() noexcept {
         node_ = node_->next;
         return *this;
     }
 
-    ConstListIterator operator++(int) noexcept {
-        ConstListIterator temp = ConstListIterator(list_, node_);
+    ListConstIterator operator++(int) noexcept {
+        ListConstIterator temp = ListConstIterator(list_, node_);
         node_ = node_->next;
         return temp;
     }
 
-    ConstListIterator& operator--() noexcept {
+    ListConstIterator& operator--() noexcept {
         node_ = node_->previous;
         return *this;
     }
 
-    ConstListIterator operator--(int) noexcept {
-        ConstListIterator temp = ConstListIterator(list_, node_);
+    ListConstIterator operator--(int) noexcept {
+        ListConstIterator temp = ListConstIterator(list_, node_);
         node_ = node_->previous;
         return temp;
     }
@@ -50,11 +50,11 @@ public:
         return pointer_traits<pointer>::pointerAt(node->value);
     }
 
-    [[nodiscard]] bool operator==(const ConstListIterator& rhs) const noexcept {
+    [[nodiscard]] bool operator==(const ListConstIterator& rhs) const noexcept {
         return node_ == rhs.node_;
     }
 
-    [[nodiscard]] bool operator!=(const ConstListIterator& rhs) const noexcept {
+    [[nodiscard]] bool operator!=(const ListConstIterator& rhs) const noexcept {
         return node_ != rhs.node_;
     }
 
@@ -66,7 +66,7 @@ protected:
 };
 
 template<typename List>
-class ListIterator : public ConstListIterator<List> {
+class ListIterator : public ListConstIterator<List> {
 public:
     using node_type = typename List::node_type;
     using value_type = typename List::value_type;
@@ -74,10 +74,10 @@ public:
     using pointer = typename List::pointer;
     using reference = typename List::reference;
     using iterator_category = std::bidirectional_iterator_tag;
-	using base_class = ConstListIterator<List>;
+	using base_class = ListConstIterator<List>;
 
     ListIterator(List* list, node_type* node)
-        : ConstListIterator<List>(list, node) {}
+        : ListConstIterator<List>(list, node) {}
 
     ListIterator& operator++() noexcept {
         node_ = node_->next;
@@ -134,7 +134,7 @@ public:
     using difference_type = typename allocator_traits::difference_type;
 
     using iterator = ListIterator<List>;
-    using const_iterator = ConstListIterator<List>;
+    using const_iterator = ListConstIterator<List>;
 
     struct Node {
         Node* next;
@@ -482,8 +482,7 @@ private:
         auto previous_node = next_node->previous;
         bool added = false;
 
-        size_type i = count;
-        while (i) {
+        for (size_type i = 0; i < count; ++i) {
             auto new_node = node_allocator_traits::allocate(alloc_, 1);
             node_allocator_traits::construct(alloc_, std::addressof(new_node->value), std::forward<Args>(args)...);
 
@@ -494,7 +493,6 @@ private:
             added = true;
 
             ++size_;
-            --i;
         }
 
         if (added) {
