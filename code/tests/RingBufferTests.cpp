@@ -108,8 +108,7 @@ TEST_CASE("RingBuffer Tests", "[ring_buffer]") {
         REQUIRE(move_buffer.capacity() >= 9);
         REQUIRE(nxt::core::isPowerOf2(move_buffer.capacity()));
 
-		REQUIRE(copy_buffer_2.size() == 0);
-        REQUIRE(copy_buffer_2.front() == 0);
+        REQUIRE(copy_buffer_2.size() == 0);
         REQUIRE(copy_buffer_2.capacity() == 0);
     }
 }

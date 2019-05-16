@@ -116,10 +116,10 @@ public:
     using size_type = typename PageVector::size_type;
     using difference_type = typename PageVector::difference_type;
     using iterator_category = std::random_access_iterator_tag;
-	using base_class = PageVectorConstIterator<PageVector>;
+    using base_class = PageVectorConstIterator<PageVector>;
 
     PageVectorIterator(PageVector* vector, size_type index)
-            : base_class(vector, index) {}
+        : base_class(vector, index) {}
 
     PageVectorIterator& operator++() noexcept {
         ++current_index_;
@@ -174,8 +174,8 @@ public:
     }
 
 protected:
-    using base_class::page_vector_;
     using base_class::current_index_;
+    using base_class::page_vector_;
 };
 
 template<typename T, std::size_t PageSize, typename Allocator = std::allocator<T>>
@@ -274,9 +274,16 @@ public:
     }
 
     template<typename InputIter, typename = std::enable_if_t<IsInputIteratorV<InputIter>>>
+    PageVector(InputIter first, InputIter last)
+        : size_(0)
+        , alloc_() {
+        assign(first, last);
+    }
+
+    template<typename InputIter, typename = std::enable_if_t<IsInputIteratorV<InputIter>>>
     void assign(InputIter first, InputIter last) {
         if constexpr (IsForwardIteratorV<InputIter>) {
-            auto item_count = std::distance(last, first);
+            auto item_count = std::distance(first, last);
 
             if (size_ > item_count) {
                 for (size_type i = 0; i < item_count; ++i) {
@@ -284,7 +291,7 @@ public:
                     ++first;
                 }
 
-				for (size_type i = item_count; i < size_; ++i) {
+                for (size_type i = item_count; i < size_; ++i) {
                     page_allocator_traits::destroy(alloc_, pointerAt(i));
                 }
             } else {
@@ -298,14 +305,13 @@ public:
                     page_allocator_traits::construct(alloc_, pointerAt(i), *first);
                     ++first;
                 }
-
             }
 
-			size_ = item_count;
+            size_ = item_count;
         }
     }
 
-	void assign(size_type count, const T& value) {
+    void assign(size_type count, const T& value) {
         if (size_ > count) {
             for (size_type i = 0; i < count; ++i) {
                 valueAt(i) = value;
@@ -326,7 +332,7 @@ public:
         }
 
         size_ = item_count;
-	}
+    }
 
     [[nodiscard]] size_type capacity() const noexcept {
         return pages_.size() * page_size;

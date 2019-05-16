@@ -55,7 +55,7 @@ public:
         , alloc_(alloc) {
         if constexpr (IsForwardIteratorV<InputIter>) {
             // if it is forward iterator, we can calculate the distance and make copies
-            auto count = std::distance(last, first);
+            auto count = std::distance(first, last);
             if (count > 0) {
                 // allocate the buffer
                 auto buffer = allocator_traits::allocate(alloc_, count);
@@ -77,6 +77,14 @@ public:
                 ++first;
             }
         }
+    }
+
+    Vector(std::initializer_list<value_type> values)
+        : size_(0)
+        , capacity_(0)
+        , data_(nullptr)
+        , alloc_() {
+        assign(values.begin(), values.end());
     }
 
     Vector(const Vector& rhs)
@@ -174,7 +182,7 @@ public:
     template<typename InputIter, typename = std::enable_if_t<IsInputIteratorV<InputIter>>>
     void assign(InputIter first, InputIter last) {
         if constexpr (IsForwardIteratorV<InputIter>) {
-            auto item_count = std::distance(last, first);
+            auto item_count = std::distance(first, last);
             if (item_count > size_) {
                 if (item_count > capacity_) {
                     cleanup();
@@ -183,14 +191,16 @@ public:
 
                 size_type current_index = 0;
                 while (current_index < size_) {
-                    *(data_ + current_index) = *first;
+                    data_[current_index] = *first;
 
                     ++current_index;
                     ++first;
                 }
 
-                for (current_index < item_count) {
+                while (current_index < item_count) {
                     allocator_traits::construct(alloc_, data_ + current_index, *first);
+                    ++current_index;
+                    ++first;
                 }
                 size_ = item_count;
 
@@ -205,6 +215,7 @@ public:
 
                 while (current_index < size_) {
                     allocator_traits::destroy(alloc_, data_ + current_index);
+                    ++current_index;
                 }
                 size_ = item_count;
             }

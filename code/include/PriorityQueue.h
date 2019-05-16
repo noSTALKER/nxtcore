@@ -3,6 +3,7 @@
 #include <functional>
 
 #include "PageVector.h"
+#include "Sort.h"
 
 namespace nxt::core {
 
@@ -10,15 +11,55 @@ template<typename T, typename Container = PageVector<T, 32>, typename Compare = 
 class PriorityQueue {
 public:
     using value_type = typename Container::value_type;
+    using value_compare = Compare;
     using reference = typename Container::reference;
     using const_reference = typename Container::const_reference;
     using size_type = typename Container::size_type;
     using compare_type = Compare;
+    using container_type = Container;
 
     PriorityQueue() noexcept(
         std::is_nothrow_default_constructible_v<Container>&& std::is_nothrow_default_constructible_v<Compare>)
         : container_()
         , comp_() {}
+
+    PriorityQueue(const PriorityQueue& rhs)
+        : container_(container_)
+        , comp_(rhs.comp_) {}
+
+    PriorityQueue(PriorityQueue&& rhs)
+        : container_(rhs.container_)
+        , comp_(rhs.comp_) {}
+
+    explicit PriorityQueue(const container_type& container)
+        : container_(container)
+        , comp_() {
+        makeHeap(container_.begin(), container_.end(), comp_);
+    }
+
+    explicit PriorityQueue(const value_compare& comp)
+        : container_()
+        , comp_(comp) {}
+
+    template<typename InputIter, typename = std::enable_if_t<IsInputIteratorV<InputIter>>>
+    PriorityQueue(InputIter first, InputIter last)
+        : container_(first, last)
+        , comp_() {
+        makeHeap(container_.begin(), container_.end(), comp_);
+    }
+
+    template<typename InputIter, typename = std::enable_if_t<IsInputIteratorV<InputIter>>>
+    PriorityQueue(InputIter first, InputIter last, const value_compare& comp)
+        : container_(first, last)
+        , comp_(comp) {
+        makeHeap(container_.begin(), container_.end(), comp_);
+    }
+
+    PriorityQueue(const value_compare& comp, const container_type& container)
+        : container_(container)
+        , comp_(comp) {
+        makeHeap(container_.begin(), container_.end(), comp_);
+    }
 
     [[nodiscard]] bool empty() const noexcept(noexcept(container_.empty())) {
         return container_.empty();
@@ -64,5 +105,11 @@ private:
     Container container_;
     Compare comp_;
 };
+
+template<typename InputIter,
+         typename Container = PageVector<IteratorValueTypeT<InputIter>, 32>,
+         typename Compare = std::less<>,
+         typename = std::enable_if_t<IsInputIteratorV<InputIter>>>
+PriorityQueue(InputIter first, InputIter last)->PriorityQueue<IteratorValueTypeT<InputIter>, Container, Compare>;
 
 }  // namespace nxt::core
