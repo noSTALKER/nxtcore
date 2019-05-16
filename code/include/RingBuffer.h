@@ -21,19 +21,50 @@ public:
 
     RingBuffer() noexcept(std::is_nothrow_default_constructible_v<allocator_type>)
         : data_(nullptr)
-		, front_(0)
+        , front_(0)
         , back_(0)
         , capacity_(0)
         , alloc_() {}
 
     RingBuffer(size_type capacity)
         : data(nullptr)
-		, front_(0)
+        , front_(0)
         , back_(0)
         , capacity_(0)
-        , data_(nullptr)
         , alloc_() {
         reserve(capacity);
+    }
+
+    RingBuffer(const RingBuffer& rhs)
+        : data_(nullptr)
+        , front_(0)
+        , back_(0)
+        , capacity_(0)
+        , alloc_(allocator_traits::select_on_container_copy_construction(rhs.alloc_)) {
+        reserve(rhs.capacity());
+        for (auto start = rhs.front_; start != rhs.back_; start = rhs.getNext(start)) {
+            allocator_traits::construct(alloc_, data_ + start, rhs.data_[start]);
+        }
+
+        front_ = rhs.front_;
+        back_ = rhs.back_;
+    }
+
+    RingBuffer(RingBuffer&& rhs)
+        : data_(nullptr)
+        , front_(0)
+        , back_(0)
+        , capacity_(0)
+        , alloc_(std::move(rhs.alloc_)) {
+        data_ = rhs.data_;
+        front_ = rhs.front_;
+        back_ = rhs.back_;
+        capacity_ = rhs.capacity_;
+
+        rhs.data_ = nullptr;
+        rhs.front_ = 0;
+        rhs.back_ = 0;
+        rhs.capacity_ = 0;
     }
 
     void pushBack(const T& value) {
@@ -72,7 +103,9 @@ public:
 
     void reserve(size_type new_capacity) {
         if (new_capacity > capacity_) {
-            new_capacity = getNextPowerOf2(new_capacity);
+            if (!isPowerOf2(new_capacity) || new_capacity < 2) {
+                new_capacity = getNextPowerOf2(new_capacity);
+            }
 
             auto new_buffer = allocator_traits::allocate(alloc_, new_capacity);
             auto index = front_;
