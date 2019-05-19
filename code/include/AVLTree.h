@@ -5,12 +5,11 @@
 namespace nxt::core {
 
 template<typename TreeTraits>
-class BinarySearchTree {
+class AVLTree {
 private:
     struct Node;
 
 public:
-
     using value_type = typename TreeTraits::value_type;
     using key_type = typename TreeTraits::key_type;
     using compare_type = typename TreeTraits::compare_type;
@@ -23,8 +22,8 @@ public:
     using pointer = typename allocator_traits::pointer;
     using const_pointer = typename allocator_traits::const_pointer;
     using difference_type = typename allocator_traits::difference_type;
-    using const_iterator = TreeConstIterator<BinarySearchTree<TreeTraits>>;
-    using iterator = TreeIterator<BinarySearchTree<TreeTraits>>;
+    using const_iterator = TreeConstIterator<AVLTree<TreeTraits>>;
+    using iterator = TreeIterator<AVLTree<TreeTraits>>;
 
 protected:
     using node_allocator_type = typename allocator_traits::template rebind_alloc<node_type>;
@@ -32,8 +31,8 @@ protected:
     using tree_traits = TreeTraits;
 
 public:
-    BinarySearchTree() noexcept(std::is_nothrow_default_constructible_v<node_allocator_type> &&
-                                std::is_nothrow_default_constructible_v<compare_type>)
+    AVLTree() noexcept(std::is_nothrow_default_constructible_v<node_allocator_type>&&
+                           std::is_nothrow_default_constructible_v<compare_type>)
         : head_node_(nullptr)
         , size_(0)
         , compare_()
@@ -41,19 +40,19 @@ public:
         createHeadNode();
     }
 
-    BinarySearchTree(BinarySearchTree&& rhs)
+    AVLTree(AVLTree&& rhs)
         : head_node_(nullptr)
         , size_(0)
         , compare_(rhs.compare_)
-		, alloc_(std::move(rhs.alloc_)) {
+        , alloc_(std::move(rhs.alloc_)) {
         createHeadNode();
         using std::swap;
         swap(head_node_, rhs.head_node_);
         size_ = rhs.size_;
         rhs.size_ = 0;
-	}
+    }
 
-    BinarySearchTree(const BinarySearchTree& ) {}
+    AVLTree(const AVLTree&) {}
 
     std::pair<iterator, bool> insert(const value_type& value) {
         return insert(head_node_->parent, head_node_, true, value);
@@ -92,7 +91,7 @@ public:
         }
     }
 
-    ~BinarySearchTree() {
+    ~AVLTree() {
         clear();
 
         node_allocator_traits::deallocate(alloc_, head_node_, 1);
@@ -153,6 +152,7 @@ private:
         Node* parent;
         Node* left_child;
         Node* right_child;
+        int32_t height;
     };
 
     template<typename Arg>
@@ -376,6 +376,14 @@ private:
 
             node_allocator_traits::destroy(alloc_, std::addressof(node->value));
             node_allocator_traits::deallocate(alloc_, node, 1);
+        }
+    }
+
+    int32_t height(Node* node) const noexcept {
+        if (node == nullptr) {
+            return -1;
+        } else {
+            return node->height;
         }
     }
 

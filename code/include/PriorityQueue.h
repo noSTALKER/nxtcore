@@ -61,6 +61,12 @@ public:
         makeHeap(container_.begin(), container_.end(), comp_);
     }
 
+	PriorityQueue(std::initializer_list<T> values)
+		: container_(values)
+		, comp_() {
+        makeHeap(container_.begin(), container_.end(), comp_);
+	}
+
     [[nodiscard]] bool empty() const noexcept(noexcept(container_.empty())) {
         return container_.empty();
     }
