@@ -310,7 +310,7 @@ public:
             size_ = item_count;
         } else {
             size_t item_added = 0;
-            for (size_ > item_count && first != last) {
+            while (size_ > item_count && first != last) {
                 valueAt(i) = *first;
                 ++first;
                 ++item_added;
