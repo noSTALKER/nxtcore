@@ -2,7 +2,7 @@
 
 #include "../include/Vector.h"
 
-TEST_CASE("vectors constructors", "[vector]") {
+TEST_CASE("Vector Tests", "[vector]") {
     SECTION("Creating empty Vector") {
         nxt::core::Vector<int> vector;
 
