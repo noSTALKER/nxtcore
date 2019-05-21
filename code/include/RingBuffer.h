@@ -19,6 +19,8 @@ public:
     using size_type = typename allocator_traits::size_type;
     using difference_type = typename allocator_traits::difference_type;
 
+	static_assert(std::is_unsigned_v<size_type>, "size_type must a unsigned integral");
+
     RingBuffer() noexcept(std::is_nothrow_default_constructible_v<allocator_type>)
         : data_(nullptr)
         , front_(0)
@@ -99,6 +101,8 @@ public:
             front_ = getNext(front_);
             return result;
         }
+
+		throw std::logic_error("trying to pop value from empty ring buffer");
     }
 
     void reserve(size_type new_capacity) {

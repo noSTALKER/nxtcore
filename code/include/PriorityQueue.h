@@ -91,7 +91,7 @@ public:
         pushHeap(container_.begin(), container_.end(), comp_);
     }
 
-    [[nodiscard]] const_reference top() {
+    [[nodiscard]] const_reference top() const {
         return container_.front();
     }
 

@@ -179,6 +179,9 @@ public:
         insertFromIterator(head_->next, first, last);
     }
 
+	List(std::initializer_list<value_type> values)
+        : List(values.begin(), values.end()) {}
+
     List(const List& list)
         : size_(0)
         , alloc_(node_allocator_traits::select_on_container_copy_construction(list.alloc_)) {

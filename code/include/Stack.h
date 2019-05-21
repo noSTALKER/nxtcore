@@ -1,6 +1,5 @@
 #pragma once
 
-#include <stack>
 #include "PageVector.h"
 
 namespace nxt::core {
@@ -17,17 +16,21 @@ public:
     Stack() noexcept(std::is_nothrow_default_constructible_v<Container>)
         : container_() {}
 
-    Stack(const Container& container) noexcept(std::is_nothrow_copy_constructible_v<Container>)
+    explicit Stack(const Container& container) noexcept(std::is_nothrow_copy_constructible_v<Container>)
         : container_(container) {}
 
-    Stack(Container&& container) noexcept(std::is_nothrow_move_constructible_v<Container>)
+    explicit Stack(Container&& container) noexcept(std::is_nothrow_move_constructible_v<Container>)
         : container_(std::move(container)) {}
 
-    [[nodiscard]] reference top() {
+    template<typename InputIter, typename = std::enable_if_t<IsInputIteratorV<InputIter>>>
+    Stack(InputIter first, InputIter last)
+        : container_(first, last) {}
+
+    [[nodiscard]] reference top() noexcept {
         return container_.back();
     }
 
-    [[nodiscard]] const_reference top() const {
+    [[nodiscard]] const_reference top() const noexcept {
         return container_.back();
     }
 
@@ -65,4 +68,10 @@ public:
 private:
     container_type container_;
 };
+
+template<typename InputIter,
+         typename Container = PageVector<IteratorValueTypeT<InputIter>, 32>,
+         typename = std::enable_if_t<IsInputIteratorV<InputIter>>>
+Stack(InputIter, InputIter)->Stack<IteratorValueTypeT<InputIter>, Container>;
+
 }  // namespace nxt::core

@@ -1,6 +1,7 @@
 #pragma once
 #include <iterator>
 #include "TypeTraits.h"
+#include <vector>
 
 namespace nxt::core {
 
@@ -52,7 +53,7 @@ public:
         : size_(0)
         , capacity_(0)
         , data_(nullptr)
-        , alloc_(alloc) {
+        , alloc_() {
         if constexpr (IsForwardIteratorV<InputIter>) {
             // if it is forward iterator, we can calculate the distance and make copies
             auto count = std::distance(first, last);
@@ -80,11 +81,7 @@ public:
     }
 
     Vector(std::initializer_list<value_type> values)
-        : size_(0)
-        , capacity_(0)
-        , data_(nullptr)
-        , alloc_() {
-        assign(values.begin(), values.end());
+        : Vector(values.begin(), values.end()) {
     }
 
     Vector(const Vector& rhs)
