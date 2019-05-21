@@ -360,9 +360,17 @@ private:
             }
 
             auto replace_parent = replace_node->parent;
-            replace_parent->left_child = replace_node->left_child;
+            if (replace_parent->left_child == replace_node) {
+                replace_parent->left_child = replace_node->left_child;
+                if (replace_parent->left_child != nullptr)
+                    replace_parent->left_child->parent = replace_parent;
+            } else {
+                replace_parent->right_child = replace_node->left_child;
+                if (replace_parent->right_child != nullptr)
+                    replace_parent->right_child->parent = replace_parent;
+            }
 
-            replace_node->parent = parent_node;
+            
             replace_node->left_child = node->left_child;
             if (replace_node->left_child != nullptr)
                 replace_node->left_child->parent = replace_node;
@@ -371,6 +379,7 @@ private:
             if (replace_node->right_child != nullptr)
                 replace_node->right_child->parent = replace_node;
 
+            replace_node->parent = parent_node;
             if (parent_node == head_node_) {
                 head_node_->parent = replace_node;
             } else if (parent_node->left_child == node) {
@@ -387,11 +396,19 @@ private:
         }
 
         if (node == head_node_->left_child) {
-            head_node_->left_child = node->parent;
+            if (node->parent != head_node_) {
+                head_node_->left_child = node->parent;
+            } else {
+                head_node_->left_child = head_node_->parent;
+            }
         }
 
         if (node == head_node_->right_child) {
-            head_node_->right_child = node->parent;
+            if (node->parent != head_node_) {
+                head_node_->right_child = node->parent;
+            } else {
+                head_node_->right_child = head_node_->parent;
+            }
         }
 
         --size_;

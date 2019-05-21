@@ -311,6 +311,23 @@ public:
             }
 
             size_ = item_count;
+        } else {
+            size_t item_added = 0;
+            while (size_ > item_count && first != last) {
+                valueAt(i) = *first;
+                ++first;
+                ++item_added;
+            }
+
+            while (first != last) {
+                pushBack(*first);
+                ++first;
+                ++item_added;
+            }
+
+            for (size_type i = item_count; i < size_; ++i) {
+                page_allocator_traits::destroy(alloc_, pointerAt(i));
+            }
         }
     }
 
