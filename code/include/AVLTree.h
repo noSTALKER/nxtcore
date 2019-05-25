@@ -411,6 +411,7 @@ private:
             }
         }
 
+
         --size_;
 
         while (last_affected_node != head_node_) {

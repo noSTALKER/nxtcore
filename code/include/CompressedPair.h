@@ -7,6 +7,8 @@ namespace nxt::core {
 struct ValueInitThenVariadicArgsT {};
 struct FirstArgThenVariadicArgsT {};
 
+// This class uses empty-class optimization to save space when second item in the pair is a empty
+// class
 template<typename First, typename Second, bool = std::is_empty_v<First> && !std::is_final_v<First>>
 class CompressedPair final : private First {
 public:

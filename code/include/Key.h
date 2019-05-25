@@ -16,7 +16,7 @@ struct Key {
     Key() = default;
 
     /**
-     * @brief
+     * @brief Constructor
      *
      */
     Key(index_type index, generation_type generation) noexcept

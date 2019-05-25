@@ -511,6 +511,7 @@ private:
     page_allocator alloc_;
 };
 
+// template type deduction guide for constructor which accepts input iterators
 template<typename InputIter,
          std::size_t PageSize = 32,
          typename Allocator = std::allocator<IteratorValueTypeT<InputIter>>,
