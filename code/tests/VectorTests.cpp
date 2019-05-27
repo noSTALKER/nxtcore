@@ -87,4 +87,21 @@ TEST_CASE("Vector Tests", "[vector]") {
         REQUIRE(vector[6] == 4);
 
     }
+
+    SECTION("Erasing Items") {
+        nxt::core::Vector<int> vector = {-1, 0, 1, 2, 3, 4, 5, 6, 7, 8};
+        
+        REQUIRE(vector.size() == 10);
+        
+        vector.erase(vector.begin());
+        REQUIRE(vector.size() == 9);
+        REQUIRE(vector[0] == 0);
+
+        auto next_value = vector.erase(vector.begin() + 1, vector.begin() + 4);
+        REQUIRE(vector.size() == 6);
+        REQUIRE(*next_value == 4);
+
+        vector.erase(vector.begin(), vector.end());
+        REQUIRE(vector.size() == 0);
+    }
 }

@@ -257,6 +257,8 @@ public:
         }
     }
 
+    
+
     void assign(std::initializer_list<T> values) {
         assign(values.begin(), values.end());
     }
@@ -349,6 +351,35 @@ public:
             allocator_traits::destroy(alloc_, (data_ + size_ - 1));
             --size_;
         }
+    }
+
+    iterator erase(const_iterator position) {
+        return erase(position, position + 1);
+    }
+
+    iterator erase(const_iterator first, const_iterator last) {
+        if (first == last)
+            return const_cast<iterator>(first);
+
+        iterator src = const_cast<iterator>(last);
+        iterator dest = const_cast<iterator>(first);
+        iterator end = data_ + size_;
+
+        iterator result = dest;
+
+        while (src != end) {
+            *dest = *src;
+            ++dest;
+            ++src;
+        }
+
+        while (dest != end) {
+            allocator_traits::destroy(alloc_, dest);
+            ++dest;
+            --size_;
+        }
+
+        return result;
     }
 
     void clear() noexcept {
