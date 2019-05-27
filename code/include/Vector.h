@@ -1,7 +1,7 @@
 #pragma once
 #include <iterator>
-#include "TypeTraits.h"
 #include <vector>
+#include "TypeTraits.h"
 
 namespace nxt::core {
 
@@ -81,8 +81,7 @@ public:
     }
 
     Vector(std::initializer_list<value_type> values)
-        : Vector(values.begin(), values.end()) {
-    }
+        : Vector(values.begin(), values.end()) {}
 
     Vector(const Vector& rhs)
         : size_(0)
@@ -371,12 +370,18 @@ public:
         }
     }
 
-    iterator insert(const_iterator position, const T& value) {}
+    iterator insert(const_iterator position, const T& value) {
+        return insertElement(position, value);
+    }
 
-    iterator insert(const_iterator position, T&& value) {}
+    iterator insert(const_iterator position, T&& value) {
+        return insertElement(position, std::move(value));
+    }
 
     template<typename... Args>
-    iterator emplace(const_iterator position, Args&&... args) {}
+    iterator emplace(const_iterator position, Args&&... args) {
+        return insertElement(position, std::forward<Args>(args)...);
+    }
 
     [[nodiscard]] pointer data() noexcept {
         return data_;
@@ -440,6 +445,78 @@ private:
         }
     }
 
+    template<typename... Args>
+    iterator insertElement(const_iterator position, Args&&... args) {
+        if (size_ == capacity_) {
+            constexpr size_type kMinSize = 8;
+            auto actual_capacity = capacity_ * 2;
+            actual_capacity = std::max(actual_capacity, kMinSize);
+
+            auto new_buffer = allocator_traits::allocate(alloc_, actual_capacity);
+
+            auto src = data_;
+            auto end = data_ + size_;
+            auto dest = new_buffer;
+
+            while (src != position) {
+                if constexpr (std::is_nothrow_move_constructible_v<value_type>) {
+                    allocator_traits::construct(alloc_, dest, std::move(*src));
+                } else {
+                    allocator_traits::construct(alloc_, dest, *src);
+                }
+
+                ++src;
+                ++dest;
+            }
+
+            allocator_traits::construct(alloc_, dest, std::forward<Args>(args)...);
+            auto result = dest;
+            ++dest;
+
+            while (src != end) {
+                if constexpr (std::is_nothrow_move_constructible_v<value_type>) {
+                    allocator_traits::construct(alloc_, dest, std::move(*src));
+                } else {
+                    allocator_traits::construct(alloc_, dest, *src);
+                }
+
+                ++src;
+                ++dest;
+            }
+
+            ++size_;
+            data_ = new_buffer;
+            capacity_ = actual_capacity;
+            return result;
+        } else {
+            if (position == end()) {
+                emplaceBack(std::forward<Args>(args)...);
+                return data_ + size_ - 1;
+            }
+
+            // move the elements backwards one position
+            auto dest = data_ + size_;
+
+            auto last = dest;
+            iterator first = const_cast<iterator>(position);
+
+            // move the last element to unallocated space
+            allocator_traits::construct(alloc_, last, std::move(*(last - 1)));
+            --last;
+
+            // move all the elements one position
+            while (first != last) {
+                --last;
+                --dest;
+                *dest = *last;
+            }
+
+            allocator_traits::construct(alloc_, first, std::forward<Args>(args)...);
+            ++size_;
+            return first;
+        }
+    }
+
     void growBuffer(size_type new_capacity, bool exact) {
         constexpr size_type kMinSize = 8;
         auto actual_capacity = new_capacity;
@@ -483,5 +560,5 @@ private:
     size_type capacity_;
     pointer data_;
     allocator_type alloc_;
-};
+};  // namespace nxt::core
 }  // namespace nxt::core
