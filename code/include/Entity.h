@@ -4,8 +4,6 @@
 #include <string>
 #include <unordered_map>
 
-#include "Export.h"
-
 namespace nxt::core {
 
 class Entity {
@@ -59,19 +57,19 @@ public:
      * @return true
      * @return false
      */
-    constexpr bool operator==(const Entity& rhs) const noexcept {
+    [[nodiscard]] constexpr bool operator==(const Entity& rhs) const noexcept {
         return index_ == rhs.index_ && generation_ == rhs.generation_;
     }
 
-    constexpr bool operator!=(const Entity& rhs) const noexcept {
+    [[nodiscard]] constexpr bool operator!=(const Entity& rhs) const noexcept {
         return index_ != rhs.index_ || generation_ != rhs.generation_;
     }
 
-    std::string getString() const noexcept {
+    [[nodiscard]] std::string getString() const noexcept {
         return std::to_string(index_) + '_' + std::to_string(generation_);
     }
 
-    constexpr bool isValid() const noexcept {
+    [[nodiscard]] constexpr bool isValid() const noexcept {
         return (*this != kInvalidEntity) ? true : false;
     }
 
@@ -91,8 +89,8 @@ namespace std {
 //! Specialization of std::hash for ess::core::Entity so that it can be used
 //! in std::unordered_map and std::unordered_set
 template<>
-struct hash<ess::core::Entity> {
-    size_t operator()(const ess::core::Entity& entity) const noexcept {
+struct hash<nxt::core::Entity> {
+    size_t operator()(const nxt::core::Entity& entity) const noexcept {
         return entity.index_;
     }
 };

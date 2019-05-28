@@ -35,14 +35,14 @@ private:
  */
 class EntityManager : public EventSource {
 public:
-    static EntityManager* Get();
+    static EntityManager* get();
 
     /**
      * @brief Create and return a new Entity
      *
      * @return Newly created entity
      */
-    Entity CreateEntity(bool temporary = false) noexcept;
+    Entity createEntity(bool temporary = false) noexcept;
 
     /**
      * @brief Checks if the given Entity is still alive
@@ -50,7 +50,7 @@ public:
      * @param entity Entity to be checked
      * @return True if the passed Entity is still alive or false otherwise
      */
-    bool IsAlive(const Entity& entity) const noexcept;
+    bool isAlive(const Entity& entity) const noexcept;
 
     /**
      * @brief
@@ -59,7 +59,7 @@ public:
      * @return true
      * @return false
      */
-    bool IsActive(const Entity& entity) const noexcept;
+    bool isActive(const Entity& entity) const noexcept;
 
     /**
      * @brief Set the Active object
@@ -67,7 +67,7 @@ public:
      * @param entity
      * @param active
      */
-    void SetActive(const Entity& entity, bool active);
+    void setActive(const Entity& entity, bool active);
 
     /**
      * @brief
@@ -76,7 +76,7 @@ public:
      * @return true
      * @return false
      */
-    bool IsTemporary(const Entity& entity) const noexcept;
+    bool isTemporary(const Entity& entity) const noexcept;
 
     /**
      * @brief Set the Active object
@@ -84,7 +84,7 @@ public:
      * @param entity
      * @param active
      */
-    void SetTemporary(const Entity& entity, bool value);
+    void setTemporary(const Entity& entity, bool value);
 
     /**
      * @brief
@@ -93,10 +93,10 @@ public:
      * @return true
      * @return false
      */
-    bool DestroyEntity(const Entity& entity) noexcept;
+    bool destroyEntity(const Entity& entity) noexcept;
 
     template<class T>
-    T* GetComponent() const noexcept {
+    T* getComponent() const noexcept {
         static_assert(std::is_base_of<core::Component, T>::value,
                       "Can only get derived class of ess::core::Component class");
         assert(ess::core::ComponentLookup<T>::component_id != -1 &&
@@ -105,18 +105,18 @@ public:
     }
 
     template<class T>
-    void RegisterComponent() {
+    void registerComponent() {
         static_assert(std::is_base_of<core::Component, T>::value,
                       "Can only register derived class of ess::core::Component class");
         T* component = new T;
-        components_.EmplaceBack(component);
-        component_map_.Emplace(component->GetName(), component);
-        component->OnRegister();
+        components_.emplaceBack(component);
+        component_map_.emplace(component->getName(), component);
+        component->onRegister();
         ess::core::ComponentLookup<T>::component_id = components_.Size() - 1;
     }
 
     template<class T>
-    void IsComponentRegistered() const noexcept {
+    void isComponentRegistered() const noexcept {
         static_assert(std::is_base_of<core::Component, T>::value,
                       "Can only query derived class of ess::core::Component class");
         return ess::core::ComponentLookup<T>::component_id != -1;
@@ -125,17 +125,19 @@ public:
     EntityManager(const EntityManager&) = delete;
     EntityManager& operator=(const EntityManager&) = delete;
 
-    Component* GetComponent(const std::string& name) const noexcept {
-        auto iter = component_map_.Find(name);
-        if (iter != component_map_.End()) {
+    Component* getComponent(const std::string& name) const noexcept {
+        auto iter = component_map_.find(name);
+        if (iter != component_map_.end()) {
             return iter->second;
         }
         return nullptr;
     }
 
-    const data::SlotMap<Entity>& GetEntities() const noexcept {
+    const SlotMap<Entity>& getEntities() const noexcept {
         return entity_storage_;
     }
+
+    void clearAllEntities();
 
 private:
     EntityManager() = default;
@@ -163,6 +165,6 @@ private:
     SlotMap<EntityInfo> entities_;
     SlotMap<Entity> entity_storage_;
     Vector<std::unique_ptr<Component>> components_;
-    data::HashMap<std::string, Component*> component_map_;
+    std::unordered_map<std::string, Component*> component_map_;
 };
 }  // namespace nxt::core

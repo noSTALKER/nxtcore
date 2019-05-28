@@ -1,10 +1,7 @@
 #pragma once
 
 #include "Entity.h"
-#include "Export.h"
-#include "HashMap.h"
-#include "SlotMap.h"
-#include "Value.h"
+#include "Key.h"
 
 namespace nxt::core {
 /**
@@ -20,14 +17,14 @@ struct ComponentLookup {};
  */
 class Component {
 public:
-    virtual const std::string& GetName() const noexcept = 0;
+    virtual const std::string& getName() const noexcept = 0;
     /**
      * @brief Add the entity to the component
      *
      * @param entity Entity to be added to the component
      * @return Key of the added entity in the component
      */
-    virtual Key AddEntity(const Entity& entity) noexcept = 0;
+    virtual Key addEntity(const Entity& entity) noexcept = 0;
 
     /**
      * @brief Check if the given entity is present in the Component
@@ -36,7 +33,7 @@ public:
      * @return true
      * @return false
      */
-    virtual bool HasEntity(const Entity& entity) const noexcept = 0;
+    virtual bool hasEntity(const Entity& entity) const noexcept = 0;
 
     /**
      * @brief Remove the given entity from the Component if it is present
@@ -45,7 +42,7 @@ public:
      * @return true
      * @return false
      */
-    virtual bool RemoveEntity(const Entity& entity) noexcept = 0;
+    virtual bool removeEntity(const Entity& entity) noexcept = 0;
 
     /**
      * @brief Check if the given key points to a valid entity in the Component
@@ -54,7 +51,7 @@ public:
      * @return true
      * @return false
      */
-    virtual bool IsValid(const Key& key) const noexcept = 0;
+    virtual bool isValid(const Key& key) const noexcept = 0;
 
     /**
      * @brief Get the Key corresponding to the given Entity
@@ -62,14 +59,13 @@ public:
      * @param entity
      * @return K
      */
-    virtual Key GetKey(const core::Entity& entity) const noexcept = 0;
+    virtual Key getKey(const core::Entity& entity) const noexcept = 0;
 
-    virtual void OnRegister() = 0;
+    virtual void onRegister() = 0;
 
     virtual ~Component() = default;
 };
 }  // namespace nxt::core
-}  // namespace ess
 
 /**
  * @brief Use this macro to register a new component which needs exporting
