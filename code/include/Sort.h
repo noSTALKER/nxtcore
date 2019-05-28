@@ -1,5 +1,6 @@
 #pragma once
 
+#include <algorithm>
 #include "TypeTraits.h"
 
 namespace nxt::core {
@@ -593,11 +594,10 @@ palindromeUntil(BiDirectionalIter first, BiDirectionalIter last, Compare comp) {
         ++first;
     }
 
-	return last_saved;
+    return last_saved;
 }
 
-template<typename BiDirectionalIter,
-         typename = std::enable_if_t<IsBidirectionalIteratorV<BiDirectionalIter>>>
+template<typename BiDirectionalIter, typename = std::enable_if_t<IsBidirectionalIteratorV<BiDirectionalIter>>>
 [[nodiscard]] constexpr BiDirectionalIter
 palindromeUntil(BiDirectionalIter first, BiDirectionalIter last) {
     return palindromeUntil(first, last, std::equal_to<>());
@@ -621,6 +621,45 @@ template<typename BiDirectionalIter, typename = std::enable_if_t<IsBidirectional
 [[nodiscard]] constexpr bool
 isPalindrome(BiDirectionalIter first, BiDirectionalIter last) {
     return isPalindrome(first, last, std::equal_to<>());
+}
+
+template<typename InputIter1,
+         typename InputIter2,
+         typename Compare,
+         typename = std::enable_if_t<IsInputIteratorV<InputIter1> && IsInputIteratorV<InputIter2>>>
+[[nodiscard]] constexpr bool
+isEqual(InputIter1 first1, InputIter1 last1, InputIter2 first2, InputIter2 last2, Compare comp) {
+    if constexpr (IsRandomAccessIteratorV<InputIter1> && IsRandomAccessIteratorV<InputIter2>) {
+        if (last1 - first1 != last2 - first2) {
+            return false;
+        }
+
+		while (first1 != last1) {
+            if (!comp(*first1, *first2))
+                return false;
+            ++first1;
+            ++first2;
+        }
+
+		return true;
+    } else {
+        while (first1 != last1 && first2 != last2) {
+            if (!comp(*first1, *first2))
+                return false;
+            ++first1;
+            ++first2;
+        }
+
+		return first1 == last1 && first2 == last2;
+    }
+}
+
+template<typename InputIter1,
+         typename InputIter2,
+         typename = std::enable_if_t<IsInputIteratorV<InputIter1> && IsInputIteratorV<InputIter2>>>
+[[nodiscard]] constexpr bool
+isEqual(InputIter1 first1, InputIter1 last1, InputIter2 first2, InputIter2 last2) {
+    return isEqual(first1, last1, first2, last2, std::equal_to<>);
 }
 
 }  // namespace nxt::core

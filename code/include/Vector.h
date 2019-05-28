@@ -1,5 +1,6 @@
 #pragma once
 #include <iterator>
+#include <vector>
 #include "TypeTraits.h"
 
 namespace nxt::core {
@@ -52,10 +53,10 @@ public:
         : size_(0)
         , capacity_(0)
         , data_(nullptr)
-        , alloc_(alloc) {
+        , alloc_() {
         if constexpr (IsForwardIteratorV<InputIter>) {
             // if it is forward iterator, we can calculate the distance and make copies
-            auto count = std::distance(last, first);
+            auto count = std::distance(first, last);
             if (count > 0) {
                 // allocate the buffer
                 auto buffer = allocator_traits::allocate(alloc_, count);
@@ -78,6 +79,9 @@ public:
             }
         }
     }
+
+    Vector(std::initializer_list<value_type> values)
+        : Vector(values.begin(), values.end()) {}
 
     Vector(const Vector& rhs)
         : size_(0)
@@ -174,7 +178,7 @@ public:
     template<typename InputIter, typename = std::enable_if_t<IsInputIteratorV<InputIter>>>
     void assign(InputIter first, InputIter last) {
         if constexpr (IsForwardIteratorV<InputIter>) {
-            auto item_count = std::distance(last, first);
+            auto item_count = std::distance(first, last);
             if (item_count > size_) {
                 if (item_count > capacity_) {
                     cleanup();
@@ -183,14 +187,16 @@ public:
 
                 size_type current_index = 0;
                 while (current_index < size_) {
-                    *(data_ + current_index) = *first;
+                    data_[current_index] = *first;
 
                     ++current_index;
                     ++first;
                 }
 
-                for (current_index < item_count) {
+                while (current_index < item_count) {
                     allocator_traits::construct(alloc_, data_ + current_index, *first);
+                    ++current_index;
+                    ++first;
                 }
                 size_ = item_count;
 
@@ -205,6 +211,7 @@ public:
 
                 while (current_index < size_) {
                     allocator_traits::destroy(alloc_, data_ + current_index);
+                    ++current_index;
                 }
                 size_ = item_count;
             }
@@ -249,6 +256,8 @@ public:
             size_ = new_size;
         }
     }
+
+    
 
     void assign(std::initializer_list<T> values) {
         assign(values.begin(), values.end());
@@ -344,6 +353,35 @@ public:
         }
     }
 
+    iterator erase(const_iterator position) {
+        return erase(position, position + 1);
+    }
+
+    iterator erase(const_iterator first, const_iterator last) {
+        if (first == last)
+            return const_cast<iterator>(first);
+
+        iterator src = const_cast<iterator>(last);
+        iterator dest = const_cast<iterator>(first);
+        iterator end = data_ + size_;
+
+        iterator result = dest;
+
+        while (src != end) {
+            *dest = *src;
+            ++dest;
+            ++src;
+        }
+
+        while (dest != end) {
+            allocator_traits::destroy(alloc_, dest);
+            ++dest;
+            --size_;
+        }
+
+        return result;
+    }
+
     void clear() noexcept {
         for (size_type i = 0; i < size_; ++i) {
             allocator_traits::destroy(alloc_, (data_ + i));
@@ -363,12 +401,18 @@ public:
         }
     }
 
-    iterator insert(const_iterator position, const T& value) {}
+    iterator insert(const_iterator position, const T& value) {
+        return insertElement(position, value);
+    }
 
-    iterator insert(const_iterator position, T&& value) {}
+    iterator insert(const_iterator position, T&& value) {
+        return insertElement(position, std::move(value));
+    }
 
     template<typename... Args>
-    iterator emplace(const_iterator position, Args&&... args) {}
+    iterator emplace(const_iterator position, Args&&... args) {
+        return insertElement(position, std::forward<Args>(args)...);
+    }
 
     [[nodiscard]] pointer data() noexcept {
         return data_;
@@ -432,6 +476,78 @@ private:
         }
     }
 
+    template<typename... Args>
+    iterator insertElement(const_iterator position, Args&&... args) {
+        if (size_ == capacity_) {
+            constexpr size_type kMinSize = 8;
+            auto actual_capacity = capacity_ * 2;
+            actual_capacity = std::max(actual_capacity, kMinSize);
+
+            auto new_buffer = allocator_traits::allocate(alloc_, actual_capacity);
+
+            auto src = data_;
+            auto end = data_ + size_;
+            auto dest = new_buffer;
+
+            while (src != position) {
+                if constexpr (std::is_nothrow_move_constructible_v<value_type>) {
+                    allocator_traits::construct(alloc_, dest, std::move(*src));
+                } else {
+                    allocator_traits::construct(alloc_, dest, *src);
+                }
+
+                ++src;
+                ++dest;
+            }
+
+            allocator_traits::construct(alloc_, dest, std::forward<Args>(args)...);
+            auto result = dest;
+            ++dest;
+
+            while (src != end) {
+                if constexpr (std::is_nothrow_move_constructible_v<value_type>) {
+                    allocator_traits::construct(alloc_, dest, std::move(*src));
+                } else {
+                    allocator_traits::construct(alloc_, dest, *src);
+                }
+
+                ++src;
+                ++dest;
+            }
+
+            ++size_;
+            data_ = new_buffer;
+            capacity_ = actual_capacity;
+            return result;
+        } else {
+            if (position == end()) {
+                emplaceBack(std::forward<Args>(args)...);
+                return data_ + size_ - 1;
+            }
+
+            // move the elements backwards one position
+            auto dest = data_ + size_;
+
+            auto last = dest;
+            iterator first = const_cast<iterator>(position);
+
+            // move the last element to unallocated space
+            allocator_traits::construct(alloc_, last, std::move(*(last - 1)));
+            --last;
+
+            // move all the elements one position
+            while (first != last) {
+                --last;
+                --dest;
+                *dest = *last;
+            }
+
+            allocator_traits::construct(alloc_, first, std::forward<Args>(args)...);
+            ++size_;
+            return first;
+        }
+    }
+
     void growBuffer(size_type new_capacity, bool exact) {
         constexpr size_type kMinSize = 8;
         auto actual_capacity = new_capacity;
@@ -475,5 +591,5 @@ private:
     size_type capacity_;
     pointer data_;
     allocator_type alloc_;
-};
+};  // namespace nxt::core
 }  // namespace nxt::core

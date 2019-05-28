@@ -55,4 +55,30 @@ TEST_CASE("Math Tests", "[math]") {
         REQUIRE_FALSE(nxt::core::isEven(9u));
 
 	}
+
+	SECTION("IsOdd Test") {
+            STATIC_REQUIRE_FALSE(nxt::core::isOdd(2u));
+            STATIC_REQUIRE_FALSE(nxt::core::isOdd(4u));
+            STATIC_REQUIRE_FALSE(nxt::core::isOdd(6u));
+            STATIC_REQUIRE_FALSE(nxt::core::isOdd(8u));
+            STATIC_REQUIRE_FALSE(nxt::core::isOdd(10u));
+
+            REQUIRE_FALSE(nxt::core::isOdd(2u));
+            REQUIRE_FALSE(nxt::core::isOdd(4u));
+            REQUIRE_FALSE(nxt::core::isOdd(6u));
+            REQUIRE_FALSE(nxt::core::isOdd(8u));
+            REQUIRE_FALSE(nxt::core::isOdd(10u));
+
+            STATIC_REQUIRE(nxt::core::isOdd(1u));
+            STATIC_REQUIRE(nxt::core::isOdd(3u));
+            STATIC_REQUIRE(nxt::core::isOdd(5u));
+            STATIC_REQUIRE(nxt::core::isOdd(7u));
+            STATIC_REQUIRE(nxt::core::isOdd(9u));
+
+            REQUIRE(nxt::core::isOdd(1u));
+            REQUIRE(nxt::core::isOdd(3u));
+            REQUIRE(nxt::core::isOdd(5u));
+            REQUIRE(nxt::core::isOdd(7u));
+            REQUIRE(nxt::core::isOdd(9u));
+        }
 }

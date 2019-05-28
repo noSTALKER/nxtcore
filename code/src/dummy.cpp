@@ -119,19 +119,7 @@ main() {
 
     std::cout << "Is Sorted : " << nxt::core::isSorted(page_vec.begin(), page_vec.end()) << '\n';
 
-    nxt::core::PageVector<int, 32> page_vec_heap;
-    page_vec_heap.pushBack(0);
-    page_vec_heap.pushBack(7);
-    page_vec_heap.pushBack(1);
-    page_vec_heap.pushBack(5);
-    page_vec_heap.pushBack(3);
-    page_vec_heap.pushBack(7);
-    page_vec_heap.pushBack(4);
-    page_vec_heap.pushBack(4);
-    page_vec_heap.pushBack(2);
-    page_vec_heap.pushBack(0);
-    page_vec_heap.pushBack(6);
-
+    nxt::core::PageVector page_vec_heap = {0, 7, 1, 5, 3, 7, 4, 4, 2, 0, 6};
     nxt::core::makeHeap(page_vec_heap.begin(), page_vec_heap.end());
 
     std::cout << "Page Vector after heapify:\n";
@@ -142,11 +130,7 @@ main() {
 
     std::cout << "Is Heap : " << nxt::core::isHeap(page_vec_heap.begin(), page_vec_heap.end()) << '\n';
 
-    nxt::core::PriorityQueue<int> queue;
-    queue.push(2);
-    queue.push(4);
-    queue.push(0);
-    queue.push(7);
+    nxt::core::PriorityQueue<int> queue = {2, 4, 0, 7};
     std::cout << "Queue empty : " << queue.empty() << '\n';
     std::cout << "Queue size : " << queue.size() << '\n';
 

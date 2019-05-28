@@ -20,7 +20,7 @@ public:
     using difference_type = typename PageVector::difference_type;
     using iterator_category = std::random_access_iterator_tag;
 
-    PageVectorConstIterator(PageVector* vector, size_type index)
+    PageVectorConstIterator(PageVector* vector, size_type index) noexcept
         : page_vector_(vector)
         , current_index_(index) {}
 
@@ -116,10 +116,10 @@ public:
     using size_type = typename PageVector::size_type;
     using difference_type = typename PageVector::difference_type;
     using iterator_category = std::random_access_iterator_tag;
-	using base_class = PageVectorConstIterator<PageVector>;
+    using base_class = PageVectorConstIterator<PageVector>;
 
-    PageVectorIterator(PageVector* vector, size_type index)
-            : base_class(vector, index) {}
+    PageVectorIterator(PageVector* vector, size_type index) noexcept
+        : base_class(vector, index) {}
 
     PageVectorIterator& operator++() noexcept {
         ++current_index_;
@@ -174,11 +174,11 @@ public:
     }
 
 protected:
-    using base_class::page_vector_;
     using base_class::current_index_;
+    using base_class::page_vector_;
 };
 
-template<typename T, std::size_t PageSize, typename Allocator = std::allocator<T>>
+template<typename T, std::size_t PageSize = 32, typename Allocator = std::allocator<T>>
 class PageVector {
 public:
     constexpr static auto page_size = PageSize;
@@ -217,7 +217,7 @@ public:
         }
     }
 
-    PageVector(PageVector&& rhs)
+    PageVector(PageVector&& rhs) noexcept(std::is_nothrow_move_constructible_v<page_allocator>)
         : size_(0)
         , alloc_(std::move(rhs.alloc_)) {
         takeData(std::move(rhs));
@@ -274,9 +274,19 @@ public:
     }
 
     template<typename InputIter, typename = std::enable_if_t<IsInputIteratorV<InputIter>>>
+    PageVector(InputIter first, InputIter last)
+        : size_(0)
+        , alloc_() {
+        assign(first, last);
+    }
+
+    PageVector(std::initializer_list<T> values)
+        : PageVector(values.begin(), values.end()) {}
+
+    template<typename InputIter, typename = std::enable_if_t<IsInputIteratorV<InputIter>>>
     void assign(InputIter first, InputIter last) {
         if constexpr (IsForwardIteratorV<InputIter>) {
-            auto item_count = std::distance(last, first);
+            auto item_count = static_cast<size_type>(std::distance(first, last));
 
             if (size_ > item_count) {
                 for (size_type i = 0; i < item_count; ++i) {
@@ -284,7 +294,7 @@ public:
                     ++first;
                 }
 
-				for (size_type i = item_count; i < size_; ++i) {
+                for (size_type i = item_count; i < size_; ++i) {
                     page_allocator_traits::destroy(alloc_, pointerAt(i));
                 }
             } else {
@@ -298,14 +308,30 @@ public:
                     page_allocator_traits::construct(alloc_, pointerAt(i), *first);
                     ++first;
                 }
-
             }
 
-			size_ = item_count;
+            size_ = item_count;
+        } else {
+            size_t item_added = 0;
+            while (size_ > item_count && first != last) {
+                valueAt(i) = *first;
+                ++first;
+                ++item_added;
+            }
+
+            while (first != last) {
+                pushBack(*first);
+                ++first;
+                ++item_added;
+            }
+
+            for (size_type i = item_count; i < size_; ++i) {
+                page_allocator_traits::destroy(alloc_, pointerAt(i));
+            }
         }
     }
 
-	void assign(size_type count, const T& value) {
+    void assign(size_type count, const T& value) {
         if (size_ > count) {
             for (size_type i = 0; i < count; ++i) {
                 valueAt(i) = value;
@@ -326,7 +352,7 @@ public:
         }
 
         size_ = item_count;
-	}
+    }
 
     [[nodiscard]] size_type capacity() const noexcept {
         return pages_.size() * page_size;
@@ -348,19 +374,19 @@ public:
         return valueAt(index);
     }
 
-    [[nodiscard]] reference front() {
+    [[nodiscard]] reference front() noexcept {
         return pages_.front()->operator[](0);
     }
 
-    [[nodiscard]] const_reference front() const {
+    [[nodiscard]] const_reference front() const noexcept {
         return pages_.front()->operator[](0);
     }
 
-    [[nodiscard]] reference back() {
+    [[nodiscard]] reference back() noexcept {
         return pages_.back()->operator[]((size_ - 1) % page_size);
     }
 
-    [[nodiscard]] const_reference back() const {
+    [[nodiscard]] const_reference back() const noexcept {
         return pages_.back()->operator[]((size_ - 1) % page_size);
     }
 
@@ -448,7 +474,7 @@ private:
         }
     }
 
-    void cleanup() {
+    void cleanup() noexcept {
         clear();
 
         for (auto page : pages_) {
@@ -458,7 +484,7 @@ private:
         pages_.clear();
     }
 
-    void takeData(PageVector&& rhs) {
+    void takeData(PageVector&& rhs) noexcept {
         pages_ = std::move(rhs.pages_);
         size_ = rhs.size_;
         rhs.size_ = 0;
@@ -484,5 +510,12 @@ private:
     size_type size_;
     page_allocator alloc_;
 };
+
+// template type deduction guide for constructor which accepts input iterators
+template<typename InputIter,
+         std::size_t PageSize = 32,
+         typename Allocator = std::allocator<IteratorValueTypeT<InputIter>>,
+         typename = std::enable_if_t<IsInputIteratorV<InputIter>>>
+PageVector(InputIter, InputIter)->PageVector<IteratorValueTypeT<InputIter>, PageSize, Allocator>;
 
 }  // namespace nxt::core
