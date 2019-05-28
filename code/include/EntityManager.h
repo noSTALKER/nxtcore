@@ -1,0 +1,168 @@
+#pragma once
+
+#include <memory>
+#include <unordered_set>
+
+#include "Component.h"
+#include "Entity.h"
+#include "Event.h"
+#include "SlotMap.h"
+
+namespace nxt::core {
+
+class EntityCreatedEvent : public Event<EntityCreatedEvent> {
+public:
+    EntityCreatedEvent(const Entity& entity)
+        : created_entity_(entity) {}
+
+    const Entity& GetCreatedEntity() const noexcept {
+        return created_entity_;
+    }
+
+private:
+    Entity created_entity_;
+};
+
+/**
+ * @brief Manager class which controls the lifecycle of Entities in an Application.
+ *        Current responsibility of this Manager includes:
+ *        1. Creating new Entity
+ *        2. Marking entities inactive or active
+ *        3. Destroying exisiting Entity
+ *        4. Querying validity of an Entity
+ *        Currently an EntityManager can store max of 2^32 entities
+ *
+ */
+class EntityManager : public EventSource {
+public:
+    static EntityManager* Get();
+
+    /**
+     * @brief Create and return a new Entity
+     *
+     * @return Newly created entity
+     */
+    Entity CreateEntity(bool temporary = false) noexcept;
+
+    /**
+     * @brief Checks if the given Entity is still alive
+     *
+     * @param entity Entity to be checked
+     * @return True if the passed Entity is still alive or false otherwise
+     */
+    bool IsAlive(const Entity& entity) const noexcept;
+
+    /**
+     * @brief
+     *
+     * @param entity
+     * @return true
+     * @return false
+     */
+    bool IsActive(const Entity& entity) const noexcept;
+
+    /**
+     * @brief Set the Active object
+     *
+     * @param entity
+     * @param active
+     */
+    void SetActive(const Entity& entity, bool active);
+
+    /**
+     * @brief
+     *
+     * @param entity
+     * @return true
+     * @return false
+     */
+    bool IsTemporary(const Entity& entity) const noexcept;
+
+    /**
+     * @brief Set the Active object
+     *
+     * @param entity
+     * @param active
+     */
+    void SetTemporary(const Entity& entity, bool value);
+
+    /**
+     * @brief
+     *
+     * @param entity
+     * @return true
+     * @return false
+     */
+    bool DestroyEntity(const Entity& entity) noexcept;
+
+    template<class T>
+    T* GetComponent() const noexcept {
+        static_assert(std::is_base_of<core::Component, T>::value,
+                      "Can only get derived class of ess::core::Component class");
+        assert(ess::core::ComponentLookup<T>::component_id != -1 &&
+               "Component is not registered. Use RegisterComponent() first before using GetComponent()");
+        return static_cast<T*>(components_[ess::core::ComponentLookup<T>::component_id].get());
+    }
+
+    template<class T>
+    void RegisterComponent() {
+        static_assert(std::is_base_of<core::Component, T>::value,
+                      "Can only register derived class of ess::core::Component class");
+        T* component = new T;
+        components_.EmplaceBack(component);
+        component_map_.Emplace(component->GetName(), component);
+        component->OnRegister();
+        ess::core::ComponentLookup<T>::component_id = components_.Size() - 1;
+    }
+
+    template<class T>
+    void IsComponentRegistered() const noexcept {
+        static_assert(std::is_base_of<core::Component, T>::value,
+                      "Can only query derived class of ess::core::Component class");
+        return ess::core::ComponentLookup<T>::component_id != -1;
+    }
+
+    EntityManager(const EntityManager&) = delete;
+    EntityManager& operator=(const EntityManager&) = delete;
+
+    Component* GetComponent(const std::string& name) const noexcept {
+        auto iter = component_map_.Find(name);
+        if (iter != component_map_.End()) {
+            return iter->second;
+        }
+        return nullptr;
+    }
+
+    const data::SlotMap<Entity>& GetEntities() const noexcept {
+        return entity_storage_;
+    }
+
+private:
+    EntityManager() = default;
+    /**
+     * @brief
+     *
+     */
+    struct EntityInfo {
+        unsigned int index;
+        unsigned int generation : 30;
+        unsigned int temporary : 1;
+        unsigned int active : 1;
+        EntityInfo()
+            : index(0)
+            , generation(0)
+            , active(0)
+            , temporary(0) {}
+        EntityInfo(unsigned int index, unsigned int generation, bool active, bool temporary)
+            : index(index)
+            , generation(generation)
+            , active(active)
+            , temporary(temporary) {}
+    };
+
+    SlotMap<EntityInfo> entities_;
+    SlotMap<Entity> entity_storage_;
+    Vector<std::unique_ptr<Component>> components_;
+    data::HashMap<std::string, Component*> component_map_;
+};
+}  // namespace nxt::core
