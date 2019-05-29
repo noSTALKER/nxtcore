@@ -13,5 +13,5 @@ file(GLOB NXTCORE_TEST_FILES ${NXTCORE_SOURCE_DIRECTORY}/tests/*.cpp)
 source_group("Header Files"   FILES ${ESSCORE_HEADER_FILES})
 source_group("Source Files"   FILES ${ESSCORE_SOURCE_FILES})
 
-add_executable(nxtcore ${NXTCORE_SOURCE_FILES} ${NXTCORE_HEADER_FILES})
+add_library(nxtcore ${NXTCORE_SOURCE_FILES} ${NXTCORE_HEADER_FILES})
 add_executable(tests ${NXTCORE_TEST_FILES})

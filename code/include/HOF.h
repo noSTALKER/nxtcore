@@ -1,5 +1,7 @@
 #pragma once
 
+#include <functional>
+
 namespace nxt::core {
 
 /**
@@ -8,38 +10,56 @@ namespace nxt::core {
  * @param comp
  */
 template<typename T>
-constexpr auto
-Equals(const T& comp) {
-    return [comp](const T& value) { return comp = value; };
+[[nodiscard]] constexpr auto
+equalsTo(const T& comp) {
+    return [comp](const T& value) { return comp == value; };
+}
+
+template<typename T>
+[[nodiscard]] constexpr auto
+notEqualsTo(const T& comp) {
+    return [comp](const T& value) { return comp != value; };
+}
+
+template<typename T>
+[[nodiscard]] constexpr auto
+lessThan(const T& comp) {
+    return [comp](const T& value) { return value < comp; };
+}
+
+template<typename T>
+[[nodiscard]] constexpr auto
+greaterThan(const T& comp) {
+    return [comp](const T& value) { return value > comp; };
 }
 
 template<typename... Predicates>
-constexpr auto
-WhenAll(Predicates... ps) {
+[[nodiscard]] constexpr auto
+whenAll(Predicates... ps) {
     return [=](const auto& value) { return (ps(value) && ...); };
 }
 
 template<typename... Predicates>
-constexpr auto
-WhenAny(Predicates... ps) {
+[[nodiscard]] constexpr auto
+whenAny(Predicates... ps) {
     return [=](const auto& value) { return (ps(value) || ...); };
 }
 
 template<typename... Predicates>
-constexpr auto
-WhenNone(Predicates... ps) {
+[[nodiscard]] constexpr auto
+whenNone(Predicates... ps) {
     return [=](const auto& value) { return !(ps(value) && ...); };
 }
 
 template<typename F, typename... Funcs>
-constexpr auto
-Compose(F f, Funcs... funcs) {
+[[nodiscard]] constexpr auto
+compose(F f, Funcs... funcs) {
     return [=](const auto& value) { return f(Compose(funcs...)(value)); };
 }
 
 template<typename F>
-constexpr auto
-Compose(F f) {
+[[nodiscard]] constexpr auto
+compose(F f) {
     return [=](const auto& value) { return f(value); };
 }
 
