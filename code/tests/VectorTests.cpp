@@ -85,7 +85,6 @@ TEST_CASE("Vector Tests", "[vector]") {
         vector.insert(vector.begin() + 6, 4);
         REQUIRE(vector.size() == 9);
         REQUIRE(vector[6] == 4);
-
     }
 
     SECTION("Erasing Items") {
