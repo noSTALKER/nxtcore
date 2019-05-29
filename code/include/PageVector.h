@@ -313,8 +313,8 @@ public:
             size_ = item_count;
         } else {
             size_t item_added = 0;
-            while (size_ > item_count && first != last) {
-                valueAt(i) = *first;
+            while (size_ > item_added && first != last) {
+                valueAt(item_added) = *first;
                 ++first;
                 ++item_added;
             }
@@ -325,7 +325,7 @@ public:
                 ++item_added;
             }
 
-            for (size_type i = item_count; i < size_; ++i) {
+            for (size_type i = item_added; i < size_; ++i) {
                 page_allocator_traits::destroy(alloc_, pointerAt(i));
             }
         }

@@ -1,6 +1,8 @@
 #pragma once
 #include <iterator>
 #include <vector>
+#include <algorithm>
+
 #include "TypeTraits.h"
 
 namespace nxt::core {
@@ -589,5 +591,5 @@ private:
     size_type capacity_;
     pointer data_;
     allocator_type alloc_;
-};  // namespace nxt::core
+};
 }  // namespace nxt::core

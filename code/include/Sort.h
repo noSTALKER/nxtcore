@@ -659,7 +659,7 @@ template<typename InputIter1,
          typename = std::enable_if_t<IsInputIteratorV<InputIter1> && IsInputIteratorV<InputIter2>>>
 [[nodiscard]] constexpr bool
 isEqual(InputIter1 first1, InputIter1 last1, InputIter2 first2, InputIter2 last2) {
-    return isEqual(first1, last1, first2, last2, std::equal_to<>);
+    return isEqual(first1, last1, first2, last2, std::equal_to<>());
 }
 
 }  // namespace nxt::core
