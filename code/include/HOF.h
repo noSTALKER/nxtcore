@@ -11,13 +11,13 @@ namespace nxt::core {
  */
 template<typename T>
 [[nodiscard]] constexpr auto
-equalsTo(const T& comp) {
+equalTo(const T& comp) {
     return [comp](const T& value) { return comp == value; };
 }
 
 template<typename T>
 [[nodiscard]] constexpr auto
-notEqualsTo(const T& comp) {
+notEqualTo(const T& comp) {
     return [comp](const T& value) { return comp != value; };
 }
 

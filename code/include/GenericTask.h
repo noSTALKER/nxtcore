@@ -21,7 +21,7 @@ public:
 
 protected:
     bool run() override {
-        this->invokeHelper(std::make_index_sequence<1 + sizeof...(Args)>{});
+        invokeHelper(std::make_index_sequence<1 + sizeof...(Args)>{});
         return true;
     }
 
