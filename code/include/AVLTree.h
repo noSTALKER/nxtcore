@@ -77,8 +77,6 @@ public:
         if (node == head_node_) {
             return 0;
         } else {
-            auto parent_node = node->parent;
-
             eraseNode(node);
             return 1;
         }
@@ -447,13 +445,13 @@ private:
 
     void balanceNode(Node* node) {
         constexpr int32_t max_imbalance = 1;
-        if (height(node->left_child) - height(node->right_child) > 1) {
+        if (height(node->left_child) - height(node->right_child) > max_imbalance) {
             if (height(node->left_child->left_child) >= height(node->left_child->right_child)) {
                 rotateOuterLeft(node);
             } else {
                 rotateInnerLeft(node);
             }
-        } else if (height(node->right_child) - height(node->left_child) > 1) {
+        } else if (height(node->right_child) - height(node->left_child) > max_imbalance) {
             if (height(node->right_child->right_child) >= height(node->right_child->left_child)) {
                 rotateOuterRight(node);
             } else {

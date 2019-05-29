@@ -15,3 +15,13 @@ source_group("Source Files"   FILES ${ESSCORE_SOURCE_FILES})
 
 add_library(nxtcore ${NXTCORE_SOURCE_FILES} ${NXTCORE_HEADER_FILES})
 add_executable(tests ${NXTCORE_TEST_FILES})
+
+target_compile_definitions(nxtcore
+    PRIVATE 
+        NXT_CORE_DEFINE
+)
+
+target_link_libraries(tests
+    PUBLIC
+        nxtcore
+)

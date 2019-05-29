@@ -153,13 +153,13 @@ private:
         EntityInfo()
             : index(0)
             , generation(0)
-            , active(0)
-            , temporary(0) {}
+            , temporary(0)
+            , active(0) {}
         EntityInfo(unsigned int index, unsigned int generation, bool active, bool temporary)
             : index(index)
             , generation(generation)
-            , active(active)
-            , temporary(temporary) {}
+            , temporary(active)
+            , active(temporary) {}
     };
 
     SlotMap<EntityInfo> entities_;

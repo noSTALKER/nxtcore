@@ -7,6 +7,7 @@
 
 #include "Task.h"
 #include "Vector.h"
+#include "Export.h"
 
 namespace nxt::core {
 /**
@@ -20,7 +21,7 @@ public:
      *
      * @param name
      */
-    TaskQueue(const std::string& name);
+    NXTCORE_DLL_EXPORT TaskQueue(const std::string& name);
 
     /**
      * @brief Get the Name object
