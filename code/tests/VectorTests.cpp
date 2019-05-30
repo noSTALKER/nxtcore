@@ -3,6 +3,10 @@
 #include "../include/Vector.h"
 
 TEST_CASE("Vector Tests", "[vector]") {
+    SECTION("sizeof test for vector") {
+        STATIC_REQUIRE(sizeof(nxt::core::Vector<int>) == 32);
+    }
+
     SECTION("Creating empty Vector") {
         nxt::core::Vector<int> vector;
 
