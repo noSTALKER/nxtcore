@@ -5,13 +5,13 @@
 namespace nxt::core {
 
 template<typename T, typename = std::enable_if_t<std::is_unsigned_v<RemoveCVRefT<T>>>>
-constexpr bool
+[[nodiscard]] constexpr bool
 isPowerOf2(T value) {
     return (value > 0u) && ((value & (value - 1u)) == 0u);
 }
 
 template<typename T, typename = std::enable_if_t<std::is_unsigned_v<RemoveCVRefT<T>>>>
-constexpr T
+[[nodiscard]] constexpr T
 getNextPowerOf2(T value) {
     T result = 1;
     while (result <= value)
@@ -20,13 +20,13 @@ getNextPowerOf2(T value) {
 }
 
 template<typename T, typename = std::enable_if_t<std::is_unsigned_v<RemoveCVRefT<T>>>>
-constexpr bool
+[[nodiscard]] constexpr bool
 isEven(T value) {
     return ((value & 1u) == 0);
 }
 
 template<typename T, typename = std::enable_if_t<std::is_unsigned_v<RemoveCVRefT<T>>>>
-constexpr bool
+[[nodiscard]] constexpr bool
 isOdd(T value) {
     return ((value & 1u) != 0);
 }

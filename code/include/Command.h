@@ -22,7 +22,7 @@ public:
      *
      * @return Name of the command
      */
-    const std::string& getName() const noexcept {
+    [[nodiscard]] const std::string& getName() const noexcept {
         return name_;
     }
 

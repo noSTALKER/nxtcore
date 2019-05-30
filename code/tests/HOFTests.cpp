@@ -1,4 +1,4 @@
-#include "catch2.h"
+#include "catch.hpp"
 
 #include "../include/HOF.h"
 
