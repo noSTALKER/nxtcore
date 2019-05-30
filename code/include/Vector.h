@@ -259,8 +259,6 @@ public:
         }
     }
 
-    
-
     void assign(std::initializer_list<T> values) {
         assign(values.begin(), values.end());
     }
