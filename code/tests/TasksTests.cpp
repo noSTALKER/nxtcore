@@ -1,4 +1,4 @@
-#include "catch2.h"
+#include "catch.hpp"
 
 #include "../include/GenericTask.h"
 #include "../include/Task.h"
