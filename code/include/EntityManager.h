@@ -42,7 +42,7 @@ public:
      *
      * @return Newly created entity
      */
-    Entity createEntity(bool temporary = false) noexcept;
+    [[nodiscard]] Entity createEntity(bool temporary = false) noexcept;
 
     /**
      * @brief Checks if the given Entity is still alive
@@ -50,7 +50,7 @@ public:
      * @param entity Entity to be checked
      * @return True if the passed Entity is still alive or false otherwise
      */
-    bool isAlive(const Entity& entity) const noexcept;
+    [[nodiscard]] bool isAlive(const Entity& entity) const noexcept;
 
     /**
      * @brief
@@ -59,7 +59,7 @@ public:
      * @return true
      * @return false
      */
-    bool isActive(const Entity& entity) const noexcept;
+    [[nodiscard]] bool isActive(const Entity& entity) const noexcept;
 
     /**
      * @brief Set the Active object
@@ -76,7 +76,7 @@ public:
      * @return true
      * @return false
      */
-    bool isTemporary(const Entity& entity) const noexcept;
+    [[nodiscard]] bool isTemporary(const Entity& entity) const noexcept;
 
     /**
      * @brief Set the Active object
@@ -96,7 +96,7 @@ public:
     bool destroyEntity(const Entity& entity) noexcept;
 
     template<class T>
-    T* getComponent() const noexcept {
+    [[nodiscard]] T* getComponent() const noexcept {
         static_assert(std::is_base_of<core::Component, T>::value,
                       "Can only get derived class of ess::core::Component class");
         assert(ess::core::ComponentLookup<T>::component_id != -1 &&
@@ -116,7 +116,7 @@ public:
     }
 
     template<class T>
-    void isComponentRegistered() const noexcept {
+    [[nodiscard]] bool isComponentRegistered() const noexcept {
         static_assert(std::is_base_of<core::Component, T>::value,
                       "Can only query derived class of ess::core::Component class");
         return ess::core::ComponentLookup<T>::component_id != -1;
@@ -125,7 +125,7 @@ public:
     EntityManager(const EntityManager&) = delete;
     EntityManager& operator=(const EntityManager&) = delete;
 
-    Component* getComponent(const std::string& name) const noexcept {
+    [[nodiscard]] Component* getComponent(const std::string& name) const noexcept {
         auto iter = component_map_.find(name);
         if (iter != component_map_.end()) {
             return iter->second;
@@ -133,7 +133,7 @@ public:
         return nullptr;
     }
 
-    const SlotMap<Entity>& getEntities() const noexcept {
+    [[nodiscard]] const SlotMap<Entity>& getEntities() const noexcept {
         return entity_storage_;
     }
 

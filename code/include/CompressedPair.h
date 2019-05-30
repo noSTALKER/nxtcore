@@ -22,19 +22,19 @@ public:
         : First(std::forward<FirstArg>(firstArg))
         , second_(std::forward<Args>(args)...) {}
 
-    const First& first() const noexcept {
+    [[nodiscard]] const First& first() const noexcept {
         return *this;
     }
 
-    First& first() noexcept {
+    [[nodiscard]] First& first() noexcept {
         return *this;
     }
 
-    const Second& second() const noexcept {
+    [[nodiscard]] const Second& second() const noexcept {
         return second_;
     }
 
-    Second& second() noexcept {
+    [[nodiscard]] Second& second() noexcept {
         return second_;
     }
 
@@ -55,19 +55,19 @@ public:
         : first_(std::forward<FirstArg>(firstArg))
         , second_(std::forward<Args>(args)...) {}
 
-    const First& first() const noexcept {
+    [[nodiscard]] const First& first() const noexcept {
         return first_;
     }
 
-    First& first() noexcept {
+    [[nodiscard]] First& first() noexcept {
         return first_;
     }
 
-    const Second& second() const noexcept {
+    [[nodiscard]] const Second& second() const noexcept {
         return second_;
     }
 
-    Second& second() noexcept {
+    [[nodiscard]] Second& second() noexcept {
         return second_;
     }
 
