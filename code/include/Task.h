@@ -39,6 +39,7 @@ public:
                 } else {
                     setStatus(Status::kError);
                 }
+                
             } catch (...) {
                 setStatus(Status::kError);
             }
@@ -97,6 +98,7 @@ protected:
      */
     void setStatus(Status status) noexcept {
         if (status != getStatus()) {
+            std::unique_lock lock(mutex_);
             status_.store(status, std::memory_order::memory_order_release);
             if (status == Status::kError || status == Status::kFinished) {
                 cond_variable_.notify_all();
