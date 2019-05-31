@@ -72,7 +72,7 @@ TaskQueue::stop() {
 void
 TaskQueue::spawnWorkerThreads() {
     while (current_threads_.load(std::memory_order_acquire) <= max_threads_) {
-        current_threads_.fetch_add(1, std::memory_order_acq_rel);
+        current_threads_.fetch_add(1, std::memory_order_release);
         std::thread thread(&TaskQueue::workerLogic, this);
         thread.detach();
     }
@@ -85,14 +85,13 @@ TaskQueue::workerLogic() {
         std::unique_lock<std::mutex> lock(mutex_);
         conditional_variable_.wait(lock, [this]() { return !tasks_.empty(); });
 
-        std::shared_ptr<Task> task = tasks_.front();
-        tasks_.pop();
+        std::shared_ptr<Task> task = tasks_.popAndExtract();
         lock.unlock();
 
         if (task->getStatus() == Task::Status::kQueued) {
             task->execute();
         }
     }
-    current_threads_.fetch_sub(1, std::memory_order_acq_rel);
+    current_threads_.fetch_sub(1, std::memory_order_release);
 }
 }  // namespace nxt::core

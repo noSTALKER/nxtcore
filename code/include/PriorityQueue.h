@@ -15,11 +15,10 @@ public:
     using reference = typename Container::reference;
     using const_reference = typename Container::const_reference;
     using size_type = typename Container::size_type;
-    using compare_type = Compare;
     using container_type = Container;
 
-    PriorityQueue() noexcept(
-        std::is_nothrow_default_constructible_v<Container>&& std::is_nothrow_default_constructible_v<Compare>)
+    PriorityQueue() noexcept(std::is_nothrow_default_constructible_v<container_type>&&
+                                 std::is_nothrow_default_constructible_v<value_compare>)
         : container_()
         , comp_() {}
 
@@ -108,8 +107,8 @@ public:
     }
 
 private:
-    Container container_;
-    Compare comp_;
+    container_type container_;
+    value_compare comp_;
 };
 
 template<typename InputIter,

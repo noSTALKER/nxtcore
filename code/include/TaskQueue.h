@@ -3,11 +3,11 @@
 #include <condition_variable>
 #include <memory>
 #include <mutex>
-#include <queue>
 
 #include "Task.h"
 #include "Vector.h"
 #include "Export.h"
+#include "Queue.h"
 
 namespace nxt::core {
 /**
@@ -78,7 +78,7 @@ private:
     void workerLogic();
 
     std::string name_;
-    std::queue<std::shared_ptr<Task>> tasks_;
+    Queue<std::shared_ptr<Task>> tasks_;
     std::atomic<uint32_t> current_threads_;
     uint32_t max_threads_;
     std::atomic<bool> queue_running_;
