@@ -54,7 +54,7 @@ whenNone(Predicates... ps) {
 template<typename F, typename... Funcs>
 [[nodiscard]] constexpr auto
 compose(F f, Funcs... funcs) {
-    return [=](const auto& value) { return f(Compose(funcs...)(value)); };
+    return [=](const auto& value) { return f(compose(funcs...)(value)); };
 }
 
 template<typename F>
