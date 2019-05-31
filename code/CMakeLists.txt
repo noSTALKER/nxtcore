@@ -24,12 +24,12 @@ target_compile_definitions(nxtcore
 )
 
 target_include_directories(tests 
-	PUBLIC
-		${CMAKE_SOURCE_DIR}/third_party/Catch2/single_include/catch2
+    PUBLIC
+        ${CMAKE_SOURCE_DIR}/third_party/Catch2/single_include/catch2
 )
 
 target_link_libraries(tests
     PUBLIC
         nxtcore
-		Catch2::Catch2
+        Catch2::Catch2
 )

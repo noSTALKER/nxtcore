@@ -243,6 +243,22 @@ public:
         return size_;
     }
 
+    [[nodiscard]] reference front() {
+        return head_->next->value;
+    }
+
+    [[nodiscard]] const_reference front() const {
+        return head_->next->value;
+    }
+
+    [[nodiscard]] reference back() {
+        return head_->previous->value;
+    }
+
+    [[nodiscard]] const_reference back() const {
+        return head_->previous->value;
+    }
+
     [[nodiscard]] iterator end() noexcept {
         return iterator(this, head_);
     }
@@ -314,12 +330,24 @@ public:
         insertNode(head_, std::move(value));
     }
 
+    template<typename... Args>
+    reference emplaceBack(Args&& ... args) {
+        auto node = insertNode(head_, std::forward<Args>(args)...);
+        return node->value;
+    }
+
     void pushFront(const T& value) {
         insertNode(head_->next, value);
     }
 
     void pushFront(T&& value) {
         insertNode(head_->next, std::move(value));
+    }
+
+    template<typename... Args>
+    reference emplaceFront(Args&&... args) {
+        auto node = insertNode(head_->next, std::forward<Args>(args)...);
+        return node->value;
     }
 
     iterator erase(const_iterator position) {
@@ -581,8 +609,8 @@ private:
     }
 
     void destroyHeadNode() noexcept {
-        node_allocator_traits::destroy(alloc_, std::addressof(node->next));
-        node_allocator_traits::destroy(alloc_, std::addressof(node->previous));
+        node_allocator_traits::destroy(alloc_, std::addressof(head_->next));
+        node_allocator_traits::destroy(alloc_, std::addressof(head_->previous));
         node_allocator_traits::deallocate(alloc_, head_, 1);
     }
 
