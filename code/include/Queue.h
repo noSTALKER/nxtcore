@@ -75,19 +75,19 @@ public:
         container_.emplaceBack(std::forward<Args>(args)...);
     }
 
-    [[nodiscard]] const_reference front() const noexcept(container_.front()) {
+    [[nodiscard]] const_reference front() const noexcept(noexcept(container_.front())) {
         return container_.front();
     }
 
-    [[nodiscard]] reference front() noexcept(container_.front()) {
+    [[nodiscard]] reference front() noexcept(noexcept(container_.front())) {
         return container_.front();
     }
 
-    [[nodiscard]] const_reference back() const noexcept(container_.back()) {
+    [[nodiscard]] const_reference back() const noexcept(noexcept(container_.back())) {
         return container_.back();
     }
 
-    [[nodiscard]] reference back() noexcept(container_.back()) {
+    [[nodiscard]] reference back() noexcept(noexcept(container_.back())) {
         return container_.back();
     }
 

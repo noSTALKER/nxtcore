@@ -9,6 +9,7 @@ template<typename List>
 class ListConstIterator {
 public:
     using node_type = typename List::node_type;
+    using node_pointer = typename List::node_pointer;
     using value_type = typename List::value_type;
     using difference_type = typename List::difference_type;
     using pointer = typename List::const_pointer;
@@ -16,7 +17,7 @@ public:
     using const_reference = typename List::const_reference;
     using iterator_category = std::bidirectional_iterator_tag;
 
-    ListConstIterator(List* list, node_type* node)
+    ListConstIterator(List* list, node_pointer node)
         : list_(list)
         , node_(node) {}
 
@@ -60,7 +61,7 @@ public:
 
 protected:
     List* list_;
-    node_type* node_;
+    node_pointer node_;
 
     friend List;
 };
@@ -69,6 +70,7 @@ template<typename List>
 class ListIterator : public ListConstIterator<List> {
 public:
     using node_type = typename List::node_type;
+    using node_pointer = typename List::node_pointer;
     using value_type = typename List::value_type;
     using difference_type = typename List::difference_type;
     using pointer = typename List::pointer;
@@ -76,7 +78,7 @@ public:
     using iterator_category = std::bidirectional_iterator_tag;
 	using base_class = ListConstIterator<List>;
 
-    ListIterator(List* list, node_type* node)
+    ListIterator(List* list, node_pointer node)
         : ListConstIterator<List>(list, node) {}
 
     ListIterator& operator++() noexcept {
@@ -122,6 +124,8 @@ public:
     using node_type = Node;
     using node_allocator_type = typename std::allocator_traits<Allocator>::template rebind_alloc<Node>;
     using node_allocator_traits = std::allocator_traits<node_allocator_type>;
+    using node_pointer = typename node_allocator_traits::pointer;
+    using node_const_pointer = typename node_allocator_traits::const_pointer;
 
     using value_type = T;
     using allocator_type = typename std::allocator_traits<Allocator>::template rebind_alloc<value_type>;
@@ -137,8 +141,8 @@ public:
     using const_iterator = ListConstIterator<List>;
 
     struct Node {
-        Node* next;
-        Node* previous;
+        node_pointer next;
+        node_pointer previous;
         value_type value;
 
         Node(const Node&) = delete;
@@ -342,6 +346,8 @@ public:
         while (node != head_) {
             auto next_node = node->next;
             node_allocator_traits::destroy(alloc_, std::addressof(node->value));
+            node_allocator_traits::destroy(alloc_, std::addressof(node->previous));
+            node_allocator_traits::destroy(alloc_, std::addressof(node->next));
             node_allocator_traits::deallocate(alloc_, node, 1);
 
             node = next_node;
@@ -407,13 +413,7 @@ public:
             }
 
             // if value is copy assignable, use it
-            if constexpr (std::is_copy_assignable_v<value_type>) {
-                old_node->value = value;
-            } else {
-                // else try using copy constructor after calling the destructor
-                node_allocator_traits::destroy(alloc_, std::addressof(old_node->value));
-                node_allocator_traits::construct(alloc_, std::addressof(old_node->value), value);
-            }
+            old_node->value = value;
             old_node = old_node->next;
             --count;
         }
@@ -457,20 +457,19 @@ public:
 private:
     void constructHeadNode() {
         head_ = node_allocator_traits::allocate(alloc_, 1);
-        head_->next = head_;
-        head_->previous = head_;
+        node_allocator_traits::construct(alloc_, std::addressof(head_->next), head_);
+        node_allocator_traits::construct(alloc_, std::addressof(head_->previous), head_);
     }
 
     template<typename... Args>
-    Node* insertNode(Node* node, Args&&... args) {
+    node_pointer insertNode(node_pointer node, Args&&... args) {
         auto next_node = node;
         auto previous_node = next_node->previous;
 
         auto new_node = node_allocator_traits::allocate(alloc_, 1);
         node_allocator_traits::construct(alloc_, std::addressof(new_node->value), std::forward<Args>(args)...);
-
-        new_node->next = next_node;
-        new_node->previous = previous_node;
+        node_allocator_traits::construct(alloc_, std::addressof(new_node->next), next_node);
+        node_allocator_traits::construct(alloc_, std::addressof(new_node->previous), previous_node);
 
         next_node->previous = new_node;
         previous_node->next = new_node;
@@ -480,7 +479,7 @@ private:
     }
 
     template<typename... Args>
-    Node* insertCountNode(Node* node, size_type count, Args&&... args) {
+    node_pointer insertCountNode(node_pointer node, size_type count, Args&&... args) {
         auto next_node = node;
         auto previous_node = next_node->previous;
         bool added = false;
@@ -488,8 +487,9 @@ private:
         for (size_type i = 0; i < count; ++i) {
             auto new_node = node_allocator_traits::allocate(alloc_, 1);
             node_allocator_traits::construct(alloc_, std::addressof(new_node->value), std::forward<Args>(args)...);
+            node_allocator_traits::construct(alloc_, std::addressof(new_node->next));
+            node_allocator_traits::construct(alloc_, std::addressof(new_node->previous), previous_node);
 
-            new_node->previous = previous_node;
             previous_node->next = new_node;
 
             previous_node = new_node;
@@ -508,7 +508,7 @@ private:
     }
 
     template<typename InputIter>
-    Node* insertFromIterator(Node* node, InputIter first, InputIter last) {
+    node_pointer insertFromIterator(node_pointer node, InputIter first, InputIter last) {
         auto next_node = node;
         auto previous_node = next_node->previous;
         auto iter = first;
@@ -517,6 +517,8 @@ private:
         while (iter != last) {
             auto new_node = node_allocator_traits::allocate(alloc_, 1);
             node_allocator_traits::construct(alloc_, std::addressof(new_node->value), *iter);
+            node_allocator_traits::construct(alloc_, std::addressof(new_node->next));
+            node_allocator_traits::construct(alloc_, std::addressof(new_node->previous), previous_node);
 
             new_node->previous = previous_node;
             previous_node->next = new_node;
@@ -537,12 +539,14 @@ private:
         }
     }
 
-    Node* eraseNode(Node* node) noexcept {
+    node_pointer eraseNode(node_pointer node) noexcept {
         if (node != head_) {
             auto previous_node = node->previous;
             auto next_node = node->next;
 
             node_allocator_traits::destroy(alloc_, std::addressof(next_node->value));
+            node_allocator_traits::destroy(alloc_, std::addressof(next_node->next));
+            node_allocator_traits::destroy(alloc_, std::addressof(next_node->previous));
             node_allocator_traits::deallocate(alloc_, node, 1);
 
             previous_node->next = next_node;
@@ -556,12 +560,14 @@ private:
         return node;
     }
 
-    Node* eraseNodes(Node* first, Node* last) noexcept {
+    node_pointer eraseNodes(node_pointer first, node_pointer last) noexcept {
         auto previous_node = first->previous;
         while (first != last) {
             auto next_node = first->next;
 
             node_allocator_traits::destroy(alloc_, std::addressof(first->value));
+            node_allocator_traits::destroy(alloc_, std::addressof(first->next));
+            node_allocator_traits::destroy(alloc_, std::addressof(first->previous));
             node_allocator_traits::deallocate(alloc_, first, 1);
 
             --size_;
@@ -575,10 +581,12 @@ private:
     }
 
     void destroyHeadNode() noexcept {
+        node_allocator_traits::destroy(alloc_, std::addressof(node->next));
+        node_allocator_traits::destroy(alloc_, std::addressof(node->previous));
         node_allocator_traits::deallocate(alloc_, head_, 1);
     }
 
-    Node* head_;
+    node_pointer head_;
     size_type size_;
     node_allocator_type alloc_;
 

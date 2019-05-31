@@ -90,7 +90,7 @@ public:
         pushHeap(container_.begin(), container_.end(), comp_);
     }
 
-    [[nodiscard]] const_reference top() noexcept(container_.front()) {
+    [[nodiscard]] const_reference top() const noexcept(noexcept(container_.front())) {
         return container_.front();
     }
 

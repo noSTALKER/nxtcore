@@ -22,14 +22,14 @@ public:
 	static_assert(std::is_unsigned_v<size_type>, "size_type must a unsigned integral");
 
     RingBuffer() noexcept(std::is_nothrow_default_constructible_v<allocator_type>)
-        : data_(nullptr)
+        : data_()
         , front_(0)
         , back_(0)
         , capacity_(0)
         , alloc_() {}
 
     RingBuffer(size_type capacity)
-        : data(nullptr)
+        : data()
         , front_(0)
         , back_(0)
         , capacity_(0)
@@ -38,7 +38,7 @@ public:
     }
 
     RingBuffer(const RingBuffer& rhs)
-        : data_(nullptr)
+        : data_()
         , front_(0)
         , back_(0)
         , capacity_(0)
@@ -53,7 +53,7 @@ public:
     }
 
     RingBuffer(RingBuffer&& rhs)
-        : data_(nullptr)
+        : data_()
         , front_(0)
         , back_(0)
         , capacity_(0)
