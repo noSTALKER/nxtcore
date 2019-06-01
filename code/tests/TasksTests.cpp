@@ -6,6 +6,7 @@
 
 #include <thread>
 #include <chrono>
+#include <memory_resource>
 
 TEST_CASE("Task System tests", "[task]") {
     nxt::core::TaskQueue task_queue("test_queue");

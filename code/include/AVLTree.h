@@ -28,6 +28,8 @@ public:
 protected:
     using node_allocator_type = typename allocator_traits::template rebind_alloc<node_type>;
     using node_allocator_traits = std::allocator_traits<node_allocator_type>;
+    using node_pointer = typename node_allocator_traits::pointer;
+    using node_const_pointer = typename node_allocator_traits::const_pointer;
     using tree_traits = TreeTraits;
 
 public:
@@ -68,6 +70,9 @@ public:
     std::pair<iterator, bool> emplace(Args&&... args) {
         auto node = node_allocator_traits::allocate(alloc_, 1);
         node_allocator_traits::construct(alloc_, std::addressof(node->value), std::forward<Args>(args)...);
+        node_allocator_traits::construct(alloc_, std::addressof(node->parent));
+        node_allocator_traits::construct(alloc_, std::addressof(node->left_child));
+        node_allocator_traits::construct(alloc_, std::addressof(node->right_child));
         auto node = emplace(head_node_->parent, head_node_, true, node);
         return {iterator(this, node), node != head_node_};
     }
@@ -97,6 +102,9 @@ public:
     ~AVLTree() {
         clear();
 
+        node_allocator_traits::destroy(alloc_, std::addressof(head_node_->parent));
+        node_allocator_traits::destroy(alloc_, std::addressof(head_node_->left_child));
+        node_allocator_traits::destroy(alloc_, std::addressof(head_node_->right_child));
         node_allocator_traits::deallocate(alloc_, head_node_, 1);
     }
 
@@ -152,23 +160,22 @@ public:
 private:
     struct Node {
         value_type value;
-        Node* parent;
-        Node* left_child;
-        Node* right_child;
+        node_pointer parent;
+        node_pointer left_child;
+        node_pointer right_child;
         int32_t height;
     };
 
     template<typename Arg>
-    Node* insert(Node* node, Node* parent, bool is_left, Arg&& arg) {
+    node_pointer insert(node_pointer node, node_pointer parent, bool is_left, Arg&& arg) {
         if (node == head_node_ || node == nullptr) {
             auto node = node_allocator_traits::allocate(alloc_, 1);
             node_allocator_traits::construct(alloc_, std::addressof(node->value), std::forward<Arg>(arg));
 
-            node->parent = parent;
-            node->left_child = nullptr;
-            node->right_child = nullptr;
+            node_allocator_traits::construct(alloc_, std::addressof(node->parent), parent);
+            node_allocator_traits::construct(alloc_, std::addressof(node->left_child));
+            node_allocator_traits::construct(alloc_, std::addressof(node->right_child));
             node->height = 0;
-            node->parent = parent;
 
             if (parent == head_node_) {
                 head_node_->parent = node;
@@ -202,7 +209,7 @@ private:
         }
     }
 
-    Node* emplace(Node* node, Node* parent, bool is_left, Node* node_to_add) {
+    node_pointer emplace(node_pointer node, node_pointer parent, bool is_left, node_pointer node_to_add) {
         if (node == head_node_ || node == nullptr) {
             node_to_add->parent = parent;
             node_to_add->height = 0;
@@ -239,16 +246,19 @@ private:
             return result;
         } else {
             node_allocator_traits::destroy(alloc_, std::addressof(node_to_add->value));
+            node_allocator_traits::destroy(alloc_, std::addressof(node_to_add->parent));
+            node_allocator_traits::destroy(alloc_, std::addressof(node_to_add->left_child));
+            node_allocator_traits::destroy(alloc_, std::addressof(node_to_add->right_child));
             node_allocator_traits::deallocate(alloc_, node_to_add, 1);
             return head_node_;
         }
     }
 
     template<typename Key>
-    Node* lowerBoundNode(const Key& key) const {
+    node_pointer lowerBoundNode(const Key& key) const {
         // intialize with end node
-        Node* result = head_node_;
-        Node* node = head_node_->parent;
+        node_pointer result = head_node_;
+        node_pointer node = head_node_->parent;
 
         while (node != nullptr) {
             if (compare_(tree_traits::key(node->value), key)) {
@@ -265,10 +275,10 @@ private:
     }
 
     template<typename Key>
-    Node* upperBoundNode(const Key& key) const {
+    node_pointer upperBoundNode(const Key& key) const {
         // intialize with end node
-        Node* result = head_node_;
-        Node* node = head_node_->parent;
+        node_pointer result = head_node_;
+        node_pointer node = head_node_->parent;
 
         while (node != nullptr) {
             if (compare_(key, tree_traits::key(node->value))) {
@@ -283,8 +293,8 @@ private:
     }
 
     template<typename Key>
-    Node* findNode(const Key& key) const {
-        Node* node = head_node_->parent;
+    node_pointer findNode(const Key& key) const {
+        node_pointer node = head_node_->parent;
 
         while (node != nullptr) {
             if (compare_(key, tree_traits::key(node->value))) {
@@ -301,13 +311,13 @@ private:
 
     void createHeadNode() {
         head_node_ = node_allocator_traits::allocate(alloc_, 1);
-        head_node_->left_child = nullptr;
-        head_node_->right_child = nullptr;
-        head_node_->parent = head_node_;
+        node_allocator_traits::construct(alloc_, std::addressof(head_node_->parent), head_node_);
+        node_allocator_traits::construct(alloc_, std::addressof(head_node_->left_child));
+        node_allocator_traits::construct(alloc_, std::addressof(head_node_->right_child));
         head_node_->height = -1;
     }
 
-    void eraseNode(Node* node) {
+    void eraseNode(node_pointer node) {
         auto parent_node = node->parent;
         auto last_affected_node = head_node_;
 
@@ -418,20 +428,26 @@ private:
         }
 
         node_allocator_traits::destroy(alloc_, std::addressof(node->value));
+        node_allocator_traits::destroy(alloc_, std::addressof(node->parent));
+        node_allocator_traits::destroy(alloc_, std::addressof(node->left_child));
+        node_allocator_traits::destroy(alloc_, std::addressof(node->right_child));
         node_allocator_traits::deallocate(alloc_, node, 1);
     }
 
-    void freeTree(Node* node) noexcept {
+    void freeTree(node_pointer node) noexcept {
         if (node != nullptr) {
             freeTree(node->left_child);
             freeTree(node->right_child);
 
             node_allocator_traits::destroy(alloc_, std::addressof(node->value));
+            node_allocator_traits::destroy(alloc_, std::addressof(node->parent));
+            node_allocator_traits::destroy(alloc_, std::addressof(node->left_child));
+            node_allocator_traits::destroy(alloc_, std::addressof(node->right_child));
             node_allocator_traits::deallocate(alloc_, node, 1);
         }
     }
 
-    int32_t height(Node* node) const noexcept {
+    int32_t height(node_pointer node) const noexcept {
         if (node == nullptr) {
             return -1;
         } else {
@@ -439,11 +455,11 @@ private:
         }
     }
 
-    void calculateHeight(Node* node) noexcept {
+    void calculateHeight(node_pointer node) noexcept {
         node->height = std::max(height(node->left_child), height(node->right_child)) + 1;
     }
 
-    void balanceNode(Node* node) {
+    void balanceNode(node_pointer node) {
         constexpr int32_t max_imbalance = 1;
         if (height(node->left_child) - height(node->right_child) > max_imbalance) {
             if (height(node->left_child->left_child) >= height(node->left_child->right_child)) {
@@ -462,7 +478,7 @@ private:
         calculateHeight(node);
     }
 
-    void rotateOuterLeft(Node* node) {
+    void rotateOuterLeft(node_pointer node) {
         auto parent_node = node->parent;
         auto left_node = node->left_child;
 
@@ -490,7 +506,7 @@ private:
         calculateHeight(left_node);
     }
 
-    void rotateOuterRight(Node* node) {
+    void rotateOuterRight(node_pointer node) {
         auto parent_node = node->parent;
         auto right_node = node->right_child;
 
@@ -519,7 +535,7 @@ private:
         calculateHeight(right_node);
     }
 
-    void rotateInnerLeft(Node* node) {
+    void rotateInnerLeft(node_pointer node) {
         auto parent_node = node->parent;
         auto left_node = node->left_child;
         auto inner_right_node = left_node->right_child;
@@ -552,7 +568,7 @@ private:
         calculateHeight(inner_right_node);
     }
 
-    void rotateInnerRight(Node* node) {
+    void rotateInnerRight(node_pointer node) {
         auto parent_node = node->parent;
         auto right_node = node->right_child;
         auto inner_left_node = right_node->left_child;
@@ -585,7 +601,7 @@ private:
         calculateHeight(inner_left_node);
     }
 
-    Node* head_node_;
+    node_pointer head_node_;
     size_type size_;
     compare_type compare_;
     node_allocator_type alloc_;

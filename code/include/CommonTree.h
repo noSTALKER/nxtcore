@@ -10,10 +10,12 @@ public:
     using reference = typename Tree::const_reference;
     using difference_type = typename Tree::difference_type;
     using node_type = typename Tree::node_type;
+    using node_pointer = typename Tree::node_pointer;
+    using node_const_pointer = typename Tree::node_const_pointer;
     using tree_type = Tree;
     using iterator_category = std::bidirectional_iterator_tag;
 
-    TreeConstIterator(tree_type* tree, node_type* node)
+    TreeConstIterator(tree_type* tree, node_pointer node)
         : tree_(tree)
         , node_(node) {}
 
@@ -63,7 +65,7 @@ public:
 
             node_ = max_node;
         } else {
-            node_type* parent_node = node_->parent;
+            node_pointer parent_node = node_->parent;
             while (parent_node != nullptr && node_ == parent_node->left_child) {
                 node_ = parent_node;
                 parent_node = node_->parent;
@@ -91,7 +93,7 @@ public:
 
 protected:
     tree_type* tree_;
-    node_type* node_;
+    node_pointer node_;
 };
 
 template<typename Tree>
@@ -103,11 +105,13 @@ public:
     using reference = typename Tree::reference;
     using difference_type = typename Tree::difference_type;
     using node_type = typename Tree::node_type;
+    using node_pointer = typename Tree::node_pointer;
+    using node_const_pointer = typename Tree::node_const_pointer;
     using tree_type = Tree;
     using iterator_category = std::bidirectional_iterator_tag;
     using Base = TreeConstIterator<Tree>;
 
-    TreeIterator(tree_type* tree, node_type* node)
+    TreeIterator(tree_type* tree, node_pointer node)
         : Base(tree, node) {}
 
     [[nodiscard]] reference operator*() const {

@@ -25,19 +25,19 @@ public:
     Vector() noexcept(std::is_nothrow_default_constructible_v<allocator_type>)
         : size_(0)
         , capacity_(0)
-        , data_(nullptr)
+        , data_()
         , alloc_() {}
 
     explicit Vector(const allocator_type& alloc) noexcept
         : size_(0)
         , capacity_(0)
-        , data_(nullptr)
+        , data_()
         , alloc_(alloc) {}
 
     explicit Vector(size_type count, const allocator_type& alloc = allocator_type())
         : size_(0)
         , capacity_(0)
-        , data_(nullptr)
+        , data_()
         , alloc_(alloc) {
         constructCountValues(count);
     }
@@ -45,7 +45,7 @@ public:
     Vector(size_type count, const T& value, const allocator_type& alloc = allocator_type())
         : size_(0)
         , capacity_(0)
-        , data_(nullptr)
+        , data_()
         , alloc_(alloc) {
         constructCountValues(count, value);
     }
@@ -54,7 +54,7 @@ public:
     Vector(InputIter first, InputIter last)
         : size_(0)
         , capacity_(0)
-        , data_(nullptr)
+        , data_()
         , alloc_() {
         if constexpr (IsForwardIteratorV<InputIter>) {
             // if it is forward iterator, we can calculate the distance and make copies
