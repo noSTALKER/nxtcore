@@ -1,6 +1,7 @@
 #pragma once
 
 #include "CommonTree.h"
+#include <xtree>
 
 namespace nxt::core {
 
@@ -10,7 +11,6 @@ private:
     struct Node;
 
 public:
-
     using value_type = typename TreeTraits::value_type;
     using key_type = typename TreeTraits::key_type;
     using compare_type = typename TreeTraits::compare_type;
@@ -34,8 +34,8 @@ protected:
     using tree_traits = TreeTraits;
 
 public:
-    BinarySearchTree() noexcept(std::is_nothrow_default_constructible_v<node_allocator_type> &&
-                                std::is_nothrow_default_constructible_v<compare_type>)
+    BinarySearchTree() noexcept(std::is_nothrow_default_constructible_v<node_allocator_type>&&
+                                    std::is_nothrow_default_constructible_v<compare_type>)
         : head_node_()
         , size_(0)
         , compare_()
@@ -47,15 +47,40 @@ public:
         : head_node_()
         , size_(0)
         , compare_(rhs.compare_)
-		, alloc_(std::move(rhs.alloc_)) {
+        , alloc_(std::move(rhs.alloc_)) {
         createHeadNode();
         using std::swap;
         swap(head_node_, rhs.head_node_);
         size_ = rhs.size_;
         rhs.size_ = 0;
-	}
+    }
 
-    BinarySearchTree(const BinarySearchTree& ) {}
+    BinarySearchTree(const BinarySearchTree& rhs)
+        : head_node_()
+        , size_(0)
+        , compare_(rhs.compare_)
+        , alloc_(node_allocator_traits::select_on_container_copy_construction(rhs.alloc_)) {
+        createHeadNode();
+        if (rhs.size_ > 0) {
+            auto root_node = copyTree(rhs.head_node_->parent);
+            head_node_->parent = root_node;
+            root_node->parent = head_node_;
+
+            auto min_node = root_node;
+            while (min_node->left_child != nullptr) {
+                min_node = min_node->left_child;
+            }
+            head_node_->left_child = min_node;
+
+            auto max_node = root_node;
+            while (max_node->right_child != nullptr) {
+                max_node = max_node->right_child;
+            }
+            head_node_->right_child = max_node;
+        }
+
+        size_ = rhs.size_;
+    }
 
     std::pair<iterator, bool> insert(const value_type& value) {
         return insert(head_node_->parent, head_node_, true, value);
@@ -386,7 +411,6 @@ private:
             } else {
                 head_node_->left_child = head_node_->parent;
             }
-            
         }
 
         if (node == head_node_->right_child) {
@@ -394,7 +418,7 @@ private:
                 head_node_->right_child = node->parent;
             } else {
                 head_node_->right_child = head_node_->parent;
-            }  
+            }
         }
 
         --size_;
@@ -403,7 +427,7 @@ private:
         node_allocator_traits::destroy(alloc_, std::addressof(node->parent));
         node_allocator_traits::destroy(alloc_, std::addressof(node->left_child));
         node_allocator_traits::destroy(alloc_, std::addressof(node->right_child));
-        
+
         node_allocator_traits::deallocate(alloc_, node, 1);
     }
 
@@ -419,6 +443,28 @@ private:
 
             node_allocator_traits::deallocate(alloc_, node, 1);
         }
+    }
+
+    node_pointer copyTree(node_pointer node) {
+        auto copy_node = node_allocator_traits::allocate(alloc_, 1);
+        node_allocator_traits::construct(alloc_, std::addressof(copy_node->value), node->value);
+        node_allocator_traits::construct(alloc_, std::addressof(copy_node->parent));
+        node_allocator_traits::construct(alloc_, std::addressof(copy_node->left_child));
+        node_allocator_traits::construct(alloc_, std::addressof(copy_node->right_child));
+
+        if (node->left_child != nullptr) {
+            auto left_child = copyTree(node->left_child);
+            copy_node->left_child = left_child;
+            left_child->parent = copy_node;
+        }
+
+        if (node->right_child != nullptr) {
+            auto right_child = copyTree(node->right_child);
+            copy_node->right_child = right_child;
+            right_child->parent = copy_node;
+        }
+
+        return copy_node;
     }
 
     node_pointer head_node_;

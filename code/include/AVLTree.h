@@ -54,7 +54,32 @@ public:
         rhs.size_ = 0;
     }
 
-    AVLTree(const AVLTree&) {}
+    AVLTree(const AVLTree& rhs)
+        : head_node_()
+        , size_(0)
+        , compare_(rhs.compare_)
+        , alloc_(node_allocator_traits::select_on_container_copy_construction(rhs.alloc_)) {
+        createHeadNode();
+        if (rhs.size_ > 0) {
+            auto root_node = copyTree(rhs.head_node_->parent);
+            head_node_->parent = root_node;
+            root_node->parent = head_node_;
+
+            auto min_node = root_node;
+            while (min_node->left_child != nullptr) {
+                min_node = min_node->left_child;
+            }
+            head_node_->left_child = min_node;
+
+            auto max_node = root_node;
+            while (max_node->right_child != nullptr) {
+                max_node = max_node->right_child;
+            }
+            head_node_->right_child = max_node;
+        }
+
+        size_ = rhs.size_;
+    }
 
     std::pair<iterator, bool> insert(const value_type& value) {
         auto node = insert(head_node_->parent, head_node_, true, value);
@@ -445,6 +470,29 @@ private:
             node_allocator_traits::destroy(alloc_, std::addressof(node->right_child));
             node_allocator_traits::deallocate(alloc_, node, 1);
         }
+    }
+
+    node_pointer copyTree(node_pointer node) {
+        auto copy_node = node_allocator_traits::allocate(alloc_, 1);
+        node_allocator_traits::construct(alloc_, std::addressof(copy_node->value), node->value);
+        node_allocator_traits::construct(alloc_, std::addressof(copy_node->parent));
+        node_allocator_traits::construct(alloc_, std::addressof(copy_node->left_child));
+        node_allocator_traits::construct(alloc_, std::addressof(copy_node->right_child));
+        copy_node->height = node->height;
+
+        if (node->left_child != nullptr) {
+            auto left_child = copyTree(node->left_child);
+            copy_node->left_child = left_child;
+            left_child->parent = copy_node;
+        }
+
+        if (node->right_child != nullptr) {
+            auto right_child = copyTree(node->right_child);
+            copy_node->right_child = right_child;
+            right_child->parent = copy_node;
+        }
+
+        return copy_node;
     }
 
     int32_t height(node_pointer node) const noexcept {
