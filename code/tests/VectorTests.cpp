@@ -69,7 +69,7 @@ TEST_CASE("Vector Tests", "[vector]") {
         vector.insert(vector.end(), 7);
         REQUIRE(vector.size() == 4);
         REQUIRE(vector[3] == 7);
-        
+
         vector.insert(vector.begin() + 3, 6);
         REQUIRE(vector.size() == 5);
         REQUIRE(vector[3] == 6);
@@ -93,9 +93,9 @@ TEST_CASE("Vector Tests", "[vector]") {
 
     SECTION("Erasing Items") {
         nxt::core::Vector<int> vector = {-1, 0, 1, 2, 3, 4, 5, 6, 7, 8};
-        
+
         REQUIRE(vector.size() == 10);
-        
+
         vector.erase(vector.begin());
         REQUIRE(vector.size() == 9);
         REQUIRE(vector[0] == 0);
@@ -129,5 +129,9 @@ TEST_CASE("Vector Tests", "[vector]") {
         REQUIRE(vector_1 <= vector_2);
         REQUIRE_FALSE(vector_1 <= vector_3);
         REQUIRE_FALSE(vector_1 <= vector_4);
+
+        REQUIRE_FALSE(vector_1 > vector_2);
+        REQUIRE(vector_1 > vector_3);
+        REQUIRE(vector_1 > vector_4);
     }
 }

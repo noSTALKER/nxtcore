@@ -624,7 +624,7 @@ operator>(const Vector<T, Allocator>& lhs, const Vector<T, Allocator>& rhs) {
 template<typename T, typename Allocator>
 [[nodiscard]] bool
 operator<=(const Vector<T, Allocator>& lhs, const Vector<T, Allocator>& rhs) {
-    return !(rhs > lhs);
+    return !(rhs < lhs);
 }
 
 template<typename T, typename Allocator>
