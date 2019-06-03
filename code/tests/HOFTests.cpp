@@ -1,7 +1,7 @@
 #include "catch.hpp"
 
 #include "../include/HOF.h"
-#include "../include/Math.h"
+#include "../include/Maths.h"
 
 TEST_CASE("HOF Tests", "[hof]") {
     SECTION("equalTo Tests") {

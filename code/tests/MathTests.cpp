@@ -1,6 +1,6 @@
 #include "catch.hpp"
 
-#include "../include/Math.h"
+#include "../include/Maths.h"
 
 TEST_CASE("Math Tests", "[math]") {
     SECTION("Power of 2 Test") {
