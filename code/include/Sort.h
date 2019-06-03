@@ -634,14 +634,14 @@ isEqual(InputIter1 first1, InputIter1 last1, InputIter2 first2, InputIter2 last2
             return false;
         }
 
-		while (first1 != last1) {
+        while (first1 != last1) {
             if (!comp(*first1, *first2))
                 return false;
             ++first1;
             ++first2;
         }
 
-		return true;
+        return true;
     } else {
         while (first1 != last1 && first2 != last2) {
             if (!comp(*first1, *first2))
@@ -650,7 +650,7 @@ isEqual(InputIter1 first1, InputIter1 last1, InputIter2 first2, InputIter2 last2
             ++first2;
         }
 
-		return first1 == last1 && first2 == last2;
+        return first1 == last1 && first2 == last2;
     }
 }
 
@@ -660,6 +660,33 @@ template<typename InputIter1,
 [[nodiscard]] constexpr bool
 isEqual(InputIter1 first1, InputIter1 last1, InputIter2 first2, InputIter2 last2) {
     return isEqual(first1, last1, first2, last2, std::equal_to<>());
+}
+
+template<typename InputIter1,
+         typename InputIter2,
+         typename Compare,
+         typename = std::enable_if_t<IsInputIteratorV<InputIter1> && IsInputIteratorV<InputIter2>>>
+[[nodiscard]] constexpr bool
+lexicographicalCompare(InputIter1 first1, InputIter1 last1, InputIter2 first2, InputIter2 last2, Compare comp) {
+    while (first1 != last1 && first2 != last2) {
+        if (comp(*first1, *first2)) {
+            return true;
+        } else if (comp(*first2, *first1)) {
+            return false;
+        }
+        ++first1;
+        ++first2;
+    }
+
+    return first1 == last1 && first2 != last2;
+}
+
+template<typename InputIter1,
+         typename InputIter2,
+         typename = std::enable_if_t<IsInputIteratorV<InputIter1> && IsInputIteratorV<InputIter2>>>
+[[nodiscard]] constexpr bool
+lexicographicalCompare(InputIter1 first1, InputIter1 last1, InputIter2 first2, InputIter2 last2) {
+    return lexicographicalCompare(first1, last1, first2, last2, std::less<>());
 }
 
 }  // namespace nxt::core

@@ -107,4 +107,27 @@ TEST_CASE("Vector Tests", "[vector]") {
         vector.erase(vector.begin(), vector.end());
         REQUIRE(vector.size() == 0);
     }
+
+    SECTION("Comparision operators tests") {
+        nxt::core::Vector<int> vector_1 = {1, 2, 3, 4, 5};
+        nxt::core::Vector<int> vector_2 = {1, 2, 3, 4, 5};
+        nxt::core::Vector<int> vector_3 = {0, 1, 2, 3, 4};
+        nxt::core::Vector<int> vector_4 = {0, 1, 2, 3, 4, 5};
+
+        REQUIRE(vector_1 == vector_2);
+        REQUIRE(vector_1 != vector_3);
+        REQUIRE(vector_1 != vector_4);
+
+        REQUIRE_FALSE(vector_1 != vector_2);
+        REQUIRE_FALSE(vector_1 == vector_3);
+        REQUIRE_FALSE(vector_1 == vector_4);
+
+        REQUIRE_FALSE(vector_1 < vector_2);
+        REQUIRE_FALSE(vector_1 < vector_3);
+        REQUIRE_FALSE(vector_1 < vector_4);
+
+        REQUIRE(vector_1 <= vector_2);
+        REQUIRE_FALSE(vector_1 <= vector_3);
+        REQUIRE_FALSE(vector_1 <= vector_4);
+    }
 }
