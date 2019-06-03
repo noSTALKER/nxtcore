@@ -53,16 +53,16 @@ TEST_CASE("HOF Tests", "[hof]") {
 
     SECTION("whenNone Tests") {
         auto when_none =
-            nxt::core::whenNone(nxt::core::isEven<uint32_t>, nxt::core::lessThan(10u), nxt::core::greaterThan(2u));
+            nxt::core::whenNone(nxt::core::isEven<uint32_t>, nxt::core::lessThan(10u), nxt::core::greaterThan(12u));
 
         REQUIRE_FALSE(when_none(4));
         REQUIRE_FALSE(when_none(6));
         REQUIRE_FALSE(when_none(8));
+        REQUIRE_FALSE(when_none(0));
+        REQUIRE_FALSE(when_none(2));
+        REQUIRE_FALSE(when_none(3));
+        REQUIRE_FALSE(when_none(10));
 
-        REQUIRE(when_none(0));
-        REQUIRE(when_none(2));
-        REQUIRE(when_none(3));
-        REQUIRE(when_none(10));
         REQUIRE(when_none(11));
     }
 
