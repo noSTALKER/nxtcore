@@ -2,7 +2,7 @@
 
 #include <iterator>
 
-#include "Math.h"
+#include "Maths.h"
 
 namespace nxt::core {
 

@@ -48,7 +48,7 @@ whenAny(Predicates... ps) {
 template<typename... Predicates>
 [[nodiscard]] constexpr auto
 whenNone(Predicates... ps) {
-    return [=](const auto& value) { return !(ps(value) && ...); };
+    return [=](const auto& value) { return !(ps(value) || ...); };
 }
 
 template<typename F, typename... Funcs>
