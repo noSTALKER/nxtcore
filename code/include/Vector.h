@@ -1,9 +1,10 @@
 #pragma once
+#include <algorithm>
 #include <iterator>
 #include <vector>
-#include <algorithm>
 
 #include "TypeTraits.h"
+#include "Sort.h"
 
 namespace nxt::core {
 
@@ -592,4 +593,44 @@ private:
     pointer data_;
     allocator_type alloc_;
 };
+
+template<typename InputIter, typename Allocator = std::allocator<IteratorValueTypeT<InputIter>>>
+Vector(InputIter, InputIter)->Vector<IteratorValueTypeT<InputIter>, Allocator>;
+
+template<typename T, typename Allocator>
+[[nodiscard]] bool
+operator==(const Vector<T, Allocator>& lhs, const Vector<T, Allocator>& rhs) {
+    return isEqual(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
+}
+
+template<typename T, typename Allocator>
+[[nodiscard]] bool
+operator!=(const Vector<T, Allocator>& lhs, const Vector<T, Allocator>& rhs) {
+    return !isEqual(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
+}
+
+template<typename T, typename Allocator>
+[[nodiscard]] bool
+operator<(const Vector<T, Allocator>& lhs, const Vector<T, Allocator>& rhs) {
+    return lexicographicalCompare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
+}
+
+template<typename T, typename Allocator>
+[[nodiscard]] bool
+operator>(const Vector<T, Allocator>& lhs, const Vector<T, Allocator>& rhs) {
+    return rhs < lhs;
+}
+
+template<typename T, typename Allocator>
+[[nodiscard]] bool
+operator<=(const Vector<T, Allocator>& lhs, const Vector<T, Allocator>& rhs) {
+    return !(rhs < lhs);
+}
+
+template<typename T, typename Allocator>
+[[nodiscard]] bool
+operator>=(const Vector<T, Allocator>& lhs, const Vector<T, Allocator>& rhs) {
+    return !(lhs < lhs);
+}
+
 }  // namespace nxt::core
