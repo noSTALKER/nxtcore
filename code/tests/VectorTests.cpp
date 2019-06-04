@@ -107,4 +107,9 @@ TEST_CASE("Vector Tests", "[vector]") {
         vector.erase(vector.begin(), vector.end());
         REQUIRE(vector.size() == 0);
     }
+
+    SECTION("Copy Constructor Test") {
+        nxt::core::Vector vector = {0, 1, 2, 3, 4};
+        nxt::core::Vector copy_vector = vector;
+    }
 }
