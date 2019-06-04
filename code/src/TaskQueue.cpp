@@ -71,7 +71,7 @@ TaskQueue::stop() {
 
 void
 TaskQueue::spawnWorkerThreads() {
-    while (current_threads_.load(std::memory_order_acquire) <= max_threads_) {
+    while (current_threads_.load(std::memory_order_acquire) < max_threads_) {
         current_threads_.fetch_add(1, std::memory_order_release);
         std::thread thread(&TaskQueue::workerLogic, this);
         thread.detach();

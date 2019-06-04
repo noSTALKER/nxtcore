@@ -138,5 +138,7 @@ TEST_CASE("Vector Tests", "[vector]") {
     SECTION("Copy Constructor Test") {
         nxt::core::Vector vector = {0, 1, 2, 3, 4};
         nxt::core::Vector copy_vector = vector;
+
+        REQUIRE(vector == copy_vector);
     }
 }
