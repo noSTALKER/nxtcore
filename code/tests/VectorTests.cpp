@@ -133,5 +133,9 @@ TEST_CASE("Vector Tests", "[vector]") {
         REQUIRE_FALSE(vector_1 > vector_2);
         REQUIRE(vector_1 > vector_3);
         REQUIRE(vector_1 > vector_4);
+
+        REQUIRE(vector_1 >= vector_2);
+        REQUIRE(vector_1 >= vector_3);
+        REQUIRE(vector_1 >= vector_4);
     }
 }
