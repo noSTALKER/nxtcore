@@ -53,6 +53,8 @@ public:
      */
     bool addTask(const std::shared_ptr<Task>& task);
 
+    std::size_t addTasks(const Vector<std::shared_ptr<Task>>& task);
+
     ///**
     // * @brief
     // *
@@ -73,6 +75,8 @@ public:
      */
     void stop();
 
+    ~TaskQueue();
+
 private:
     void spawnWorkerThreads();
     void workerLogic();
@@ -84,5 +88,6 @@ private:
     std::atomic<bool> queue_running_;
     std::mutex mutex_;
     std::condition_variable conditional_variable_;
+    std::unordered_map<std::thread::id, std::thread> threads_;
 };
 }  // namespace nxt::core
