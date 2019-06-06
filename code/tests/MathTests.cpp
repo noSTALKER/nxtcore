@@ -110,4 +110,28 @@ TEST_CASE("Math Tests", "[math]") {
         STATIC_REQUIRE(nxt::core::getNextPowerOf2(17u) == 32u);
         STATIC_REQUIRE(nxt::core::getNextPowerOf2(33u) == 64u);
     }
+
+    SECTION("rotateLeft Tests") {
+        uint16_t test_number = 0b0011'1001'1000'1111;
+        REQUIRE(nxt::core::rotateLeft(test_number, 0) == test_number);
+        REQUIRE(nxt::core::rotateLeft(test_number, 16) == test_number);
+
+        REQUIRE(nxt::core::rotateLeft(test_number, 1) == 0b1001'1100'1100'0111);
+        REQUIRE(nxt::core::rotateLeft(test_number, 17) == 0b1001'1100'1100'0111);
+
+       REQUIRE(nxt::core::rotateLeft(test_number, 4) == 0b1111'0011'1001'1000);
+       REQUIRE(nxt::core::rotateLeft(test_number, 36) == 0b1111'0011'1001'1000);
+    }
+    
+    SECTION("rotateRight Tests") {
+        uint16_t test_number = 0b0011'1001'1000'1111;
+        REQUIRE(nxt::core::rotateRight(test_number, 0) == test_number);
+        REQUIRE(nxt::core::rotateRight(test_number, 16) == test_number);
+
+        REQUIRE(nxt::core::rotateRight(test_number, 1) == 0b0111'0011'0001'1110);
+        REQUIRE(nxt::core::rotateRight(test_number, 17) == 0b0111'0011'0001'1110);
+
+        REQUIRE(nxt::core::rotateRight(test_number, 4) == 0b1001'1000'1111'0011);
+        REQUIRE(nxt::core::rotateRight(test_number, 36) == 0b1001'1000'1111'0011);
+    }
 }
