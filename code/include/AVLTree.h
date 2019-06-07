@@ -35,7 +35,7 @@ protected:
 public:
     AVLTree() noexcept(std::is_nothrow_default_constructible_v<node_allocator_type>&&
                            std::is_nothrow_default_constructible_v<compare_type>)
-        : head_node_(nullptr)
+        : head_node_()
         , size_(0)
         , compare_()
         , alloc_() {
@@ -43,7 +43,7 @@ public:
     }
 
     AVLTree(AVLTree&& rhs)
-        : head_node_(nullptr)
+        : head_node_()
         , size_(0)
         , compare_(rhs.compare_)
         , alloc_(std::move(rhs.alloc_)) {

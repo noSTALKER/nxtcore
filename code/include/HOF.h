@@ -51,16 +51,16 @@ whenNone(Predicates... ps) {
     return [=](const auto& value) { return !(ps(value) || ...); };
 }
 
-template<typename F, typename... Funcs>
-[[nodiscard]] constexpr auto
-compose(F f, Funcs... funcs) {
-    return [=](const auto& value) { return f(compose(funcs...)(value)); };
-}
-
 template<typename F>
 [[nodiscard]] constexpr auto
 compose(F f) {
     return [=](const auto& value) { return f(value); };
+}
+
+template<typename F, typename... Funcs>
+[[nodiscard]] constexpr auto
+compose(F f, Funcs... funcs) {
+    return [=](const auto& value) { return f(compose(funcs...)(value)); };
 }
 
 }  // namespace nxt::core
