@@ -34,7 +34,7 @@ template<typename T, typename = std::enable_if_t<std::is_unsigned_v<RemoveCVRefT
 rotateLeft(T value, uint32_t rotate) {
     constexpr T bit_size = sizeof(T) * 8;
     uint32_t rotate_factor = rotate % bit_size;
-    return (value >> rotate_factor) | (value << (bit_size - rotate_factor));
+    return (value << rotate_factor) | (value >> (bit_size - rotate_factor));
 }
 
 template<typename T, typename = std::enable_if_t<std::is_unsigned_v<RemoveCVRefT<T>>>>
@@ -42,7 +42,7 @@ template<typename T, typename = std::enable_if_t<std::is_unsigned_v<RemoveCVRefT
 rotateRight(T value, uint32_t rotate) {
     constexpr T bit_size = sizeof(T) * 8;
     uint32_t rotate_factor = rotate % bit_size;
-    return (value << rotate_factor) | (value >> (bit_size - rotate_factor));
+    return (value >> rotate_factor) | (value << (bit_size - rotate_factor));
 }
 
 }  // namespace nxt::core
