@@ -3,7 +3,7 @@
 #include <functional>
 
 #include "PageVector.h"
-#include "Sort.h"
+#include "../Sort.h"
 
 namespace nxt::core {
 

@@ -4,10 +4,10 @@
 #include <memory>
 #include <mutex>
 
+#include "../Container/Queue.h"
+#include "../Container/Vector.h"
+#include "../Export.h"
 #include "Task.h"
-#include "Vector.h"
-#include "Export.h"
-#include "Queue.h"
 
 namespace nxt::core {
 /**
@@ -61,7 +61,7 @@ public:
     // * @param tasks
     // * @return unsigned int
     // */
-    //std::size_t addTasks(const Vector<std::shared_ptr<Task>>& tasks);
+    // std::size_t addTasks(const Vector<std::shared_ptr<Task>>& tasks);
 
     /**
      * @brief

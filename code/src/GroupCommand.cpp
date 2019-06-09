@@ -1,4 +1,4 @@
-#include "../include/GroupCommand.h"
+#include "../include/Command/GroupCommand.h"
 
 namespace nxt::core {
 

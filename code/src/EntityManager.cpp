@@ -1,6 +1,6 @@
-#include "../include/EntityManager.h"
-#include "../include/Component.h"
-#include "../include/System.h"
+#include "../include/ECS/EntityManager.h"
+#include "../include/ECS/Component.h"
+#include "../include/ECS/System.h"
 
 namespace nxt::core {
 

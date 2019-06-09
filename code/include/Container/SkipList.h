@@ -15,7 +15,9 @@ public:
     using pointer = typename allocator_traits::pointer;
     using const_pointer = typename allocator_traits::const_pointer;
 
-    SkipList() {}
+    SkipList() 
+    {
+    }
 
 };
 }  // namespace nxt::core

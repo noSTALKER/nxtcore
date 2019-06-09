@@ -1,7 +1,7 @@
 #include "catch.hpp"
 
-#include "../include/PriorityQueue.h"
-#include "../include/Vector.h"
+#include "../include/Container/PriorityQueue.h"
+#include "../include/Container/Vector.h"
 
 TEST_CASE("PriorityQueue Tests", "[priority_queue]") {
     SECTION("Priority Queue Push and Pop Tests") {

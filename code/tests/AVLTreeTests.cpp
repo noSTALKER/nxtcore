@@ -1,6 +1,6 @@
 #include "catch.hpp"
 
-#include "../include/AVLTree.h"
+#include "../include/Container/AVLTree.h"
 
 TEST_CASE("AVLTree Tests", "[avl_tree]") {
     SECTION("sorting check") {

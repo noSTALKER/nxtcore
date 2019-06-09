@@ -5,8 +5,8 @@
 
 #include "Component.h"
 #include "Entity.h"
-#include "Event.h"
-#include "SlotMap.h"
+#include "../Event.h"
+#include "../Container/SlotMap.h"
 
 namespace nxt::core {
 

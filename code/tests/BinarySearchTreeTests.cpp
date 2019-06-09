@@ -1,6 +1,6 @@
 #include "catch.hpp"
 
-#include "../include/BinarySearchTree.h"
+#include "../include/Container/BinarySearchTree.h"
 
 TEST_CASE("BinarySeachTree Tests", "[binary_search_tree]") {
     SECTION("sorting check") {

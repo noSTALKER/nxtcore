@@ -1,7 +1,7 @@
 #pragma once
 #include <iterator>
 #include <list>
-#include "TypeTraits.h"
+#include "../TypeTraits.h"
 
 namespace nxt::core {
 

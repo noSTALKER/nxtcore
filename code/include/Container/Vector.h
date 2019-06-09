@@ -2,8 +2,8 @@
 #include <algorithm>
 #include <iterator>
 
-#include "TypeTraits.h"
-#include "Sort.h"
+#include "../TypeTraits.h"
+#include "../Sort.h"
 
 namespace nxt::core {
 

@@ -1,7 +1,7 @@
 #pragma once
 #include <memory>
 
-#include "Common.h"
+#include "../Common.h"
 
 namespace nxt::core {
 

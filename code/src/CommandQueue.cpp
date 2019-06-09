@@ -1,5 +1,5 @@
-#include "../include/CommandQueue.h"
-#include "../include/Command.h"
+#include "../include/Command/CommandQueue.h"
+#include "../include/Command/Command.h"
 
 namespace nxt::core {
 

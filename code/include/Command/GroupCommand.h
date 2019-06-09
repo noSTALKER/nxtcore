@@ -2,7 +2,7 @@
 
 #include <memory>
 
-#include "Vector.h"
+#include "../Container/Vector.h"
 #include "Command.h"
 
 namespace nxt::core {

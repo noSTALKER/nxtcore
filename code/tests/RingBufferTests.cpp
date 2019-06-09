@@ -1,6 +1,6 @@
 #include "catch.hpp"
 
-#include "../include/RingBuffer.h"
+#include "../include/Container/RingBuffer.h"
 
 TEST_CASE("RingBuffer Tests", "[ring_buffer]") {
     SECTION("popFront() and pushBack() tests") {

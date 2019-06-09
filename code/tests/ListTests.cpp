@@ -1,7 +1,7 @@
 #include "catch.hpp"
 
-#include "../include/List.h"
-#include "../include/Vector.h"
+#include "../include/Container/List.h"
+#include "../include/Container/Vector.h"
 #include "../include/Sort.h"
 
 TEST_CASE("List Tests", "[priority_queue]") {

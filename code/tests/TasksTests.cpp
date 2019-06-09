@@ -1,8 +1,8 @@
 #include "catch.hpp"
 
-#include "../include/GenericTask.h"
-#include "../include/Task.h"
-#include "../include/TaskQueue.h"
+#include "../include/Threading/GenericTask.h"
+#include "../include/Threading/Task.h"
+#include "../include/Threading/TaskQueue.h"
 
 #include <thread>
 #include <chrono>

@@ -1,6 +1,6 @@
 #include "catch.hpp"
 
-#include "../include/Vector.h"
+#include "../include/Container/Vector.h"
 
 TEST_CASE("Vector Tests", "[vector]") {
     SECTION("sizeof test for vector") {

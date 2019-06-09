@@ -689,4 +689,77 @@ lexicographicalCompare(InputIter1 first1, InputIter1 last1, InputIter2 first2, I
     return lexicographicalCompare(first1, last1, first2, last2, std::less<>());
 }
 
+template<typename BiDirectionalIter, typename = std::enable_if_t<IsBidirectionalIteratorV<BiDirectionalIter>>>
+constexpr BiDirectionalIter
+shiftLeft(BiDirectionalIter first, BiDirectionalIter last, IteratorDifferenceTypeT<BiDirectionalIter> shift_value) {
+    if (shift_value <= 0)
+        return last;
+
+    auto start_position = first;
+
+    if constexpr (IsRandomAccessIteratorV<BiDirectionalIter>) {
+        if (shift_value >= last - first)
+            return first;
+        start_position += shift_value;
+    } else {
+        for (auto i = 0; i < shift_value; ++i) {
+            if (start_position == last) {
+                return first;
+            }
+            ++start_position;
+        }
+    }
+
+    auto destination = first;
+    while (start_position != last) {
+        *destination = std::move(*start_position);
+        ++start_position;
+        ++destination;
+    }
+
+    return first;
+}
+
+template<typename BiDirectionalIter, typename = std::enable_if_t<IsBidirectionalIteratorV<BiDirectionalIter>>>
+constexpr BiDirectionalIter
+shiftRight(BiDirectionalIter first, BiDirectionalIter last, IteratorDifferenceTypeT<BiDirectionalIter> shift_value) {
+    if (shift_value <= 0)
+        return last;
+
+    auto start_position = last;
+    if constexpr (IsRandomAccessIteratorV<BiDirectionalIter>) {
+        if (shift_value >= last - first)
+            return first;
+        start_position -= shift_value;
+    } else {
+        for (auto i = 0; i < shift_value; ++i) {
+            if (first == start_position) {
+                return first;
+            }
+            --start_position;
+        }
+    }
+
+    auto source = start_position;
+    auto destination = last;
+    while (source != first) {
+        --destination;
+        --source;
+        *destination = std::move(*source);
+    }
+
+    return first;
+}
+
+template<typename BiDirectionalIter, typename = std::enable_if_t<IsBidirectionalIteratorV<BiDirectionalIter>>>
+constexpr void
+rotateLeft(BiDirectionalIter first, BiDirectionalIter mid, BiDirectionalIter last) {
+    if (first == mid  || mid == last) 
+        return;
+
+    reverse(first, mid);
+    reverse(mid, last);
+    reverse(first, last);
+}
+
 }  // namespace nxt::core
