@@ -1,7 +1,7 @@
 #pragma once
 
 #include <algorithm>
-#include "TypeTraits.h"
+#include "../TypeTraits.h"
 
 namespace nxt::core {
 

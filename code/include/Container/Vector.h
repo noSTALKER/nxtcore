@@ -3,7 +3,7 @@
 #include <iterator>
 
 #include "../TypeTraits.h"
-#include "../Sort.h"
+#include "../Algorithm/Sort.h"
 
 namespace nxt::core {
 

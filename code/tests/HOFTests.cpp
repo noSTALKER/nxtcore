@@ -1,6 +1,6 @@
 #include "catch.hpp"
 
-#include "../include/HOF.h"
+#include "../include/Algorithm/HOF.h"
 #include "../include/Maths.h"
 
 TEST_CASE("HOF Tests", "[hof]") {

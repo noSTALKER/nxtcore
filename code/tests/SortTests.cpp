@@ -1,6 +1,6 @@
 #include "catch.hpp"
 
-#include "../include/Sort.h"
+#include "../include/Algorithm/Sort.h"
 
 TEST_CASE("Sort Test", "[sort]") {
     SECTION("isPalindrome Tests") {

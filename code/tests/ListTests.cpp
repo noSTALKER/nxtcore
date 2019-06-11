@@ -2,7 +2,7 @@
 
 #include "../include/Container/List.h"
 #include "../include/Container/Vector.h"
-#include "../include/Sort.h"
+#include "../include/Algorithm/Sort.h"
 
 TEST_CASE("List Tests", "[priority_queue]") {
     SECTION("List Constructors") {
