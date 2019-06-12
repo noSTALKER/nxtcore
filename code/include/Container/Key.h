@@ -5,7 +5,7 @@
 
 namespace nxt::core {
 /**
- * @brief Key structure to be used in SlotMap
+ * @brief Key structure to be used in SlotMap with 32 bit generation and 32 bit index 
  *
  */
 struct Key {
@@ -33,6 +33,10 @@ struct Key {
     constexpr bool operator==(const Key& rhs) const noexcept {
         return index == rhs.index && generation == rhs.generation;
     }
+
+    constexpr bool operator!=(const Key& rhs) const noexcept{
+        return index != rhs.index || generation != rhs.generation;
+        }
 
     index_type index;
     generation_type generation;

@@ -43,7 +43,7 @@ private:
 };
 
 template<typename First, typename Second>
-class CompressedPair<First, Second, false> {
+class CompressedPair<First, Second, false> final {
 public:
     template<typename... Args>
     CompressedPair(ValueInitThenVariadicArgsT, Args&&... args)

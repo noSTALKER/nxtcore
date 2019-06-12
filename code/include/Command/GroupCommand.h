@@ -7,7 +7,7 @@
 
 namespace nxt::core {
 /**
- * @brief
+ * @brief A command which 
  *
  */
 class GroupCommand : public Command {
