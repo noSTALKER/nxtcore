@@ -12,14 +12,14 @@ public:
         , duration_(0)
         , is_running_(false) {}
 
-    void start() {
+    void start() noexcept {
         if (!is_running_) {
             start_point_ = std::chrono::high_resolution_clock::now();
             is_running_ = true;
         }
     }
 
-    void stop() {
+    void stop() noexcept {
         if (is_running_) {
             auto end_point = std::chrono::high_resolution_clock::now();
             is_running_ = false;
@@ -27,18 +27,22 @@ public:
             duration_ += current_duration;
         }
     }
-    void reset() {
+    void reset() noexcept {
         is_running_ = false;
         duration_ = std::chrono::nanoseconds::zero();
     }
 
-    [[nodiscard]] isRunning() const noexcept {
+    [[nodiscard]] bool isRunning() const noexcept {
         return is_running_;
     }
 
     template<typename Duration>
     [[nodiscard]] Duration getDuration() const noexcept {
         return std::chrono::duration_cast<Duration>(duration_);
+    }
+
+    [[nodiscard]] const std::string& getName() const noexcept {
+        return name_;
     }
 
     StopWatch(const StopWatch&) = delete;

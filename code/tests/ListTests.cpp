@@ -37,5 +37,16 @@ TEST_CASE("List Tests", "[priority_queue]") {
         REQUIRE(list.size() == 3);
         REQUIRE(list.front() == 0);
         REQUIRE(list.back() == 2);
+
+        list.insert(list.begin(), -2);
+        REQUIRE(list.size() == 4);
+        REQUIRE(list.front() == -2);
+        REQUIRE(list.back() == 2);
+
+        auto position = list.begin();
+        ++position;
+        auto result = list.insert(position, -1);
+        REQUIRE(list.size() == 5);
+        REQUIRE(*result == -1);
     }
 }
