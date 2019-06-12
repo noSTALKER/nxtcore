@@ -95,17 +95,24 @@ private:
         size_type high,
         size_type range_low,
         size_type range_high) {
-        if (low >= range_low && high <= range_high) {
+        if (low == range_low && high == range_high) {
+            //if query range is equal to interval, return the value
             return data_[tree_index];
         } else {
             auto mid = (low + high) / 2;
-            if (low == range_low && mid == range_high)
-                return data_[2 * tree_index + 1];
-            else if (mid + 1 == range_low && high == range_high)
-                return data_[2 * tree_index + 1];
+            if (range_low >= low && range_high <= mid) {
+                // if range lies in the left interval, query left child
+                return queryValue(2 * tree_index + 1, low, mid, range_low, range_high);
+            } else if (range_low >= mid + 1 && range_high <= range_high) {
+                // if range lies in right interval, query right child
+                return queryValue(2 * tree_index + 2, mid + 1, high, range_low, range_high);
+            }
             else {
-                auto value_low = queryValue(2 * tree_index + 1, low, mid, range_low, range_high);
-                auto value_high = queryValue(2 * tree_index + 1, mid + 1, low, range_low, range_high);
+                // else the range lies over both sub-childs, so query both child and apply the operation
+                // note that the range values are modified in case to [range_low, mid] for left child
+                // and [mid + 1,range_high] for right child
+                auto value_low = queryValue(2 * tree_index + 1, low, mid, range_low, mid);
+                auto value_high = queryValue(2 * tree_index + 2, mid + 1, high, mid + 1, range_high);
                 return op_(value_low, value_high);
             }
         }
