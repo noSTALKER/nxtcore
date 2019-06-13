@@ -82,4 +82,29 @@ binarySearch(ForwardIter first, ForwardIter last, const T& value) {
     return binarySearch(first, last, value, std::less<>());
 }
 
+template<typename InputIter, typename T, typename = std::enable_if_t<IsInputIteratorV<InputIter>>>
+[[nodiscard]] constexpr InputIter
+find(InputIter first, InputIter last, const T & value) {
+    while (first != last) {
+        if (*first == value)
+            break;
+        ++first;
+    }
+    return first;
+}
+
+template<typename InputIter, typename T, typename = std::enable_if_t<IsInputIteratorV<InputIter>>>
+[[nodiscard]] constexpr IteratorDifferenceTypeT<InputIter>
+count(InputIter first, InputIter last, const T& value) {
+    IteratorDifferenceTypeT<InputIter> count = 0;
+    while (first != last) {
+        if (*first == value)
+            ++count;
+        ++first;
+    }
+    return count;
+}
+
+
+
 }  // namespace nxt::core
