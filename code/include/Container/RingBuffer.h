@@ -52,7 +52,7 @@ public:
         back_ = rhs.back_;
     }
 
-    RingBuffer(RingBuffer&& rhs)
+    RingBuffer(RingBuffer&& rhs) noexcept
         : data_()
         , front_(0)
         , back_(0)

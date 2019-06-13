@@ -3,6 +3,7 @@
 #include <functional>
 #include <future>
 #include <thread>
+#include <optional>
 
 #include "Task.h"
 
@@ -12,11 +13,16 @@ template<typename Tuple, typename Result, typename Func, typename... Args>
 class GenericTask : public Task {
 public:
     GenericTask(std::unique_ptr<Tuple> tuple)
-        : tuple_(std::move(tuple)) {}
+        : tuple_(std::move(tuple))
+        , result_() {}
 
-    Result getResult() const noexcept {
+    [[nodiscard]] const Result& getResult() const noexcept {
         wait();
-        return result_;
+        return result_.value();
+    }
+
+    [[nodiscard]] bool hasResult() const noexcept {
+        return result.has_value();
     }
 
 protected:
@@ -32,7 +38,7 @@ private:
     }
 
     std::unique_ptr<Tuple> tuple_;
-    Result result_;
+    std::optional<Result> result_;
 };
 
 template<typename Tuple, typename Func, typename... Args>

@@ -15,6 +15,10 @@ public:
         flag_.clear(std::memory_order_release);
     }
 
+    void try_lock() noexcept {
+        return !flag_.test_and_set(std::memory_order_acquire);
+    }
+
 	SpinLock(const SpinLock&) = delete;
     SpinLock& operator=(const SpinLock&) = delete;
 

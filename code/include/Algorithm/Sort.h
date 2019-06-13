@@ -45,21 +45,21 @@ selectionSort(ForwardIter first, ForwardIter last, Compare comp) {
 
     while (iter != last) {
         // find the min element in the subrange [iter, last)
-        auto minIter = iter;
+        auto min_iter = iter;
 
-        if (minIter != last) {
-            auto nextIter = std::next(iter);
-            while (nextIter != last) {
-                if (comp(*nextIter, *minIter)) {
-                    minIter = nextIter;
+        if (min_iter != last) {
+            auto next_iter = std::next(iter);
+            while (next_iter != last) {
+                if (comp(*next_iter, *min_iter)) {
+                    min_iter = next_iter;
                 }
-                ++nextIter;
+                ++next_iter;
             }
         }
 
         // swap the min element with first element in subrange
         using std::swap;
-        swap(*minIter, *iter);
+        swap(*min_iter, *iter);
 
         // increment iter to reduce the subrange
         ++iter;
@@ -116,34 +116,34 @@ partition(BiDirectionalIter first, BiDirectionalIter last, Compare comp) {
 
 template<typename InputIter1, typename InputIter2, typename OutputIter, typename Compare>
 constexpr OutputIter
-merge(InputIter1 first1, InputIter1 last1, InputIter2 first2, InputIter2 last2, OutputIter outputIter, Compare comp) {
+merge(InputIter1 first1, InputIter1 last1, InputIter2 first2, InputIter2 last2, OutputIter output_iter, Compare comp) {
     while (first1 != last1 && first2 != last2) {
         // order of comparison is important for stable merge
         if (comp(*first2, *first1)) {
-            *outputIter = *first2;
+            *output_iter = *first2;
             ++first2;
         } else {
-            *outputIter = *first1;
+            *output_iter = *first1;
             ++first1;
         }
-        ++outputIter;
+        ++output_iter;
     }
 
     // copy the remaining items if left in first iterator to the output
     while (first1 != last1) {
-        *outputIter = *first1;
+        *output_iter = *first1;
         ++first1;
-        ++outputIter;
+        ++output_iter;
     }
 
     // copy the remaining items if left in second iterator to the output
     while (first2 != last2) {
-        *outputIter = *first2;
+        *output_iter = *first2;
         ++first2;
-        ++outputIter;
+        ++output_iter;
     }
 
-    return outputIter;
+    return output_iter;
 }
 
 template<typename ForwardIter, typename Compare, typename = std::enable_if_t<IsForwardIteratorV<ForwardIter>>>
@@ -239,7 +239,7 @@ popHeap(RandomAccessIter first, RandomAccessIter last, Compare comp) {
         // pop the max value to the last place
         *result = std::move(*first);
 
-        auto hole_index = 0;
+        IteratorDifferenceTypeT<RandomAccessIter> hole_index = 0;
         auto child_index = 2 * hole_index + 1;
         auto max_distance = result - first;
         while (child_index < max_distance) {
