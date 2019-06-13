@@ -28,8 +28,37 @@ public:
     template<typename RandomAccessIter, typename = std::enable_if_t<IsRandomAccessIteratorV<RandomAccessIter>>>
     SegmentTree(RandomAccessIter first, RandomAccessIter last)
         : data_()
-        , input_size_(0) {
+        , input_size_(0)
+        , alloc_() {
         buildTree(first, last);
+    }
+
+    SegmentTree(const SegmentTree& rhs)
+        : data_()
+        , input_size_(0)
+        , alloc(allocator_traits::select_on_container_copy_construction(rhs.alloc_)) {
+        if (rhs.input_size_ > 0) {
+            auto size = rhs.size();
+            auto buffer = allocator_traits::allocate(alloc_, size);
+
+            for (size_type i = 0; i < size; ++size) {
+                allocator_traits::construct(alloc_, buffer + i, rhs.data_[i]);
+            }
+
+            input_size_ = rhs.input_size_;
+            data_ = buffer;
+        }
+    }
+
+    SegmentTree(SegmentTree&& rhs) noexcept
+        : data_()
+        , input_size_(0)
+        , alloc_(std::move(rhs.alloc_) {
+        data_ = rhs.data_;
+        input_size_ = rhs.input_size_;
+
+        rhs.data_ = nullptr;
+        rhs.input_size_ = 0;
     }
 
     size_type inputSize() const noexcept {
@@ -55,11 +84,16 @@ public:
     }
 
     ~SegmentTree() {
-        for (size_type i = 0; i < size(); ++i) {
-            allocator_traits::destroy(alloc_, data_ + i);
-        }
+        
+        if (input_size_ > 0) {
+            auto size = this->size();
+            for (size_type i = 0; i < size; ++i) {
+                allocator_traits::destroy(alloc_, data_ + i);
+            }
 
-        allocator_traits::deallocate(alloc_, data_, size());
+            allocator_traits::deallocate(alloc_, data_, size);
+        }
+        
     }
 
 private:
