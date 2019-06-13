@@ -2,6 +2,8 @@
 
 #include <memory>
 
+#include "../TypeTraits.h"
+
 namespace nxt::core {
 
 template<typename T, typename Op, typename Allocator = std::allocator<T>>
@@ -17,10 +19,17 @@ public:
     using size_type = typename allocator_traits::size_type;
     using difference_type = typename allocator_traits::difference_type;
 
-    SegmentTree(std::initializer_list<value_type> values) 
+    SegmentTree(std::initializer_list<value_type> values)
         : data_()
         , input_size_(0) {
         buildTree(values.begin(), values.end());
+    }
+
+    template<typename RandomAccessIter, typename = std::enable_if_t<IsRandomAccessIteratorV<RandomAccessIter>>>
+    SegmentTree(RandomAccessIter first, RandomAccessIter last)
+        : data_()
+        , input_size_(0) {
+        buildTree(first, last);
     }
 
     size_type inputSize() const noexcept {
@@ -36,7 +45,9 @@ public:
     }
 
     void update(size_type index, const value_type& new_value) {
-        updateValue(0, 0, input_size_ - 1, index, new_value);
+        if (index < input_size_) {
+            updateValue(0, 0, input_size_ - 1, index, new_value);
+        }
     }
 
     value_type query(size_type low, size_type high) {
@@ -52,7 +63,7 @@ public:
     }
 
 private:
-    template<typename RandomAccessIter>
+    template<typename RandomAccessIter, typename = std::enable_if_t<IsRandomAccessIterator<RandomAccessIter>>>
     void buildTree(RandomAccessIter first, RandomAccessIter last) {
         size_type input_size = std::distance(first, last);
         size_type size = 2 * input_size - 1;
@@ -72,7 +83,8 @@ private:
             buildInterval(2 * tree_index + 1, low, mid, buffer, value);
             buildInterval(2 * tree_index + 2, mid + 1, high, buffer, value);
 
-            allocator_traits::construct(alloc_, buffer + tree_index, op_(buffer[2 * tree_index + 1], buffer[2 * tree_index + 2]));
+            allocator_traits::construct(
+                alloc_, buffer + tree_index, op_(buffer[2 * tree_index + 1], buffer[2 * tree_index + 2]));
         }
     }
 
@@ -91,12 +103,12 @@ private:
     }
 
     value_type queryValue(size_type tree_index,
-        size_type low,
-        size_type high,
-        size_type range_low,
-        size_type range_high) {
+                          size_type low,
+                          size_type high,
+                          size_type range_low,
+                          size_type range_high) {
         if (low == range_low && high == range_high) {
-            //if query range is equal to interval, return the value
+            // if query range is equal to interval, return the value
             return data_[tree_index];
         } else {
             auto mid = (low + high) / 2;
@@ -106,8 +118,7 @@ private:
             } else if (range_low >= mid + 1 && range_high <= range_high) {
                 // if range lies in right interval, query right child
                 return queryValue(2 * tree_index + 2, mid + 1, high, range_low, range_high);
-            }
-            else {
+            } else {
                 // else the range lies over both sub-childs, so query both child and apply the operation
                 // note that the range values are modified in case to [range_low, mid] for left child
                 // and [mid + 1,range_high] for right child

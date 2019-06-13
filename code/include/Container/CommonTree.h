@@ -146,9 +146,9 @@ public:
 };
 
 template<typename Key, typename Compare = std::less<>, typename Allocator = std::allocator<Key>>
-struct SimpleTreeTraits {
-    using value_type = Key;
+struct SimpleTraits {
     using key_type = Key;
+    using value_type = Key;
     using reference = value_type&;
     using const_reference = const value_type&;
     using compare_type = Compare;
@@ -156,6 +156,22 @@ struct SimpleTreeTraits {
 
     static const key_type& key(const value_type& value) {
         return value;
+    }
+};
+
+template<typename Key, typename MappedType, typename Compare = std::less<>, typename Allocator = std::allocator<std::pair<const Key, Value>>>
+struct MappedTraits {
+    
+    using key_type = Key;
+    using mapped_type = MappedType;
+    using value_type = std::pair<const key_type, mapped_type>;
+    using reference = value_type&;
+    using const_reference = const value_type&;
+    using compare_type = Compare;
+    using allocator_type = typename std::allocator_traits<Allocator>::template rebind_alloc<value_type>;
+
+    static const key_type& key(const value_type& value) {
+        return value.first;
     }
 };
 

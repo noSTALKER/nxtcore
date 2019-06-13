@@ -7,7 +7,7 @@ TEST_CASE("AVLTree Tests", "[avl_tree]") {
         int values[] = {5, 8, 0, 1, 12, -5, 6};
         int sorted_values[] = {-5, 0, 1, 5, 6, 8, 12};
 
-        nxt::core::AVLTree<nxt::core::SimpleTreeTraits<int>> avl;
+        nxt::core::AVLTree<nxt::core::SimpleTraits<int>> avl;
 
         for (auto value : values) {
             avl.insert(value);
@@ -35,7 +35,7 @@ TEST_CASE("AVLTree Tests", "[avl_tree]") {
         int values[] = {1, 2, 3, 4, 5, 6, 7};
         int sorted_values[] = {1, 2, 3, 4, 5, 6, 7};
 
-        nxt::core::AVLTree<nxt::core::SimpleTreeTraits<int>> avl;
+        nxt::core::AVLTree<nxt::core::SimpleTraits<int>> avl;
 
         for (auto value : values) {
             avl.insert(value);
@@ -68,7 +68,7 @@ TEST_CASE("AVLTree Tests", "[avl_tree]") {
         int values[] = {5, 8, 0, 1, 12, -5, 6};
         int sorted_values[] = {-5, 0, 1, 5, 6, 8, 12};
 
-        nxt::core::AVLTree<nxt::core::SimpleTreeTraits<int>> avl;
+        nxt::core::AVLTree<nxt::core::SimpleTraits<int>> avl;
 
         for (auto value : values) {
             avl.insert(value);

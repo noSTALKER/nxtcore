@@ -7,7 +7,7 @@ TEST_CASE("BinarySeachTree Tests", "[binary_search_tree]") {
         int values[] = {5, 8, 0, 1, 12, -5, 6};
         int sorted_values[] = {-5, 0, 1, 5, 6, 8, 12};
 
-        nxt::core::BinarySearchTree<nxt::core::SimpleTreeTraits<int>> bst;
+        nxt::core::BinarySearchTree<nxt::core::SimpleTraits<int>> bst;
 
         for (auto value : values) {
             bst.insert(value);
@@ -36,7 +36,7 @@ TEST_CASE("BinarySeachTree Tests", "[binary_search_tree]") {
         int values[] = {1, 2, 3, 4, 5, 6, 7};
         int sorted_values[] = {1, 2, 3, 4, 5, 6, 7};
 
-        nxt::core::BinarySearchTree<nxt::core::SimpleTreeTraits<int>> bst;
+        nxt::core::BinarySearchTree<nxt::core::SimpleTraits<int>> bst;
 
         for (auto value : values) {
             bst.insert(value);
@@ -69,7 +69,7 @@ TEST_CASE("BinarySeachTree Tests", "[binary_search_tree]") {
         int values[] = {5, 8, 0, 1, 12, -5, 6};
         int sorted_values[] = {-5, 0, 1, 5, 6, 8, 12};
 
-        nxt::core::BinarySearchTree<nxt::core::SimpleTreeTraits<int>> bst;
+        nxt::core::BinarySearchTree<nxt::core::SimpleTraits<int>> bst;
 
         for (auto value : values) {
             bst.insert(value);
