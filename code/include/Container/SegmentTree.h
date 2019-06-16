@@ -83,8 +83,7 @@ public:
         return queryValue(0, 0, input_size_ - 1, low, high);
     }
 
-    ~SegmentTree() {
-        
+    ~SegmentTree() {       
         if (input_size_ > 0) {
             auto size = this->size();
             for (size_type i = 0; i < size; ++i) {
@@ -93,7 +92,6 @@ public:
 
             allocator_traits::deallocate(alloc_, data_, size);
         }
-        
     }
 
 private:
