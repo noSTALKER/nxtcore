@@ -53,7 +53,7 @@ public:
     SegmentTree(SegmentTree&& rhs) noexcept
         : data_()
         , input_size_(0)
-        , alloc_(std::move(rhs.alloc_) {
+        , alloc_(std::move(rhs.alloc_)) {
         data_ = rhs.data_;
         input_size_ = rhs.input_size_;
 
@@ -97,7 +97,7 @@ public:
     }
 
 private:
-    template<typename RandomAccessIter, typename = std::enable_if_t<IsRandomAccessIterator<RandomAccessIter>>>
+    template<typename RandomAccessIter>
     void buildTree(RandomAccessIter first, RandomAccessIter last) {
         size_type input_size = std::distance(first, last);
         size_type size = 2 * input_size - 1;
