@@ -754,12 +754,100 @@ shiftRight(BiDirectionalIter first, BiDirectionalIter last, IteratorDifferenceTy
 template<typename BiDirectionalIter, typename = std::enable_if_t<IsBidirectionalIteratorV<BiDirectionalIter>>>
 constexpr void
 rotateLeft(BiDirectionalIter first, BiDirectionalIter mid, BiDirectionalIter last) {
-    if (first == mid  || mid == last) 
+    if (first == mid || mid == last)
         return;
 
     reverse(first, mid);
     reverse(mid, last);
     reverse(first, last);
+}
+
+template<typename BiDirectionalIter,
+         typename Compare,
+         typename = std::enable_if_t<IsBidirectionalIteratorV<BiDirectionalIter>>>
+constexpr bool
+nextPermutation(BiDirectionalIter first, BiDirectionalIter last, Compare comp) {
+    auto iter = last;
+    if (first == iter || first == --iter)
+        return false;
+
+    while (true) {
+        auto next = iter;
+        // find first pair such that value[n-1] < value[n]
+        if (comp(*(--iter), *next)) {
+            auto greater_iter = last;
+
+            // find the first element that is greater than the value[n-1]
+            while (!comp(*iter, *(--greater_iter))) {
+            }
+
+            // swap the values
+            using std::swap;
+            swap(*iter, *greater_iter);
+
+            // reverse the sequence [next, last]
+            core::reverse(next, last);
+            return true;
+        }
+
+        // if we reached the first element, the reached the last permutation which is the reversed sorted
+        // sequence, so we just reverse the whole sequence and return false
+        if (iter == first) {
+            core::reverse(first, last);
+            return false;
+        }
+    }
+}
+
+template<typename BiDirectionalIter, typename = std::enable_if_t<IsBidirectionalIteratorV<BiDirectionalIter>>>
+constexpr bool
+nextPermutation(BiDirectionalIter first, BiDirectionalIter last) {
+    return nextPermutation(first, last, std::less<>());
+}
+
+template<typename BiDirectionalIter,
+         typename Compare,
+         typename = std::enable_if_t<IsBidirectionalIteratorV<BiDirectionalIter>>>
+constexpr bool
+previousPermutation(BiDirectionalIter first, BiDirectionalIter last, Compare comp) {
+    auto iter = last;
+    if (first == iter || first == --iter)
+        return false;
+
+    while (true) {
+        auto next = iter;
+        // find first pair such that value[n-1] < value[n]
+        if (comp(*next, *(--iter))) {
+            auto less_iter = last;
+
+            // find the first element that is greater than the value[n-1]
+            while (!comp(*(--less_iter), (*iter))) {
+            }
+
+            // swap the values
+            {
+                using std::swap;
+                swap(*iter, *less_iter);
+            }
+
+            // reverse the sequence [next, last]
+            core::reverse(next, last);
+            return true;
+        }
+
+        // if we reached the first element, the reached the last permutation which is the reversed sorted
+        // sequence, so we just reverse the whole sequence and return false
+        if (iter == first) {
+            core::reverse(first, last);
+            return false;
+        }
+    }
+}
+
+template<typename BiDirectionalIter, typename = std::enable_if_t<IsBidirectionalIteratorV<BiDirectionalIter>>>
+constexpr bool
+previousPermutation(BiDirectionalIter first, BiDirectionalIter last) {
+    return previousPermutation(first, last, std::less<>());
 }
 
 }  // namespace nxt::core

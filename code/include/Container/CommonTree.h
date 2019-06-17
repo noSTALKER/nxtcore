@@ -20,11 +20,11 @@ public:
         , node_(node) {}
 
     [[nodiscard]] reference operator*() const {
-        return node->value;
+        return node_->value;
     }
 
     [[nodiscard]] pointer operator->() const {
-        return std::pointer_traits<pointer>::pointer_to(node->value);
+        return std::pointer_traits<pointer>::pointer_to(node_->value);
     }
 
     TreeConstIterator& operator++() {
