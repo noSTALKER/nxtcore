@@ -136,6 +136,30 @@ public:
         createHeadNode();
     }
 
+    SkipList(SkipList&& rhs)
+        : size_(0)
+        , comp_(rhs.comp_)
+        , random_(rhs.random_)
+        , alloc_(std::move(rhs.alloc_)) {
+        createHeadNode();
+        using std::swap;
+        swap(head_node_, rhs.head_node_);
+        size_ = rhs.size_;
+        rhs.size_ = 0;
+    }
+
+    SkipList(const SkipList& rhs)
+        : size_(0)
+        , comp_(rhs.comp_)
+        , random_(rhs.random_)
+        , alloc_(node_allocator_traits::select_on_container_copy_construction(rhs.alloc_)) {
+        createHeadNode();
+        using std::swap;
+        for (const value& : rhs) {
+            insert(value);
+        }
+    }
+
     [[nodiscard]] size_type size() const noexcept {
         return size_;
     }
