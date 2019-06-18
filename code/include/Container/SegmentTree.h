@@ -20,15 +20,15 @@ public:
     using difference_type = typename allocator_traits::difference_type;
 
     SegmentTree(std::initializer_list<value_type> values)
-        : data_()
-        , input_size_(0) {
+        : input_size_(0)
+        , data_() {
         buildTree(values.begin(), values.end());
     }
 
     template<typename RandomAccessIter, typename = std::enable_if_t<IsRandomAccessIteratorV<RandomAccessIter>>>
     SegmentTree(RandomAccessIter first, RandomAccessIter last)
-        : data_()
-        , input_size_(0)
+        : input_size_(0)
+        , data_(0)
         , alloc_() {
         buildTree(first, last);
     }

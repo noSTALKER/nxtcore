@@ -1,7 +1,6 @@
 #pragma once
 
 #include "CommonTree.h"
-#include <xtree>
 
 namespace nxt::core {
 
