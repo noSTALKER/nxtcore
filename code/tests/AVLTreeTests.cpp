@@ -92,4 +92,33 @@ TEST_CASE("AVLTree Tests", "[avl_tree]") {
             ++i;
         }
     }
+
+    SECTION("map check") {
+        int values[] = {5, 8, 0, 1, 12, -5, 6};
+        int sorted_values[] = {-5, 0, 1, 5, 6, 8, 12};
+
+        nxt::core::AVLTree<nxt::core::MappedTraits<int, int>> avl;
+
+        for (auto value : values) {
+            avl.insert({value, 2 * value});
+        }
+
+        REQUIRE(avl.size() == 7);
+
+        std::size_t i = 0;
+        for (const auto& value : avl) {
+            REQUIRE(value.first == sorted_values[i]);
+            REQUIRE(value.second == 2 * sorted_values[i]);
+            ++i;
+        }
+
+        REQUIRE(avl.erase(-5) == 1);
+        REQUIRE(avl.erase(-10) == 0);
+        REQUIRE(avl.size() == 6);
+        REQUIRE((*avl.begin()).first == 0);
+
+        avl.clear();
+
+        REQUIRE(avl.size() == 0);
+    }
 }

@@ -4,15 +4,13 @@
 
 namespace nxt::core {
 
-template<typename Key,
+template<typename Traits,
          typename Value,
          std::size_t BlockSize,
          typename Compare = std::less<>,
          typename Allocator = std::allocator<std::pair<const Key, Value>>>
 class BTree {
 public:
-    
-
     using key_type = Key;
     using mapped_type = Value;
     using value_type = std::pair<const key_type, value_type>;
@@ -20,6 +18,7 @@ public:
     using const_reference = const value_type&;
     using allocator_type = typename std::allocator_traits<Allocator>::template rebind_alloc<value_type>;
     using allocator_traits = std::allocator_traits<allocator_type>;
+    using compare_type = Compare;
 
 private:
     struct InternalNode;

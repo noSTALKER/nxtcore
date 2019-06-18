@@ -218,9 +218,9 @@ private:
             return {iterator(this, node), true};
         }
 
-        if (compare_(arg, tree_traits::key(node->value))) {
+        if (compare_(tree_traits::key(arg), tree_traits::key(node->value))) {
             return insert(node->left_child, node, true, std::forward<Arg>(arg));
-        } else if (compare_(tree_traits::key(node->value), arg)) {
+        } else if (compare_(tree_traits::key(node->value), tree_traits::key(arg))) {
             return insert(node->right_child, node, false, std::forward<Arg>(arg));
         } else {
             return {iterator(this, head_node_), false};

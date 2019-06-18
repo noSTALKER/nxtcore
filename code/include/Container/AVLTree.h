@@ -221,11 +221,11 @@ private:
             return node;
         }
 
-        if (compare_(arg, tree_traits::key(node->value))) {
+        if (compare_(tree_traits::key(arg), tree_traits::key(node->value))) {
             auto result = insert(node->left_child, node, true, std::forward<Arg>(arg));
             balanceNode(node);
             return result;
-        } else if (compare_(tree_traits::key(node->value), arg)) {
+        } else if (compare_(tree_traits::key(node->value), tree_traits::key(arg))) {
             auto result = insert(node->right_child, node, false, std::forward<Arg>(arg));
             balanceNode(node);
             return result;

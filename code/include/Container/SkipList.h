@@ -112,6 +112,7 @@ public:
     using compare_type = typename Traits::compare_type;
     using iterator = SkipListIterator<SkipList>;
     using const_iterator = SkipListConstIterator<SkipList>;
+    using traits = Traits;
 
 private:
     struct SkipNode;
@@ -233,12 +234,12 @@ public:
         return {iterator(this, result), result != nullptr};
     }
 
-    size_type erase(const value_type& value) {
+    size_type erase(const key_type& value) {
         return eraseNode(value);
     }
 
     size_type erase(const_iterator position) {
-        return erase(*position);
+        return erase(traits::key(*position));
     }
 
     void clear() {
@@ -276,9 +277,9 @@ private:
         auto current_node = head_node_;
         for (difference_type i = head_node_->links.size() - 1; i >= 0; --i) {
             while (current_node->links[i] != nullptr) {
-                if (comp_(current_node->links[i]->value, value)) {
+                if (comp_(traits::key(current_node->links[i]->value), traits::key(value))) {
                     current_node = current_node->links[i];
-                } else if (comp_(value, current_node->links[i]->value)) {
+                } else if (comp_(traits::key(value), traits::key(current_node->links[i]->value))) {
                     break;
                 } else {
                     // found a duplicate
@@ -315,9 +316,9 @@ private:
         auto current_node = head_node_;
         for (difference_type i = height - 1; i >= 0; --i) {
             while (current_node->links[i] != nullptr) {
-                if (comp_(value, current_node->links[i]->value)) {
+                if (comp_(traits::key(value), traits::key(current_node->links[i]->value))) {
                     break;
-                } else if (comp_(current_node->links[i]->value, value)) {
+                } else if (comp_(traits::key(current_node->links[i]->value), traits::key(value))) {
                     current_node = current_node->links[i];
                 } else {
                     return current_node->links[i];
@@ -327,15 +328,15 @@ private:
         return nullptr;
     }
 
-    size_t eraseNode(const value_type& value) {
+    size_t eraseNode(const key_type& value) {
         node_pointer node = nullptr;
         Vector<node_pointer> update_links(head_node_->links.size(), nullptr);
         auto current_node = head_node_;
         for (difference_type i = head_node_->links.size() - 1; i >= 0; --i) {
             while (current_node->links[i] != nullptr) {
-                if (comp_(current_node->links[i]->value, value)) {
+                if (comp_(traits::key(current_node->links[i]->value), value)) {
                     current_node = current_node->links[i];
-                } else if (comp_(value, current_node->links[i]->value)) {
+                } else if (comp_(value, traits::key(current_node->links[i]->value))) {
                     break;
                 } else {
                     // found a duplicate

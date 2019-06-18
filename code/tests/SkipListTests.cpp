@@ -65,4 +65,33 @@ TEST_CASE("SkipList Tests", "[skip_list]") {
         REQUIRE(skip_list.size() == 0);
     }
 
+    SECTION("map check") {
+        int values[] = {5, 8, 0, 1, 12, -5, 6};
+        int sorted_values[] = {-5, 0, 1, 5, 6, 8, 12};
+
+        nxt::core::SkipList<nxt::core::MappedTraits<int, int>> skip_list;
+
+        for (auto value : values) {
+            skip_list.insert({value, 2 * value});
+        }
+
+        REQUIRE(skip_list.size() == 7);
+
+        std::size_t i = 0;
+        for (const auto& value : skip_list) {
+            REQUIRE(value.first == sorted_values[i]);
+            REQUIRE(value.second == 2 * sorted_values[i]);
+            ++i;
+        }
+
+        REQUIRE(skip_list.erase(-5) == 1);
+        REQUIRE(skip_list.erase(-10) == 0);
+        REQUIRE(skip_list.size() == 6);
+        REQUIRE((*skip_list.begin()).first == 0);
+
+        skip_list.clear();
+
+        REQUIRE(skip_list.size() == 0);
+    }
+
 }
