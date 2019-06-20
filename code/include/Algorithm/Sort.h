@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include "../TypeTraits.h"
+#include "Search.h"
 
 namespace nxt::core {
 
@@ -848,6 +849,67 @@ template<typename BiDirectionalIter, typename = std::enable_if_t<IsBidirectional
 constexpr bool
 previousPermutation(BiDirectionalIter first, BiDirectionalIter last) {
     return previousPermutation(first, last, std::less<>());
+}
+
+template<typename ForwardIter1,
+         typename ForwardIter2,
+         typename Compare,
+         typename = std::enable_if_t<IsForwardIteratorV<ForwardIter1> && IsForwardIteratorV<ForwardIter2>>>
+constexpr bool
+isPermutation(ForwardIter1 first1, ForwardIter1 last1, ForwardIter2 first2, ForwardIter2 last2, Compare compare) {
+    if constexpr (IsRandomAccessIteratorV<ForwardIter1> && IsBidirectionalIteratorV<ForwardIter2>) {
+        if (last1 - first1 != last2 - first2) {
+            return false;
+        }
+    }
+
+    // remove the matching suffixes
+    while (first1 != last1 || first2 != last2) {
+        // if found a
+        if (!compare(*first1, *first2)) {
+            if constexpr (IsBidirectionalIteratorV<ForwardIter1> && IsBidirectionalIteratorV<ForwardIter2>) {
+                while (compare(*--last1, *--last2)) {
+                }
+                ++last1;
+                ++last2;
+            }
+
+            auto iter1 = first1;
+            while (iter1 != last1) {
+                // see if we already encountered such element
+                if (core::find(first1, iter1, *iter1) == iter1) {
+                    // if not count the elements in the second sequence
+                    auto count2 = core::count(first2, last2, *iter1);
+
+                    // if count is zero for second sequence then return false
+                    if (count2 == 0) {
+                        return false;
+                    }
+
+                    // count the number of elements in first sequence and compare it
+                    // with number of elemnts in second sequence
+                    auto count1 = core::count(iter1, last1, *iter1);
+                    if (count1 != count2)
+                        return false;
+
+                }
+                ++iter1;
+            }
+            return true;
+        }
+        ++first1;
+        ++first2;
+    }
+
+    return first1 == last1 && first2 == last2;
+}
+
+template<typename ForwardIter1,
+         typename ForwardIter2,
+         typename = std::enable_if_t<IsForwardIteratorV<ForwardIter1> && IsForwardIteratorV<ForwardIter2>>>
+constexpr bool
+isPermutation(ForwardIter1 first1, ForwardIter1 last1, ForwardIter2 first2, ForwardIter2 last2) {
+    return isPermutation(first1, last1, first2, last2, std::equal_to<>());
 }
 
 }  // namespace nxt::core
