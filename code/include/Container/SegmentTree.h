@@ -79,11 +79,11 @@ public:
         }
     }
 
-    value_type query(size_type low, size_type high) {
+    value_type query(size_type low, size_type high) const {
         return queryValue(0, 0, input_size_ - 1, low, high);
     }
 
-    ~SegmentTree() {       
+    ~SegmentTree() {
         if (input_size_ > 0) {
             auto size = this->size();
             for (size_type i = 0; i < size; ++i) {
@@ -138,7 +138,7 @@ private:
                           size_type low,
                           size_type high,
                           size_type range_low,
-                          size_type range_high) {
+                          size_type range_high) const {
         if (low == range_low && high == range_high) {
             // if query range is equal to interval, return the value
             return data_[tree_index];

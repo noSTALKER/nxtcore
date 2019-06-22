@@ -18,7 +18,7 @@ public:
         : list_(list)
         , node_(node) {}
 
-    SkipListConstIterator& operator++() {
+    SkipListConstIterator& operator++() noexcept {
         node_ = node_->links[0];
         return *this;
     }
@@ -29,19 +29,19 @@ public:
         return result;
     }
 
-    [[nodiscard]] reference operator*() const {
+    [[nodiscard]] reference operator*() const noexcept {
         return node->value;
     }
 
-    [[nodiscard]] pointer operator->() const {
+    [[nodiscard]] pointer operator->() const noexcept {
         return std::pointer_traits<pointer>::pointer_to(node->value);
     }
 
-    [[nodiscard]] bool operator==(const SkipListConstIterator& rhs) {
+    [[nodiscard]] bool operator==(const SkipListConstIterator& rhs) const noexcept {
         return node_ == rhs.node_ && list_ == rhs.list_;
     }
 
-    [[nodiscard]] bool operator!=(const SkipListConstIterator& rhs) {
+    [[nodiscard]] bool operator!=(const SkipListConstIterator& rhs) const noexcept {
         return node_ != rhs.node_ || list_ != rhs.list_;
     }
 
@@ -64,22 +64,22 @@ public:
     SkipListIterator(SkipList* list, node_pointer node)
         : base_class(list, node) {}
 
-    SkipListIterator& operator++() {
+    SkipListIterator& operator++() noexcept {
         node_ = node_->links[0];
         return *this;
     }
 
-    [[nodiscard]] SkipListIterator operator++(int) {
+    [[nodiscard]] SkipListIterator operator++(int) noexcept {
         SkipListIterator result(list, node);
         node_ = node->links[0];
         return result;
     }
 
-    [[nodiscard]] reference operator*() const {
+    [[nodiscard]] reference operator*() const noexcept {
         return node_->value;
     }
 
-    [[nodiscard]] pointer operator->() const {
+    [[nodiscard]] pointer operator->() const noexcept {
         return std::pointer_traits<pointer>::pointer_to(node_->value);
     }
 
@@ -90,7 +90,7 @@ protected:
 
 class RandomGenerator {
 public:
-    std::size_t operator()(std::size_t max_value) {
+    std::size_t operator()(std::size_t max_value) const noexcept {
         return max_value;
     }
 };
@@ -137,7 +137,7 @@ public:
         createHeadNode();
     }
 
-    SkipList(SkipList&& rhs)
+    SkipList(SkipList&& rhs) noexcept
         : size_(0)
         , comp_(rhs.comp_)
         , random_(rhs.random_)
@@ -242,7 +242,7 @@ public:
         return erase(traits::key(*position));
     }
 
-    void clear() {
+    void clear() noexcept {
         if (size_ > 0) {
             auto current_node = head_node_->links[0];
             while (current_node != nullptr) {
@@ -311,7 +311,7 @@ private:
     }
 
     template<typename Key>
-    node_pointer findNode(const Key& value) {
+    node_pointer findNode(const Key& value) const {
         auto height = head_node_->links.size();
         auto current_node = head_node_;
         for (difference_type i = height - 1; i >= 0; --i) {

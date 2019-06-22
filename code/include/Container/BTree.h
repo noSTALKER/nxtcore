@@ -1,10 +1,11 @@
 #pragma once
 
-#include <allocators>
+#include <memory>
+#include "Buffer.h"
 
 namespace nxt::core {
 
-template<typename Traits,
+template<typename Key,
          typename Value,
          std::size_t BlockSize,
          typename Compare = std::less<>,
@@ -24,8 +25,9 @@ private:
     struct InternalNode;
     struct LeafNode;
 
-
-    //using internal_node_allocator = 
+    struct InternalNode {
+        Buffer<key_type>
+    };
 
     internal_node_allocator internal_node_alloc_;
     leaf_node_allocator leaf_node_alloc_;
