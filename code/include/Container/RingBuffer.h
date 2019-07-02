@@ -184,19 +184,22 @@ public:
     }
 
 private:
-    size_type mask(size_type value) const noexcept {
+    [[nodiscard]] size_type mask(size_type value) const noexcept {
+        // since the capacity in our case is always power of 2, 
+        // we can express the expression (value % capacity_) as
+        // value & (capacity_ - 1)
         return value & (capacity_ - 1);
     }
 
-    size_type mask(size_type value, size_type capacity) const noexcept {
+    [[nodiscard]] size_type mask(size_type value, size_type capacity) const noexcept {
         return value & (capacity - 1);
     }
 
-    size_type getNext(size_type index) const noexcept {
+    [[nodiscard]] size_type getNext(size_type index) const noexcept {
         return mask(index + 1);
     }
 
-    size_type getLast(size_type index) const noexcept {
+    [[nodiscard]] size_type getLast(size_type index) const noexcept {
         return mask(index - 1);
     }
 
