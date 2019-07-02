@@ -1,7 +1,7 @@
 #pragma once
 
 #include <iterator>
-#include "TypeTraits.h"
+#include "../TypeTraits.h"
 
 namespace nxt::core {
 
@@ -69,10 +69,10 @@ template<typename ForwardIter,
          typename = std::enable_if_t<IsForwardIteratorV<ForwardIter>>>
 [[nodiscard]] constexpr bool
 binarySearch(ForwardIter first, ForwardIter last, const T& value, Compare comp) {
-	// get the lower bound which is the first element not less than value
+    // get the lower bound which is the first element not less than value
     auto result = lowerBound(first, last, value, comp);
 
-	//check if the lower bound is not pointing to last value and 
+    // check if the lower bound is not pointing to last value and
     return result != last && (!comp(value, *result));
 }
 
@@ -84,7 +84,7 @@ binarySearch(ForwardIter first, ForwardIter last, const T& value) {
 
 template<typename InputIter, typename T, typename = std::enable_if_t<IsInputIteratorV<InputIter>>>
 [[nodiscard]] constexpr InputIter
-find(InputIter first, InputIter last, const T & value) {
+find(InputIter first, InputIter last, const T& value) {
     while (first != last) {
         if (*first == value)
             break;
@@ -104,7 +104,5 @@ count(InputIter first, InputIter last, const T& value) {
     }
     return count;
 }
-
-
 
 }  // namespace nxt::core

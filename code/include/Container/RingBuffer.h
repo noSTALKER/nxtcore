@@ -142,19 +142,19 @@ public:
         return true;
     }
 
-    [[nodiscard]] reference front() {
+    [[nodiscard]] reference front() noexcept {
         return data_[front_];
     }
 
-    [[nodiscard]] const_reference front() const {
+    [[nodiscard]] const_reference front() const noexcept {
         return data_[front_];
     }
 
-    [[nodiscard]] reference back() {
+    [[nodiscard]] reference back() noexcept {
         return data_[getLast(back_)];
     }
 
-    [[nodiscard]] const_reference back() const {
+    [[nodiscard]] const_reference back() const noexcept {
         return data_[getLast(back_)];
     }
 

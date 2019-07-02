@@ -7,7 +7,7 @@
 
 namespace nxt::core {
 /**
- * @brief A command which 
+ * @brief A command which
  *
  */
 class GroupCommand : public Command {
@@ -41,4 +41,4 @@ private:
     Vector<std::unique_ptr<Command>> child_commands_;
     bool has_executed_once_;
 };
-}  // namespace core
+}  // namespace nxt::core

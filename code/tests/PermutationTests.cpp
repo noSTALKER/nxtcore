@@ -97,4 +97,10 @@ TEST_CASE("Permutation Tests", "[sort]") {
         REQUIRE_FALSE(nxt::core::nextPermutation(values.begin(), values.end()));
 
     }
+
+    SECTION("Is Permutation Tests") {
+        std::string value1("abcde"), value2("adbce");
+
+        REQUIRE(nxt::core::isPermutation(value1.begin(), value1.end(), value2.begin(), value2.end()));
+    }
 }

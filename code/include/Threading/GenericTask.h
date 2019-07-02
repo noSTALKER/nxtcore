@@ -68,7 +68,6 @@ makeGenericTask(Func&& func, Args&& ... args) {
     using tuple_type = std::tuple<std::decay_t<Func>, std::decay_t<Args>...>;
     using func_type = std::decay_t<Func>;
     using result_type = std::invoke_result_t<Func, Args...>;
-    using generic_task_type = GenericTask<tuple_type, result_type, func_type, Args...>;
 
     auto tuple = std::make_unique<tuple_type>(std::forward<Func>(func), std::forward<Args>(args)...);
     return std::make_shared<GenericTask<tuple_type, result_type, Func, Args...>>(std::move(tuple));

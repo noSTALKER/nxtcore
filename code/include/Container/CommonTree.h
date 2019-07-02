@@ -1,5 +1,7 @@
 #pragma once
 
+#include <utility>
+
 namespace nxt::core {
 template<typename Tree>
 class TreeConstIterator {
@@ -159,9 +161,8 @@ struct SimpleTraits {
     }
 };
 
-template<typename Key, typename MappedType, typename Compare = std::less<>, typename Allocator = std::allocator<std::pair<const Key, Value>>>
+template<typename Key, typename MappedType, typename Compare = std::less<>, typename Allocator = std::allocator<std::pair<const Key, MappedType>>>
 struct MappedTraits {
-    
     using key_type = Key;
     using mapped_type = MappedType;
     using value_type = std::pair<const key_type, mapped_type>;
