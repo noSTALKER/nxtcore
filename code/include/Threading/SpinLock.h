@@ -1,6 +1,7 @@
 #pragma once
 
 #include <atomic>
+#include <immintrin.h>
 
 namespace nxt::core {
 
@@ -8,6 +9,7 @@ class SpinLock {
 public:
     void lock() noexcept {
         while (flag_.test_and_set(std::memory_order_acquire)) {
+            _mm_pause();
         }
     }
 
@@ -15,7 +17,7 @@ public:
         flag_.clear(std::memory_order_release);
     }
 
-    void try_lock() noexcept {
+    [[nodiscard]] bool try_lock() noexcept {
         return !flag_.test_and_set(std::memory_order_acquire);
     }
 
