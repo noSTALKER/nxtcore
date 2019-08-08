@@ -1,6 +1,7 @@
 #pragma once
 
 #include <algorithm>
+#include <tuple>
 #include "../TypeTraits.h"
 #include "Search.h"
 
@@ -891,7 +892,6 @@ isPermutation(ForwardIter1 first1, ForwardIter1 last1, ForwardIter2 first2, Forw
                     auto count1 = core::count(iter1, last1, *iter1);
                     if (count1 != count2)
                         return false;
-
                 }
                 ++iter1;
             }
@@ -910,6 +910,56 @@ template<typename ForwardIter1,
 constexpr bool
 isPermutation(ForwardIter1 first1, ForwardIter1 last1, ForwardIter2 first2, ForwardIter2 last2) {
     return isPermutation(first1, last1, first2, last2, std::equal_to<>());
+}
+
+template<typename Container,
+         typename Iterator = decltype(std::begin(std::declval<Container>())),
+         typename = decltype(std::end(std::declval<Container>()))>
+[[nodiscard]] constexpr auto
+enumerate(Container&& container) {
+    struct IteratorImpl {
+        using size_type = typename std::iterator_traits<Iterator>::size_type;
+		using iterator_category = std::forward_iterator_tag;
+
+        IteratorImpl& operator++() {
+            ++iterator;
+            ++index;
+            return *this;
+        }
+
+        [[nodiscard]] bool operator==(const IteratorImpl& rhs) const {
+            return iterator == rhs.iterator;
+        }
+
+        [[nodiscard]] bool operator!=(const IteratorImpl& rhs) const {
+            return iterator != rhs.iterator;
+        }
+
+        [[nodiscard]] auto operator*() const {
+            return std::tie(index, *iterator);
+        }
+
+        [[nodiscard]] auto operator*() {
+            return std::tie(index, *iterator);
+        }
+
+        Iterator iterator;
+        size_type index;
+    };
+
+    struct ContainerWrapper {
+        [[nodiscard]] auto begin() const {
+            return IteratorImpl{0, std::begin(container)};
+        }
+
+        [[nodiscard]] auto end() const {
+            return IteratorImpl{std::size, std::end(container)};
+        }
+
+        Container container;
+    };
+
+    return ContainerWrapper{std::forward<Container>(container)};
 }
 
 }  // namespace nxt::core
